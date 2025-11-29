@@ -1,16 +1,16 @@
 
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
-import { menuItems } from "@/lib/data";
 import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Package, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { MenuItem } from '@/lib/data';
 
 function StatCard({ title, value, icon: Icon, description, color }: { title: string, value: string, icon: React.ElementType, description: string, color: string }) {
   return (
@@ -52,23 +52,61 @@ function TabHeader({ icon: Icon, title, description, buttonText }: { icon: React
 export default function MenuPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [stats, setStats] = useState({
+    totalMenu: 0,
+    totalCoffee: 0,
+    totalFoodAndSnack: 0,
+    totalStock: 0,
+  });
 
   useEffect(() => {
     if (!loading && user?.role !== 'admin') {
       router.push('/');
     }
   }, [user, loading, router]);
+  
+  const fetchMenuData = useCallback(async () => {
+    try {
+      const menuRes = await fetch('https://api.sejadikopi.com/api/menu?select=id,kategori_id,stok');
+      const menuData = await menuRes.json();
+      
+      const fullMenuRes = await fetch('https://api.sejadikopi.com/api/menu');
+      const fullMenuData = await fullMenuRes.json();
+      setMenuItems(fullMenuData.data || []);
+      
+      if (menuData.data) {
+        const foodAndSnackCategoryIds = [3, 4, 5, 6, 7];
+        const coffeeCategoryId = 1;
+
+        const totalMenu = menuData.data.length;
+        const totalStock = menuData.data.reduce((acc: number, item: { stok: number }) => acc + (item.stok || 0), 0);
+        const totalCoffee = menuData.data.filter((item: { kategori_id: number }) => item.kategori_id === coffeeCategoryId).length;
+        const totalFoodAndSnack = menuData.data.filter((item: { kategori_id: number }) => foodAndSnackCategoryIds.includes(item.kategori_id)).length;
+        
+        setStats({
+          totalMenu,
+          totalCoffee,
+          totalFoodAndSnack,
+          totalStock,
+        });
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch menu data", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      fetchMenuData();
+    }
+  }, [user, fetchMenuData]);
 
 
   if (loading || user?.role !== 'admin') {
     return <div className="flex items-center justify-center h-screen">Access Denied</div>;
   }
-
-  const totalMenu = menuItems.length;
-  const totalCoffee = menuItems.filter(item => item.category === 'Coffee').length;
-  const totalFoodAndSnack = menuItems.filter(item => item.category === 'Pastry' || item.category === 'Tea').length;
-  // Assuming total stock is the sum of all available items for now
-  const totalStock = menuItems.filter(item => item.isAvailable).length;
 
   return (
     <div className="space-y-8">
@@ -78,10 +116,10 @@ export default function MenuPage() {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Menu" value={totalMenu.toString()} icon={BookOpen} description="All items on your menu." color="bg-blue-500 text-white" />
-        <StatCard title="Coffee" value={totalCoffee.toString()} icon={Coffee} description="Number of coffee varieties." color="bg-amber-600 text-white" />
-        <StatCard title="Food & Snack" value={totalFoodAndSnack.toString()} icon={Utensils} description="Pastries and other snacks." color="bg-green-500 text-white" />
-        <StatCard title="Total Stock" value={totalStock.toString()} icon={Archive} description="Items currently available." color="bg-slate-700 text-white" />
+        <StatCard title="Total Menu" value={stats.totalMenu.toString()} icon={BookOpen} description="All items on your menu." color="bg-blue-500 text-white" />
+        <StatCard title="Coffee" value={stats.totalCoffee.toString()} icon={Coffee} description="Number of coffee varieties." color="bg-amber-600 text-white" />
+        <StatCard title="Food & Snack" value={stats.totalFoodAndSnack.toString()} icon={Utensils} description="Pastries and other snacks." color="bg-green-500 text-white" />
+        <StatCard title="Total Stock" value={stats.totalStock.toString()} icon={Archive} description="Items currently available." color="bg-slate-700 text-white" />
       </div>
       
       <Tabs defaultValue="menu">
