@@ -19,6 +19,7 @@ export type Order = {
   items: OrderItem[];
   status: 'Pending' | 'Processing' | 'Completed' | 'Cancelled';
   total: number;
+  paymentMethod: 'Cash' | 'Credit Card' | 'GoPay';
   createdAt: Date;
 };
 
@@ -42,6 +43,7 @@ export const orders: Order[] = [
     items: [{ menuItemId: 'MENU002', quantity: 2 }],
     status: 'Completed',
     total: 7.0,
+    paymentMethod: 'Credit Card',
     createdAt: new Date('2023-10-26T10:00:00Z'),
   },
   {
@@ -51,6 +53,7 @@ export const orders: Order[] = [
     items: [{ menuItemId: 'MENU001', quantity: 1 }, { menuItemId: 'MENU006', quantity: 1 }],
     status: 'Processing',
     total: 5.25,
+    paymentMethod: 'Cash',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
   },
   {
@@ -60,6 +63,7 @@ export const orders: Order[] = [
     items: [{ menuItemId: 'MENU005', quantity: 1 }],
     status: 'Pending',
     total: 2.0,
+    paymentMethod: 'GoPay',
     createdAt: new Date(),
   },
   {
@@ -70,6 +74,7 @@ export const orders: Order[] = [
     items: [{ menuItemId: 'MENU004', quantity: 1 }],
     status: 'Completed',
     total: 3.0,
+    paymentMethod: 'Cash',
     createdAt: new Date(),
   },
     {
@@ -79,6 +84,7 @@ export const orders: Order[] = [
     items: [{ menuItemId: 'MENU002', quantity: 1 }, { menuItemId: 'MENU007', quantity: 2 }],
     status: 'Cancelled',
     total: 8.0,
+    paymentMethod: 'Credit Card',
     createdAt: new Date('2023-10-25T09:00:00Z'),
   },
 ];
