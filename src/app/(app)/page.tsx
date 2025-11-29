@@ -172,7 +172,7 @@ export default function DashboardPage() {
                 <div className="p-4 bg-gray-100 rounded-full mb-4">
                     <ClipboardList className="w-12 h-12 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-bold">Tidak Ada Pesanan {type === 'dine-in' ? 'Dine-in' : 'Take Away'}</h3>
+                <h3 className="text-xl font-bold">Tidak Ada Pesanan {type === 'dine-in' ? 'Dine-in' : 'Take Awayasdasd'}</h3>
                 <p className="text-muted-foreground">
                     Saat ini tidak ada pesanan {type === 'dine-in' ? 'dine-in' : 'takeaway'} yang aktif
                 </p>
