@@ -23,6 +23,7 @@ import {
   MapPin,
   ArrowRight,
   MessageSquare,
+  Pencil,
 } from 'lucide-react';
 
 const statusConfig: {
@@ -162,8 +163,8 @@ export function OrderDetailModal({
                      <p className="text-sm text-muted-foreground">{totalItems} item</p>
                 </div>
                 <div className="w-full grid grid-cols-2 gap-2">
-                    <Button variant="secondary" onClick={() => onOpenChange(false)} className="bg-slate-600 text-white hover:bg-slate-700">
-                        <X className="mr-2 h-4 w-4" /> Tutup
+                    <Button variant="secondary" className="bg-yellow-500 text-white hover:bg-yellow-600">
+                        <Pencil className="mr-2 h-4 w-4" /> Edit Item
                     </Button>
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                         Proses <ArrowRight className="ml-2 h-4 w-4" />
