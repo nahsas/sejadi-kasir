@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Coffee, LayoutDashboard, ClipboardList, History, BarChart3, BookOpen, User, Store, LogOut } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 import {
   Sidebar,
@@ -30,6 +31,7 @@ const navItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <Sidebar>
@@ -72,7 +74,7 @@ export function SidebarNav() {
                 <Button variant="ghost" size="icon" className="h-9 w-9 bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700">
                     <Store className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-9 w-9 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
+                <Button onClick={logout} variant="ghost" size="icon" className="h-9 w-9 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
                     <LogOut className="h-5 w-5" />
                 </Button>
             </div>

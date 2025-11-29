@@ -1,11 +1,29 @@
+'use client';
+
+import { useAuth } from '@/context/auth-context';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+     return <div className="flex items-center justify-center h-screen">Loading...</div>; // Or a proper loading spinner
+  }
+  
   return (
     <SidebarProvider>
       <SidebarNav />
