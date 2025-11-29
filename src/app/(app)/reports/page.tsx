@@ -157,7 +157,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-headline font-bold tracking-tight">Reports</h1>
+        <h1 className="text-3xl font-headline font-bold tracking-tight">Pembukuan</h1>
         <p className="text-muted-foreground">Analyze your sales and performance.</p>
       </div>
 

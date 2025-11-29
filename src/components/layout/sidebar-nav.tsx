@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Coffee, LayoutDashboard, ClipboardList, History, BarChart3, BookOpen, User, Store, LogOut, DoorClosed } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, History, BarChart3, BookOpen, LogOut, DoorClosed, Store } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import React, { useState, useEffect } from "react";
 
@@ -16,6 +16,8 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -31,14 +33,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 
-const navItems = [
+const mainNavItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard, roles: ['admin', 'kasir'] },
-  { href: "/orders", label: "Orders", icon: ClipboardList, roles: ['admin', 'kasir'] },
-  { href: "/menu", label: "Menu", icon: BookOpen, roles: ['admin'] },
+  { href: "/orders", label: "Order", icon: ShoppingCart, roles: ['admin', 'kasir'] },
   { href: "/history", label: "History", icon: History, roles: ['admin', 'kasir'] },
-  { href: "/reports", label: "Reports", icon: BarChart3, roles: ['admin', 'kasir'] },
+];
+
+const managementNavItems = [
+    { href: "/reports", label: "Pembukuan", icon: BarChart3, roles: ['admin', 'kasir'] },
+    { href: "/menu", label: "Menu Manager", icon: BookOpen, roles: ['admin'] },
 ];
 
 function ShopStatusModal({ isOpen, onOpenChange, shopStatus, onConfirm, loading }: { isOpen: boolean, onOpenChange: (open: boolean) => void, shopStatus: boolean | null, onConfirm: () => void, loading: boolean }) {
@@ -83,14 +89,13 @@ export function SidebarNav() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-
   const userRole = user?.role || '';
   const userName = user?.email.split('@')[0];
-  const displayName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : '';
-  const roleDisplay = user?.role === 'admin' ? '(admin on duty)' : '(cashier on duty)';
+  const displayName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : 'Admin';
+  const roleDisplay = user?.role === 'admin' ? 'Administrator' : 'Cashier';
 
-
-  const availableNavItems = navItems.filter(item => item.roles.includes(userRole));
+  const availableMainNavItems = mainNavItems.filter(item => item.roles.includes(userRole));
+  const availableManagementNavItems = managementNavItems.filter(item => item.roles.includes(userRole));
 
   const fetchShopStatus = async () => {
     try {
@@ -112,7 +117,6 @@ export function SidebarNav() {
   }, []);
 
   const handleStoreButtonClick = () => {
-    // Re-fetch status when opening modal to ensure it's fresh
     fetchShopStatus(); 
     setIsModalOpen(true);
   };
@@ -148,71 +152,98 @@ export function SidebarNav() {
     }
   };
 
+  const NavItem = ({ item }: { item: typeof mainNavItems[0] }) => (
+    <SidebarMenuItem key={item.label}>
+      <Link href={item.href}>
+        <SidebarMenuButton
+          isActive={pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))}
+          className="group flex items-center gap-4 rounded-lg px-4 py-3"
+        >
+          <div className={cn(
+              "p-2 rounded-lg bg-gray-100 group-data-[active=true]:bg-white"
+          )}>
+            <item.icon className={cn("h-6 w-6 text-gray-700 group-data-[active=true]:text-primary")} />
+          </div>
+          <span className="text-base font-medium group-data-[active=true]:text-white">
+            {item.label}
+          </span>
+        </SidebarMenuButton>
+      </Link>
+    </SidebarMenuItem>
+  );
 
   return (
     <>
-        <Sidebar>
-        <SidebarHeader>
-            <div className="flex items-center gap-2">
-            <Coffee className="w-8 h-8 text-primary" />
-            <h1 className="text-xl font-headline font-bold">SejadiKopi</h1>
+      <Sidebar>
+        <SidebarHeader className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-yellow-100 p-2">
+                <span className="text-center text-xs font-bold text-primary">SEJADI KOPI</span>
             </div>
+            <div>
+              <h1 className="text-lg font-headline font-bold">SEJADI KOPI</h1>
+              <p className="text-sm text-muted-foreground">Admin Panel</p>
+            </div>
+          </div>
         </SidebarHeader>
-        <SidebarContent>
-            <SidebarMenu>
-            {availableNavItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                <Link href={item.href}>
-                    <SidebarMenuButton
-                    isActive={pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))}
-                    tooltip={item.label}
-                    >
-                        <item.icon />
-                        <span>{item.label}</span>
-                    </SidebarMenuButton>
-                </Link>
-                </SidebarMenuItem>
-            ))}
-            </SidebarMenu>
+        <SidebarContent className="p-4">
+            <SidebarGroup>
+                <SidebarGroupLabel className="px-0">MENU UTAMA</SidebarGroupLabel>
+                <SidebarMenu>
+                    {availableMainNavItems.map((item) => <NavItem key={item.href} item={item} />)}
+                </SidebarMenu>
+            </SidebarGroup>
+            {availableManagementNavItems.length > 0 && (
+                <SidebarGroup>
+                    <SidebarGroupLabel className="px-0">MANAJEMEN</SidebarGroupLabel>
+                    <SidebarMenu>
+                         {availableManagementNavItems.map((item) => <NavItem key={item.href} item={item} />)}
+                    </SidebarMenu>
+                </SidebarGroup>
+            )}
         </SidebarContent>
-        <SidebarFooter>
-            <Separator className="my-2" />
-            <div className="p-2 flex items-center gap-3">
-                <div className="flex-1">
-                    <p className="font-bold text-sm">{displayName}</p>
-                    <p className="text-xs text-muted-foreground">{roleDisplay}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button 
-                        onClick={handleStoreButtonClick} 
-                        variant="ghost" 
-                        size="icon" 
-                        className={cn(
-                            "h-9 w-9",
-                            isShopOpen === true && "bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700",
-                            isShopOpen === false && "bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700",
-                            isShopOpen === null && "bg-gray-100 text-gray-600"
-                        )}
-                    >
-                        {isShopOpen ? <Store className="h-5 w-5" /> : <DoorClosed className="h-5 w-5" />}
-                    </Button>
-                    <Button onClick={logout} variant="ghost" size="icon" className="h-9 w-9 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
-                        <LogOut className="h-5 w-5" />
-                    </Button>
-                </div>
+        <SidebarFooter className="p-4">
+          <Separator className="my-2" />
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 bg-yellow-100">
+                <AvatarFallback className="bg-yellow-100 text-primary font-bold">{displayName.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-bold text-sm">{displayName}</p>
+              <p className="text-xs text-muted-foreground">{roleDisplay}</p>
             </div>
-            <div className="md:hidden">
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleStoreButtonClick}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-10 w-10 rounded-lg",
+                  isShopOpen === true
+                    ? "bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700"
+                    : "bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700",
+                  isShopOpen === null && "bg-gray-100 text-gray-600"
+                )}
+              >
+                {isShopOpen ? <Store className="h-5 w-5" /> : <DoorClosed className="h-5 w-5" />}
+              </Button>
+              <Button onClick={logout} variant="ghost" size="icon" className="h-10 w-10 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+          <div className="md:hidden">
             <SidebarTrigger />
-            </div>
+          </div>
         </SidebarFooter>
-        </Sidebar>
-        <ShopStatusModal 
-            isOpen={isModalOpen}
-            onOpenChange={setIsModalOpen}
-            shopStatus={isShopOpen}
-            onConfirm={handleUpdateStatus}
-            loading={isLoading}
-        />
+      </Sidebar>
+      <ShopStatusModal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        shopStatus={isShopOpen}
+        onConfirm={handleUpdateStatus}
+        loading={isLoading}
+      />
     </>
   );
 }
