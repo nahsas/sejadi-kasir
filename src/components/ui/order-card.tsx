@@ -29,7 +29,7 @@ export function OrderCard({ order }: { order: Order }) {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-bold">
-              {order.location_type === 'DINE_IN' ? order.no_meja : order.no_meja}
+              {order.location_type === 'DINE_IN' ? `Meja ${order.no_meja}` : order.no_meja}
             </h3>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant={statusInfo.variant}>
