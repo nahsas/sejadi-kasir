@@ -122,7 +122,6 @@ export function OrderDetailModal({
                                         <Utensils className="w-4 h-4 text-amber-600" />
                                     </p>
                                     <div className="flex items-center gap-1 mt-1 flex-wrap">
-                                        {menuItem && <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800">{menuItem.kategori}</Badge>}
                                         {item.varian && <Badge variant="secondary" className="text-xs">{item.varian}</Badge>}
                                     </div>
                                 </div>
@@ -134,12 +133,10 @@ export function OrderDetailModal({
                                     </p>
                                 </div>
                             </div>
-                            {item.note && (
                                 <div className="mt-2 pt-2 border-t border-dashed text-sm text-muted-foreground flex items-start gap-2">
                                    <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
                                    <span>{item.note}</span>
                                 </div>
-                            )}
                              <div className="text-sm mt-2 pt-2 border-t border-dashed">
                                  <div className="flex justify-between">
                                      <span>Harga satuan:</span>
