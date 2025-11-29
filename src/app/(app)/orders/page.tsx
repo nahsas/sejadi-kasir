@@ -73,6 +73,9 @@ export default function OrdersPage() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { toast } = useToast();
 
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [filterStatus, setFilterStatus] = React.useState("all");
+
   const fetchData = React.useCallback(async () => {
     setLoading(true);
     try {
@@ -170,8 +173,44 @@ export default function OrdersPage() {
     }
   };
 
-  const allActiveOrders = [...dineInOrders, ...takeawayOrders];
+  const getMenuName = (menuId: number) => {
+    const menuItem = menuItems.find((item) => item.id === menuId);
+    return menuItem ? menuItem.nama : 'Unknown Item';
+  };
 
+  const filteredDineInOrders = dineInOrders
+    .filter(order => {
+        if (filterStatus !== 'all' && order.status.toLowerCase() !== filterStatus) {
+            return false;
+        }
+        if (searchTerm === "") {
+            return true;
+        }
+        const lowerCaseSearch = searchTerm.toLowerCase();
+        const hasMatchingItem = order.detail_pesanans.some(item =>
+            getMenuName(item.menu_id).toLowerCase().includes(lowerCaseSearch) ||
+            (item.note && item.note.toLowerCase().includes(lowerCaseSearch))
+        );
+        return order.no_meja.toLowerCase().includes(lowerCaseSearch) || hasMatchingItem;
+    });
+
+  const filteredTakeawayOrders = takeawayOrders
+    .filter(order => {
+        if (filterStatus !== 'all' && order.status.toLowerCase() !== filterStatus) {
+            return false;
+        }
+        if (searchTerm === "") {
+            return true;
+        }
+        const lowerCaseSearch = searchTerm.toLowerCase();
+        const hasMatchingItem = order.detail_pesanans.some(item =>
+            getMenuName(item.menu_id).toLowerCase().includes(lowerCaseSearch) ||
+            (item.note && item.note.toLowerCase().includes(lowerCaseSearch))
+        );
+        return order.no_meja.toLowerCase().includes(lowerCaseSearch) || hasMatchingItem;
+    });
+
+  const allActiveOrders = [...dineInOrders, ...takeawayOrders];
   const totalTransactions = allActiveOrders.reduce((sum, order) => sum + parseFloat(order.total), 0)
     .toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 });
 
@@ -184,7 +223,7 @@ export default function OrdersPage() {
     if (loading) {
       return <div className="text-center py-16">Loading...</div>;
     }
-
+    
     if (orders.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-center py-16">
@@ -248,9 +287,11 @@ export default function OrdersPage() {
           <Input
             placeholder="Cari nomor meja, catatan, atau nama menu..."
             className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Select defaultValue="all">
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-full sm:w-[200px]">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
@@ -260,7 +301,7 @@ export default function OrdersPage() {
           <SelectContent>
             <SelectItem value="all">Semua Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
+            <SelectItem value="diproses">Processing</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -292,11 +333,11 @@ export default function OrdersPage() {
             <TabsList className="grid grid-cols-2 rounded-lg bg-gray-200 p-1 h-auto">
               <TabsTrigger value="dine-in" className="rounded-md data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Dine-in
-                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{dineInOrders.length}</Badge>
+                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{filteredDineInOrders.length}</Badge>
               </TabsTrigger>
               <TabsTrigger value="take-away" className="rounded-md data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Take Away
-                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{takeawayOrders.length}</Badge>
+                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{filteredTakeawayOrders.length}</Badge>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -304,10 +345,10 @@ export default function OrdersPage() {
         <CardContent className="pt-0">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="dine-in">
-              {renderOrderList(dineInOrders, 'dine-in')}
+              {renderOrderList(filteredDineInOrders, 'dine-in')}
             </TabsContent>
             <TabsContent value="take-away">
-              {renderOrderList(takeawayOrders, 'take-away')}
+              {renderOrderList(filteredTakeawayOrders, 'take-away')}
             </TabsContent>
           </Tabs>
         </CardContent>
