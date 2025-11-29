@@ -276,6 +276,18 @@ export default function OrdersPage() {
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <h2 className="text-xl font-bold">Detail List Meja Terisi</h2>
         <div className="flex items-center gap-2">
+          <Badge variant="outline" className="h-9 text-sm font-medium hidden md:flex">
+            {allActiveOrders.length} pesanan aktif
+          </Badge>
+          <Button onClick={fetchData} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader className="flex items-center justify-center p-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
             <TabsList className="grid grid-cols-2 rounded-lg bg-gray-200 p-1 h-auto">
               <TabsTrigger value="dine-in" className="rounded-md data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
@@ -288,18 +300,8 @@ export default function OrdersPage() {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Badge variant="outline" className="h-9 text-sm font-medium hidden md:flex">
-            {allActiveOrders.length} pesanan aktif
-          </Badge>
-          <Button onClick={fetchData} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-        </div>
-      </div>
-
-      <Card>
-        <CardContent className="pt-6">
+        </CardHeader>
+        <CardContent className="pt-0">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="dine-in">
               {renderOrderList(dineInOrders, 'dine-in')}
