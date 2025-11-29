@@ -9,6 +9,7 @@ import { columns as menuColumns } from "./columns";
 import { columns as categoryColumns } from "./category-columns";
 import { columns as discountColumns } from "./discount-columns";
 import { columns as additionalColumns } from "./additional-columns";
+import { columns as stockColumns } from "./stock-columns";
 
 import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Package, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +21,7 @@ import { MenuForm } from './menu-form';
 import { CategoryForm } from './category-form';
 import { DiscountForm } from './discount-form';
 import { AdditionalForm } from './additional-form';
+import { StockForm } from './stock-form';
 
 function StatCard({ title, value, icon: Icon, description, color }: { title: string, value: string, icon: React.ElementType, description: string, color: string }) {
   return (
@@ -36,7 +38,7 @@ function StatCard({ title, value, icon: Icon, description, color }: { title: str
   );
 }
 
-function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick }: { icon: React.ElementType, title: string, description: string, buttonText: string, onButtonClick: () => void }) {
+function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick, buttonDisabled = false }: { icon: React.ElementType, title: string, description: string, buttonText: string, onButtonClick: () => void, buttonDisabled?: boolean }) {
   return (
     <Card className="mb-6 bg-card">
       <CardContent className="flex items-center justify-between p-4">
@@ -49,7 +51,7 @@ function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick }
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
-        <Button onClick={onButtonClick}>
+        <Button onClick={onButtonClick} disabled={buttonDisabled}>
           <PlusCircle className="mr-2 h-4 w-4" />
           {buttonText}
         </Button>
@@ -85,6 +87,9 @@ export default function MenuPage() {
 
   const [isAdditionalFormOpen, setIsAdditionalFormOpen] = useState(false);
   const [editingAdditional, setEditingAdditional] = useState<Additional | null>(null);
+  
+  const [isStockFormOpen, setIsStockFormOpen] = useState(false);
+  const [editingStockItem, setEditingStockItem] = useState<MenuItem | null>(null);
 
 
   const fetchData = useCallback(async () => {
@@ -169,6 +174,11 @@ export default function MenuPage() {
     setIsAdditionalFormOpen(true);
   };
 
+  const handleStockFormOpen = (menuItem: MenuItem | null = null) => {
+    setEditingStockItem(menuItem);
+    setIsStockFormOpen(true);
+  };
+
   return (
     <div className="space-y-8">
       {isMenuFormOpen && (
@@ -204,6 +214,15 @@ export default function MenuPage() {
           additional={editingAdditional}
         />
       )}
+      {isStockFormOpen && (
+        <StockForm
+          isOpen={isStockFormOpen}
+          onClose={() => setIsStockFormOpen(false)}
+          onSuccess={fetchData}
+          menuItem={editingStockItem}
+        />
+      )}
+
 
       <div>
         <h1 className="text-3xl font-headline font-bold tracking-tight">Menu Management</h1>
@@ -234,12 +253,11 @@ export default function MenuPage() {
             />
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
-           <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Tambah Stok" onButtonClick={() => {}} />
-          <Card>
-            <CardContent className="pt-6">
-              <p>Stock management is not available through the API. Please update stock via the menu item edit form.</p>
-            </CardContent>
-          </Card>
+           <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Update All Stock" onButtonClick={() => {}} buttonDisabled={true} />
+           <DataTable 
+              columns={stockColumns({ onEdit: handleStockFormOpen })} 
+              data={menuItems} 
+            />
         </TabsContent>
         <TabsContent value="discount" className="mt-6">
           <TabHeader icon={Percent} title="Kelola Diskon" description="Buat dan kelola promosi untuk item menu" buttonText="Buat Diskon Baru" onButtonClick={() => handleDiscountFormOpen()} />
@@ -263,7 +281,7 @@ export default function MenuPage() {
           />
         </TabsContent>
         <TabsContent value="bestseller" className="mt-6">
-          <TabHeader icon={Star} title="Kelola Best Seller" description="Tandai dan atur item menu yang paling populer" buttonText="Atur Best Seller" onButtonClick={() => {}} />
+          <TabHeader icon={Star} title="Kelola Best Seller" description="Tandai dan atur item menu yang paling populer" buttonText="Atur Best Seller" onButtonClick={() => {}} buttonDisabled={true} />
           <Card>
             <CardContent className="pt-6">
               <p>Best seller management is not available through the API.</p>
@@ -274,5 +292,3 @@ export default function MenuPage() {
     </div>
   );
 }
-
-    
