@@ -75,12 +75,12 @@ export function OrderDetailModal({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete order');
+        throw new Error('Gagal menghapus pesanan');
       }
       
       toast({
-        title: 'Success',
-        description: `Order #${order.id} has been deleted.`,
+        title: 'Sukses',
+        description: `Pesanan #${order.id} telah dihapus.`,
       });
       onOpenChange(false); // Close the modal
       onOrderDeleted(); // Trigger a refetch on the parent page
@@ -90,7 +90,7 @@ export function OrderDetailModal({
        toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete order.',
+        description: 'Tidak dapat menghapus pesanan.',
       });
     }
   };
@@ -124,15 +124,15 @@ export function OrderDetailModal({
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure you want to delete this order?</AlertDialogTitle>
+                        <AlertDialogTitle>Apakah Anda yakin ingin menghapus pesanan ini?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the order
-                          and remove its data from our servers.
+                          Tindakan ini tidak dapat dibatalkan. Ini akan menghapus pesanan secara permanen
+                          dan menghapus datanya dari server kami.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Hapus</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
