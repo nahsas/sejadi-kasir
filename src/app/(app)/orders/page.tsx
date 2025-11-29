@@ -265,10 +265,12 @@ export default function OrdersPage() {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <StatCard title="MEJA TERISI" value={occupiedTablesCount !== null ? occupiedTablesCount.toString() : '...'} icon={Users} />
-        <StatCard title="TOTAL TRANSAKSI" value={totalTransactions} icon={Wallet} />
         <StatCard title="TOTAL ITEM" value={totalItems.toString()} icon={ShoppingCart} />
+        <div className="md:col-span-2">
+          <StatCard title="TOTAL TRANSAKSI" value={totalTransactions} icon={Wallet} />
+        </div>
       </div>
 
       <Card>
