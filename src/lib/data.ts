@@ -13,7 +13,9 @@ export type OrderItem = {
 
 export type Order = {
   id: string;
-  customerName: string;
+  orderType: 'Dine In' | 'Takeaway';
+  customerName: string; // Used for Takeaway or Dine In if table name not available
+  tableName?: string; // Used for Dine In
   items: OrderItem[];
   status: 'Pending' | 'Processing' | 'Completed' | 'Cancelled';
   total: number;
@@ -34,6 +36,8 @@ export const menuItems: MenuItem[] = [
 export const orders: Order[] = [
   {
     id: 'ORD001',
+    orderType: 'Dine In',
+    tableName: 'Table 5',
     customerName: 'John Doe',
     items: [{ menuItemId: 'MENU002', quantity: 2 }],
     status: 'Completed',
@@ -42,6 +46,7 @@ export const orders: Order[] = [
   },
   {
     id: 'ORD002',
+    orderType: 'Takeaway',
     customerName: 'Jane Smith',
     items: [{ menuItemId: 'MENU001', quantity: 1 }, { menuItemId: 'MENU006', quantity: 1 }],
     status: 'Processing',
@@ -50,6 +55,7 @@ export const orders: Order[] = [
   },
   {
     id: 'ORD003',
+    orderType: 'Takeaway',
     customerName: 'Alice Johnson',
     items: [{ menuItemId: 'MENU005', quantity: 1 }],
     status: 'Pending',
@@ -58,6 +64,8 @@ export const orders: Order[] = [
   },
   {
     id: 'ORD004',
+    orderType: 'Dine In',
+    tableName: 'Table 2',
     customerName: 'Bob Brown',
     items: [{ menuItemId: 'MENU004', quantity: 1 }],
     status: 'Completed',
@@ -66,6 +74,7 @@ export const orders: Order[] = [
   },
     {
     id: 'ORD005',
+    orderType: 'Takeaway',
     customerName: 'Charlie Davis',
     items: [{ menuItemId: 'MENU002', quantity: 1 }, { menuItemId: 'MENU007', quantity: 2 }],
     status: 'Cancelled',

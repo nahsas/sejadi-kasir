@@ -27,7 +27,16 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "customerName",
-    header: "Customer",
+    header: "Customer / Table",
+    cell: ({ row }) => {
+      const order = row.original;
+      const displayValue = order.orderType === 'Dine In' ? order.tableName : order.customerName;
+      return <div className="font-medium">{displayValue}</div>
+     }
+  },
+  {
+    accessorKey: "orderType",
+    header: "Type",
   },
   {
     accessorKey: "status",
@@ -61,7 +70,6 @@ export const columns: ColumnDef<Order>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const order = row.original
       return (
         <div className="text-right">
             <DropdownMenu>

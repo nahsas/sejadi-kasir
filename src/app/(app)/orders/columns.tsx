@@ -34,12 +34,20 @@ export const columns: ColumnDef<Order>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Customer
+          Customer / Table
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-     cell: ({ row }) => <div className="pl-4">{row.getValue("customerName")}</div>
+     cell: ({ row }) => {
+      const order = row.original;
+      const displayValue = order.orderType === 'Dine In' ? order.tableName : order.customerName;
+      return <div className="pl-4 font-medium">{displayValue}</div>
+     }
+  },
+  {
+    accessorKey: "orderType",
+    header: "Type",
   },
   {
     accessorKey: "status",

@@ -56,7 +56,8 @@ export default function DashboardPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
+                <TableHead>Customer / Table</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
               </TableRow>
@@ -65,7 +66,8 @@ export default function DashboardPage() {
               {recentOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{order.customerName}</TableCell>
+                  <TableCell>{order.orderType === 'Dine In' ? order.tableName : order.customerName}</TableCell>
+                  <TableCell>{order.orderType}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
                   </TableCell>
