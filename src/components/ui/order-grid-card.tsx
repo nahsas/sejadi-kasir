@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { MapPin, FileText, Info, ArrowRight } from 'lucide-react';
+import { MapPin, FileText, Info, ArrowRight, Wallet } from 'lucide-react';
 
 const statusConfig: {
   [key: string]: {
@@ -24,6 +24,7 @@ const statusConfig: {
 
 export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus }: { order: Order; menuItems: MenuItem[], onDetailClick: (order: Order) => void; onUpdateStatus: (orderId: number) => void; }) {
   const statusInfo = statusConfig[order.status.toLowerCase()] || statusConfig.pending;
+  const isProcessing = order.status.toLowerCase() === 'diproses';
 
   const getMenuName = (menuId: number) => {
     const menuItem = menuItems.find((item) => item.id === menuId);
@@ -31,6 +32,15 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus 
   };
 
   const totalItems = order.detail_pesanans.reduce((acc, item) => acc + item.jumlah, 0);
+  
+  const handleActionClick = () => {
+    if (isProcessing) {
+      // Logic for "Bayar" button will be implemented later.
+      console.log('Bayar button clicked for order:', order.id)
+    } else {
+      onUpdateStatus(order.id);
+    }
+  }
 
   return (
     <Card className={cn("shadow-lg border-2", order.status.toLowerCase() === 'pending' ? 'border-yellow-400' : 'border-blue-500')}>
@@ -99,9 +109,26 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus 
               <Info className="h-3 w-3" />
               Detail
             </Button>
-            <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1" onClick={() => onUpdateStatus(order.id)} disabled={order.status === 'diproses'}>
-              Proses
-              <ArrowRight className="h-3 w-3" />
+            <Button 
+                size="sm" 
+                className={cn(
+                    "w-full text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1",
+                    isProcessing ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+                )} 
+                onClick={handleActionClick} 
+                disabled={order.status.toLowerCase() === 'pending' && false}
+            >
+              {isProcessing ? (
+                <>
+                    <Wallet className="h-3 w-3" />
+                    Bayar
+                </>
+              ) : (
+                <>
+                    Proses
+                    <ArrowRight className="h-3 w-3" />
+                </>
+              )}
             </Button>
           </div>
         </div>
