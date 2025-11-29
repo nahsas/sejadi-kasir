@@ -123,13 +123,13 @@ export default function ReportsPage() {
   const [filteredData, setFilteredData] = React.useState(aggregateSalesData());
 
   React.useEffect(() => {
-    if (!loading && user?.role !== 'admin') {
-      router.push('/');
+    if (!loading && !user) {
+      router.push('/login');
     }
   }, [user, loading, router]);
 
 
-  if (loading || user?.role !== 'admin') {
+  if (loading || !user) {
     return <div className="flex items-center justify-center h-screen">Access Denied</div>;
   }
 

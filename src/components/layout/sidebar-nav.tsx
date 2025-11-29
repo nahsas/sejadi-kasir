@@ -16,7 +16,6 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -26,7 +25,7 @@ const navItems = [
   { href: "/orders", label: "Orders", icon: ClipboardList, roles: ['admin', 'kasir'] },
   { href: "/menu", label: "Menu", icon: BookOpen, roles: ['admin'] },
   { href: "/history", label: "History", icon: History, roles: ['admin', 'kasir'] },
-  { href: "/reports", label: "Reports", icon: BarChart3, roles: ['admin'] },
+  { href: "/reports", label: "Reports", icon: BarChart3, roles: ['admin', 'kasir'] },
 ];
 
 export function SidebarNav() {
@@ -34,6 +33,10 @@ export function SidebarNav() {
   const { user, logout } = useAuth();
 
   const userRole = user?.role || '';
+  const userName = user?.email.split('@')[0];
+  const displayName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : '';
+  const roleDisplay = user?.role === 'admin' ? '(admin on duty)' : '(cashier on duty)';
+
 
   const availableNavItems = navItems.filter(item => item.roles.includes(userRole));
 
@@ -65,14 +68,9 @@ export function SidebarNav() {
       <SidebarFooter>
         <Separator className="my-2" />
         <div className="p-2 flex items-center gap-3">
-            <Avatar className="h-10 w-10 bg-yellow-200">
-                <AvatarFallback className="bg-transparent">
-                    <User className="text-yellow-800" />
-                </AvatarFallback>
-            </Avatar>
             <div className="flex-1">
-                <p className="font-bold text-sm">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">{user?.role}</p>
+                <p className="font-bold text-sm">{displayName}</p>
+                <p className="text-xs text-muted-foreground">{roleDisplay}</p>
             </div>
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="h-9 w-9 bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700">
