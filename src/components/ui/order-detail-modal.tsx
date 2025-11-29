@@ -63,7 +63,7 @@ export function OrderDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-0">
+      <DialogContent className="sm:max-w-lg p-0">
         {!order && <div className="p-8 text-center">No order selected.</div>}
         {order && (
           <>
@@ -153,7 +153,7 @@ export function OrderDetailModal({
                 </div>
             </div>
 
-            <DialogFooter className="p-4 bg-slate-50 border-t rounded-b-lg">
+            <DialogFooter className="p-4 bg-slate-50 border-t rounded-b-lg space-y-4">
                 <div className="w-full flex justify-between items-center">
                     <div>
                         <p className="text-sm text-muted-foreground">Total Pembayaran:</p>
@@ -161,7 +161,7 @@ export function OrderDetailModal({
                     </div>
                      <p className="text-sm text-muted-foreground">{totalItems} item</p>
                 </div>
-                <div className="w-full grid grid-cols-3 gap-2 mt-4">
+                <div className="w-full grid grid-cols-3 gap-2">
                     <Button variant="secondary" onClick={() => onOpenChange(false)} className="bg-slate-600 text-white hover:bg-slate-700">
                         <X className="mr-2 h-4 w-4" /> Tutup
                     </Button>
