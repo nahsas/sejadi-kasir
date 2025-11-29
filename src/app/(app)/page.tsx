@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
     const fetchTodaysOrders = async () => {
       try {
-        const response = await fetch("https://api.sejadikopi.com/api/pesanan?select=id,created_at");
+        const response = await fetch("https://api.sejadikopi.com/api/pesanans?select=id,created_at");
         if (response.ok) {
           const data = await response.json();
           const today = new Date().toDateString();
@@ -92,7 +92,7 @@ export default function DashboardPage() {
 
     const fetchOrderStatusCount = async (status: string, setter: React.Dispatch<React.SetStateAction<number | null>>) => {
         try {
-            const response = await fetch(`https://api.sejadikopi.com/api/pesanan?select=id&status=${status}`);
+            const response = await fetch(`https://api.sejadikopi.com/api/pesanans?select=id&status=${status}`);
             if (response.ok) {
                 const data = await response.json();
                 setter(data.data.length);
@@ -107,7 +107,7 @@ export default function DashboardPage() {
     
     const fetchCompletedTodayCount = async () => {
         try {
-            const response = await fetch(`https://api.sejadikopi.com/api/pesanan?select=id,created_at&status=selesai`);
+            const response = await fetch(`https://api.sejadikopi.com/api/pesanans?select=id,created_at&status=selesai`);
             if (response.ok) {
                 const data = await response.json();
                 const today = new Date().toDateString();
@@ -235,5 +235,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
