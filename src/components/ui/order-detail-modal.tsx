@@ -30,7 +30,6 @@ import { id } from 'date-fns/locale';
 import {
   X,
   Trash2,
-  List,
   Utensils,
   MapPin,
   ArrowRight,
@@ -39,6 +38,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { PaymentModal } from './payment-modal';
 
 const statusConfig: {
   [key: string]: {
@@ -66,6 +66,7 @@ export function OrderDetailModal({
   onOrderDeleted: () => void;
 }) {
   const { toast } = useToast();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
 
   const handleDelete = async () => {
     if (!order) return;
@@ -103,7 +104,13 @@ export function OrderDetailModal({
   const totalItems = order?.detail_pesanans.reduce((sum, item) => sum + item.jumlah, 0) || 0;
   const isProcessing = order?.status.toLowerCase() === 'diproses';
 
+  const handlePaymentClick = () => {
+    onOpenChange(false); // Close current modal
+    setIsPaymentModalOpen(true); // Open payment modal
+  }
+
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0">
         {!order && <div className="p-8 text-center">No order selected.</div>}
@@ -219,6 +226,7 @@ export function OrderDetailModal({
                         <Pencil className="mr-2 h-4 w-4" /> Edit Item
                     </Button>
                     <Button 
+                        onClick={isProcessing ? handlePaymentClick : () => {}}
                         className={cn(
                             isProcessing 
                                 ? "bg-green-600 hover:bg-green-700" 
@@ -242,5 +250,11 @@ export function OrderDetailModal({
         )}
       </DialogContent>
     </Dialog>
+    <PaymentModal 
+        order={order}
+        open={isPaymentModalOpen}
+        onOpenChange={setIsPaymentModalOpen}
+    />
+    </>
   );
 }
