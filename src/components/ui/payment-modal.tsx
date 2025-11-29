@@ -40,6 +40,18 @@ export function PaymentModal({
   const handleQuickAdd = (amount: number) => {
     setPaymentAmount((prev) => (Number(prev || 0) + amount).toString());
   }
+  
+  const changeAmount = Number(paymentAmount) - orderTotal;
+  const isShortfall = changeAmount < 0;
+  const changeText = `Rp ${Math.abs(changeAmount).toLocaleString('id-ID')}`;
+
+  React.useEffect(() => {
+    // Reset state when modal is closed or order changes
+    if (!open) {
+      setPaymentAmount('');
+      setPaymentMethod('Cash');
+    }
+  }, [open]);
 
   if (!order) return null;
 
@@ -112,10 +124,20 @@ export function PaymentModal({
                             id="payment-amount"
                             type="number"
                             placeholder="Masukkan jumlah pembayaran"
-                            className="pl-8"
+                            className="pl-8 pr-8"
                             value={paymentAmount}
                             onChange={(e) => setPaymentAmount(e.target.value)}
                         />
+                         {paymentAmount && (
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-muted-foreground"
+                                onClick={() => setPaymentAmount('')}
+                            >
+                                <X className="h-4 w-4"/>
+                            </Button>
+                        )}
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                         {quickAddAmounts.map(amount => (
@@ -127,6 +149,17 @@ export function PaymentModal({
                     <Button onClick={handleAutoFill} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                         <Pencil className="mr-2 h-4 w-4" /> Auto Pas Total
                     </Button>
+                    {paymentAmount && (
+                         <div className={cn(
+                            "rounded-lg p-3 flex justify-between items-center text-lg",
+                             isShortfall ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                         )}>
+                            <span className="font-medium">{isShortfall ? 'Kurang:' : 'Kembalian:'}</span>
+                            <span className="font-bold">
+                                {changeText}
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
