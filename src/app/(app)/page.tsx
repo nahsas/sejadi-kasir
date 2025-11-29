@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderCard } from "@/components/ui/order-card";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 function StatCard({ title, value, icon: Icon, description, bgColor = "bg-white", textColor = "text-black" }: { title:string, value:string, icon: React.ElementType, description: string, bgColor?: string, textColor?: string }) {
   return (
@@ -209,8 +210,14 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
                     <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full">
-                        <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white">Dine-in</TabsTrigger>
-                        <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white">Take Away</TabsTrigger>
+                        <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2">
+                          Dine-in
+                          <Badge className="bg-white/20 text-white rounded-full">{dineInOrders.length}</Badge>
+                        </TabsTrigger>
+                        <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2">
+                          Take Away
+                          <Badge className="bg-white/20 text-white rounded-full">{takeawayOrders.length}</Badge>
+                        </TabsTrigger>
                     </TabsList>
                 </Tabs>
               <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
