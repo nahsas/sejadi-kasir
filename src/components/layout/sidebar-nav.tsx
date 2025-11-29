@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 
 const navItems = [
@@ -41,22 +42,32 @@ const navItems = [
 ];
 
 function ShopStatusModal({ isOpen, onOpenChange, shopStatus, onConfirm, loading }: { isOpen: boolean, onOpenChange: (open: boolean) => void, shopStatus: boolean | null, onConfirm: () => void, loading: boolean }) {
-    const nextStatus = shopStatus ? 'close' : 'open';
+    const nextStatusText = shopStatus ? 'menutup' : 'membuka';
+    const currentStatusText = shopStatus ? 'BUKA' : 'TUTUP';
+    const buttonText = shopStatus ? 'Tutup' : 'Buka';
+
     return (
         <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Shop Status Change</AlertDialogTitle>
+                <AlertDialogTitle>Konfirmasi Perubahan Status Toko</AlertDialogTitle>
                 <AlertDialogDescription>
                     {shopStatus === null
-                    ? "Loading shop status..."
-                    : `The shop is currently ${shopStatus ? 'OPEN' : 'CLOSED'}. Are you sure you want to ${nextStatus} the shop?`}
+                    ? "Memuat status toko..."
+                    : `Toko saat ini ${currentStatusText}. Apakah Anda yakin ingin ${nextStatusText} toko?`}
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onConfirm} disabled={loading}>
-                    {loading ? 'Updating...' : `Yes, ${nextStatus} the shop`}
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction 
+                    onClick={onConfirm} 
+                    disabled={loading}
+                    className={cn(
+                        shopStatus === false && "bg-green-600 hover:bg-green-700",
+                        shopStatus === true && "bg-red-600 hover:bg-red-700"
+                    )}
+                >
+                    {loading ? 'Memperbarui...' : `Ya, ${buttonText} Toko`}
                 </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -116,8 +127,8 @@ export function SidebarNav() {
         }
         setIsShopOpen(newStatus);
         toast({
-            title: "Success",
-            description: `Shop has been successfully ${newStatus ? 'opened' : 'closed'}.`,
+            title: "Sukses",
+            description: `Toko berhasil di${newStatus ? 'buka' : 'tutup'}.`,
         });
     } catch (error) {
         console.error("Failed to update shop status:", error);
