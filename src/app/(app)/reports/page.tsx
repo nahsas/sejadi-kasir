@@ -79,7 +79,7 @@ export default function ReportsPage() {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
             <div className="space-y-2">
               <Label>Start Date</Label>
               <Popover>
@@ -130,7 +130,7 @@ export default function ReportsPage() {
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-1 lg:col-span-2">
               <Label>Payment Method</Label>
               <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                 <SelectTrigger>
@@ -146,9 +146,9 @@ export default function ReportsPage() {
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-6">
-            <Button onClick={handleApplyFilter}>Apply</Button>
-            <Button variant="outline" onClick={handleResetFilter}>Reset</Button>
-            <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Export</Button>
+            <Button onClick={handleApplyFilter} className="bg-blue-600 hover:bg-blue-700 text-white">Apply</Button>
+            <Button variant="secondary" onClick={handleResetFilter}>Reset</Button>
+            <Button variant="outline" className="bg-green-600 hover:bg-green-700 text-white border-none"><Download className="mr-2 h-4 w-4" /> Export</Button>
           </div>
         </CardContent>
       </Card>
