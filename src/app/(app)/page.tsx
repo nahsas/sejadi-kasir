@@ -3,12 +3,11 @@
 
 import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, Loader, CalendarDays, Utensils, Layers, ClipboardList, RefreshCw } from "lucide-react";
-import { orders, Order, menuItems } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { CheckCircle2, Clock, Loader, CalendarDays, Utensils, Layers, ClipboardList, RefreshCw, AlertTriangle } from "lucide-react";
+import { Order } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OrderCard } from "@/components/ui/order-card";
 
 function StatCard({ title, value, icon: Icon, description, bgColor = "bg-white", textColor = "text-black" }: { title:string, value:string, icon: React.ElementType, description: string, bgColor?: string, textColor?: string }) {
   return (
@@ -38,110 +37,137 @@ export default function DashboardPage() {
   const [pendingOrders, setPendingOrders] = React.useState<number | null>(null);
   const [processingOrders, setProcessingOrders] = React.useState<number | null>(null);
   const [completedOrders, setCompletedOrders] = React.useState<number | null>(null);
+  
+  const [dineInOrders, setDineInOrders] = React.useState<Order[]>([]);
+  const [takeawayOrders, setTakeawayOrders] = React.useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = React.useState(true);
+  const [ordersError, setOrdersError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    const fetchTotalMenu = async () => {
-      try {
-        const response = await fetch("https://api.sejadikopi.com/api/menu?select=nama");
-        if (response.ok) {
-          const data = await response.json();
-          setTotalMenu(data.data.length);
-        } else {
-          setTotalMenu(0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch total menu:", error);
-        setTotalMenu(0);
-      }
-    };
-    
-    const fetchTotalCategories = async () => {
-      try {
-        const response = await fetch("https://api.sejadikopi.com/api/categories?select=nama");
-        if (response.ok) {
-          const data = await response.json();
-          setTotalCategories(data.data.length);
-        } else {
-          setTotalCategories(0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch total categories:", error);
-        setTotalCategories(0);
-      }
-    };
+  const fetchStatCounts = React.useCallback(async () => {
+    // This can be refactored into a single stats endpoint later
+    try {
+        const [menuRes, catRes, todayRes, pendingRes, processingRes, completedRes] = await Promise.all([
+            fetch("https://api.sejadikopi.com/api/menu?select=nama"),
+            fetch("https://api.sejadikopi.com/api/categories?select=nama"),
+            fetch("https://api.sejadikopi.com/api/pesanans?select=id,created_at"),
+            fetch("https://api.sejadikopi.com/api/pesanans?select=id&status=pending"),
+            fetch("https://api.sejadikopi.com/api/pesanans?select=id&status=diproses"),
+            fetch("https://api.sejadikopi.com/api/pesanans?select=id,created_at&status=selesai")
+        ]);
 
-    const fetchTodaysOrders = async () => {
-      try {
-        const response = await fetch("https://api.sejadikopi.com/api/pesanans?select=id,created_at");
-        if (response.ok) {
-          const data = await response.json();
-          const today = new Date().toDateString();
-          const count = data.data.filter((order: { created_at: string }) => {
-            const orderDate = new Date(order.created_at).toDateString();
-            return orderDate === today;
-          }).length;
-          setTodaysOrdersCount(count);
+        if (menuRes.ok) setTotalMenu((await menuRes.json()).data.length); else setTotalMenu(0);
+        if (catRes.ok) setTotalCategories((await catRes.json()).data.length); else setTotalCategories(0);
+        
+        if (todayRes.ok) {
+            const data = await todayRes.json();
+            const today = new Date().toDateString();
+            const count = data.data.filter((order: { created_at: string }) => new Date(order.created_at).toDateString() === today).length;
+            setTodaysOrdersCount(count);
         } else {
-          setTodaysOrdersCount(0);
+            setTodaysOrdersCount(0);
         }
-      } catch (error) {
-        console.error("Failed to fetch today's orders:", error);
-        setTodaysOrdersCount(0);
-      }
-    };
 
-    const fetchOrderStatusCount = async (status: string, setter: React.Dispatch<React.SetStateAction<number | null>>) => {
-        try {
-            const response = await fetch(`https://api.sejadikopi.com/api/pesanans?select=id&status=${status}`);
-            if (response.ok) {
-                const data = await response.json();
-                setter(data.data.length);
-            } else {
-                setter(0);
-            }
-        } catch (error) {
-            console.error(`Failed to fetch ${status} orders:`, error);
-            setter(0);
-        }
-    };
-    
-    const fetchCompletedTodayCount = async () => {
-        try {
-            const response = await fetch(`https://api.sejadikopi.com/api/pesanans?select=id,created_at&status=selesai`);
-            if (response.ok) {
-                const data = await response.json();
-                const today = new Date().toDateString();
-                const count = data.data.filter((order: { created_at: string }) => {
-                    const orderDate = new Date(order.created_at).toDateString();
-                    return orderDate === today;
-                }).length;
-                setCompletedOrders(count);
-            } else {
-                setCompletedOrders(0);
-            }
-        } catch (error) {
-            console.error(`Failed to fetch completed orders:`, error);
+        if (pendingRes.ok) setPendingOrders((await pendingRes.json()).data.length); else setPendingOrders(0);
+        if (processingRes.ok) setProcessingOrders((await processingRes.json()).data.length); else setProcessingOrders(0);
+
+        if (completedRes.ok) {
+            const data = await completedRes.json();
+            const today = new Date().toDateString();
+            const count = data.data.filter((order: { created_at: string }) => new Date(order.created_at).toDateString() === today).length;
+            setCompletedOrders(count);
+        } else {
             setCompletedOrders(0);
         }
+    } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+        setTotalMenu(0);
+        setTotalCategories(0);
+        setTodaysOrdersCount(0);
+        setPendingOrders(0);
+        setProcessingOrders(0);
+        setCompletedOrders(0);
     }
-
-
-    fetchTotalMenu();
-    fetchTotalCategories();
-    fetchTodaysOrders();
-    fetchOrderStatusCount('pending', setPendingOrders);
-    fetchOrderStatusCount('diproses', setProcessingOrders);
-    fetchCompletedTodayCount();
   }, []);
 
-  
-  const activeOrders = orders.filter(
-    (o) => o.status === "Pending" || o.status === "Processing"
-  );
-  
-  const dineInOrders = activeOrders.filter(o => o.orderType === 'Dine In');
-  const takeawayOrders = activeOrders.filter(o => o.orderType === 'Takeaway');
+  const fetchActiveOrders = React.useCallback(async () => {
+      setOrdersLoading(true);
+      setOrdersError(null);
+      try {
+          const dineInRes = await fetch("https://api.sejadikopi.com/api/pesanans?location_type=dine_in&status=pending,diproses");
+          const takeawayRes = await fetch("https://api.sejadikopi.com/api/pesanans?location_type=takeaway&status=pending,diproses");
 
+          if (dineInRes.ok) {
+              const data = await dineInRes.json();
+              setDineInOrders(data.data);
+          } else {
+              throw new Error('Failed to fetch dine-in orders');
+          }
+
+          if (takeawayRes.ok) {
+              const data = await takeawayRes.json();
+              setTakeawayOrders(data.data);
+          } else {
+              throw new Error('Failed to fetch takeaway orders');
+          }
+      } catch (error: any) {
+          console.error("Failed to fetch active orders:", error);
+          setOrdersError(error.message || "An unexpected error occurred.");
+      } finally {
+          setOrdersLoading(false);
+      }
+  }, []);
+
+  React.useEffect(() => {
+    fetchStatCounts();
+    fetchActiveOrders();
+  }, [fetchStatCounts, fetchActiveOrders]);
+
+  const handleRefresh = () => {
+      fetchStatCounts();
+      fetchActiveOrders();
+  }
+  
+  const renderOrderList = (orders: Order[], type: 'dine-in' | 'take-away') => {
+      if (ordersLoading) {
+          return (
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                    <Card key={i} className="h-64 animate-pulse bg-gray-200"></Card>
+                ))}
+             </div>
+          )
+      }
+      if (ordersError) {
+          return (
+             <div className="flex flex-col items-center justify-center text-center py-16 text-red-500">
+                <AlertTriangle className="w-12 h-12 mb-4" />
+                <h3 className="text-xl font-bold">Error Fetching Orders</h3>
+                <p className="text-muted-foreground">{ordersError}</p>
+             </div>
+          )
+      }
+       if (orders.length > 0) {
+          return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {orders.map((order) => (
+                    <OrderCard key={order.id} order={order} />
+                ))}
+            </div>
+          )
+       }
+       
+       return (
+            <div className="flex flex-col items-center justify-center text-center py-16">
+                <div className="p-4 bg-gray-100 rounded-full mb-4">
+                    <ClipboardList className="w-12 h-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-bold">Tidak Ada Pesanan {type === 'dine-in' ? 'Dine-in' : 'Take Away'}</h3>
+                <p className="text-muted-foreground">
+                    Saat ini tidak ada pesanan {type === 'dine-in' ? 'dine-in' : 'takeaway'} yang aktif
+                </p>
+            </div>
+       )
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -186,7 +212,7 @@ export default function DashboardPage() {
                         <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white">Take Away</TabsTrigger>
                     </TabsList>
                 </Tabs>
-              <Button variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
+              <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
               </Button>
@@ -196,38 +222,10 @@ export default function DashboardPage() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="dine-in">
-              {dineInOrders.length > 0 ? (
-                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Dine In orders would be mapped here */}
-                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center py-16">
-                  <div className="p-4 bg-gray-100 rounded-full mb-4">
-                    <ClipboardList className="w-12 h-12 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold">Tidak Ada Pesanan Dine-in</h3>
-                  <p className="text-muted-foreground">
-                    Saat ini tidak ada pesanan dine-in yang aktif
-                  </p>
-                </div>
-              )}
+              {renderOrderList(dineInOrders, 'dine-in')}
             </TabsContent>
             <TabsContent value="take-away">
-              {takeawayOrders.length > 0 ? (
-                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Takeaway orders would be mapped here */}
-                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center py-16">
-                  <div className="p-4 bg-gray-100 rounded-full mb-4">
-                     <ClipboardList className="w-12 h-12 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold">Tidak Ada Pesanan Take Away</h3>
-                  <p className="text-muted-foreground">
-                    Saat ini tidak ada pesanan takeaway yang aktif.
-                  </p>
-                </div>
-              )}
+              {renderOrderList(takeawayOrders, 'take-away')}
             </TabsContent>
           </Tabs>
         </CardContent>

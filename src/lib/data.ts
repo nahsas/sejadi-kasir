@@ -1,3 +1,4 @@
+
 export type MenuItem = {
   id: string;
   name: string;
@@ -7,22 +8,52 @@ export type MenuItem = {
 };
 
 export type OrderItem = {
-  menuItemId: string;
-  quantity: number;
+  id: number;
+  pesanan_id: number;
+  menu_id: number;
+  jumlah: number;
+  subtotal: string;
+  note: string | null;
+  varian: string | null;
+  additionals: any;
+  dimsum_additionals: any;
+  additional_price: string;
+  base_price: number;
+  is_locked: boolean;
+  cancelled_qty: number;
+  cancellation_notes: string | null;
+  cancelled_at: string | null;
+  jumlah_asli: number | null;
 };
 
 export type Order = {
-  id: string;
-  orderType: 'Dine In' | 'Takeaway';
-  customerName: string; // Used for Takeaway or Dine In if table name not available
-  tableName?: string; // Used for Dine In
-  items: OrderItem[];
-  status: 'Pending' | 'Processing' | 'Completed' | 'Cancelled';
-  total: number;
-  paymentMethod: 'Cash' | 'Credit Card' | 'GoPay';
-  createdAt: Date;
+  id: number;
+  no_meja: string;
+  status: string; // 'pending', 'diproses', 'selesai'
+  total: string;
+  created_at: string;
+  note: string | null;
+  updated_at: string;
+  cancellation_reason: string | null;
+  cancelled_at: string | null;
+  location_type: 'DINE_IN' | 'TAKEAWAY';
+  pickup_time: string | null;
+  discount_code: string | null;
+  discount_amount: string | null;
+  total_after_discount: string | null;
+  processed_at: string | null;
+  completed_at: string | null;
+  is_hidden: boolean | null;
+  archived_at: string | null;
+  location_area: string | null;
+  metode_pembayaran: string | null;
+  bank_qris: string | null;
+  is_final: boolean | null;
+  detail_pesanans: OrderItem[];
 };
 
+
+// The following are mock data and will be replaced by API calls.
 export const menuItems: MenuItem[] = [
   { id: 'MENU001', name: 'Espresso', category: 'Coffee', price: 2.5, isAvailable: true },
   { id: 'MENU002', name: 'Latte', category: 'Coffee', price: 3.5, isAvailable: true },
@@ -34,57 +65,4 @@ export const menuItems: MenuItem[] = [
   { id: 'MENU008', name: 'Black Tea', category: 'Tea', price: 2.0, isAvailable: true },
 ];
 
-export const orders: Order[] = [
-  {
-    id: 'ORD001',
-    orderType: 'Dine In',
-    tableName: 'Table 5',
-    customerName: 'John Doe',
-    items: [{ menuItemId: 'MENU002', quantity: 2 }],
-    status: 'Completed',
-    total: 7.0,
-    paymentMethod: 'Credit Card',
-    createdAt: new Date('2023-10-26T10:00:00Z'),
-  },
-  {
-    id: 'ORD002',
-    orderType: 'Takeaway',
-    customerName: 'Jane Smith',
-    items: [{ menuItemId: 'MENU001', quantity: 1 }, { menuItemId: 'MENU006', quantity: 1 }],
-    status: 'Processing',
-    total: 5.25,
-    paymentMethod: 'Cash',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-  },
-  {
-    id: 'ORD003',
-    orderType: 'Takeaway',
-    customerName: 'Alice Johnson',
-    items: [{ menuItemId: 'MENU005', quantity: 1 }],
-    status: 'Pending',
-    total: 2.0,
-    paymentMethod: 'GoPay',
-    createdAt: new Date(),
-  },
-  {
-    id: 'ORD004',
-    orderType: 'Dine In',
-    tableName: 'Table 2',
-    customerName: 'Bob Brown',
-    items: [{ menuItemId: 'MENU004', quantity: 1 }],
-    status: 'Completed',
-    total: 3.0,
-    paymentMethod: 'Cash',
-    createdAt: new Date(),
-  },
-    {
-    id: 'ORD005',
-    orderType: 'Takeaway',
-    customerName: 'Charlie Davis',
-    items: [{ menuItemId: 'MENU002', quantity: 1 }, { menuItemId: 'MENU007', quantity: 2 }],
-    status: 'Cancelled',
-    total: 8.0,
-    paymentMethod: 'Credit Card',
-    createdAt: new Date('2023-10-25T09:00:00Z'),
-  },
-];
+export const orders: any[] = [];
