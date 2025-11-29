@@ -26,12 +26,15 @@ import {
   Filter,
   RefreshCw,
   ClipboardList,
+  Hourglass,
+  CookingPot
 } from "lucide-react";
 import { Order, MenuItem } from "@/lib/data";
 import { OrderGridCard } from "@/components/ui/order-grid-card";
 import { OrderDetailModal } from "@/components/ui/order-detail-modal";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 
 function StatCard({
@@ -163,6 +166,61 @@ export default function OrdersPage() {
 
   const totalItems = allActiveOrders.reduce((sum, order) => sum + order.detail_pesanans.reduce((itemSum, item) => itemSum + item.jumlah, 0), 0);
 
+  const renderOrderList = (orders: Order[], type: 'dine-in' | 'take-away') => {
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    const processingOrders = orders.filter(o => o.status === 'diproses');
+
+    if (loading) {
+      return <div className="text-center py-16">Loading...</div>;
+    }
+
+    if (orders.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center py-16">
+          <div className="p-4 bg-gray-100 rounded-full mb-4">
+            <ClipboardList className="w-12 h-12 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-bold">Belum Ada Pesanan {type === 'dine-in' ? 'Dine-in' : 'Take Away'}</h3>
+          <p className="text-muted-foreground">
+            Saat ini tidak ada pesanan {type === 'dine-in' ? 'dine-in' : 'takeaway'} yang aktif.
+          </p>
+        </div>
+      );
+    }
+    
+    return (
+        <div className="space-y-6">
+            {pendingOrders.length > 0 && (
+                <div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <Hourglass className="h-5 w-5 text-yellow-600" />
+                        <h3 className="text-lg font-semibold text-yellow-700">Pending ({pendingOrders.length})</h3>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {pendingOrders.map(order => (
+                            <OrderGridCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} onUpdateStatus={handleUpdateStatus} />
+                        ))}
+                    </div>
+                </div>
+            )}
+            {pendingOrders.length > 0 && processingOrders.length > 0 && <Separator className="my-8" />}
+             {processingOrders.length > 0 && (
+                <div>
+                     <div className="flex items-center gap-2 mb-4">
+                        <CookingPot className="h-5 w-5 text-blue-600" />
+                        <h3 className="text-lg font-semibold text-blue-700">Processing ({processingOrders.length})</h3>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {processingOrders.map(order => (
+                            <OrderGridCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} onUpdateStatus={handleUpdateStatus} />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
        {selectedOrder && (
@@ -232,46 +290,10 @@ export default function OrdersPage() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="dine-in">
-              {loading ? (
-                <div className="text-center py-16">Loading...</div>
-              ) : dineInOrders.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {dineInOrders.map(order => (
-                    <OrderGridCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} onUpdateStatus={handleUpdateStatus} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center py-16">
-                  <div className="p-4 bg-gray-100 rounded-full mb-4">
-                    <ClipboardList className="w-12 h-12 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold">Belum Ada Pesanan Dine-in</h3>
-                  <p className="text-muted-foreground">
-                    Saat ini tidak ada meja yang terisi
-                  </p>
-                </div>
-              )}
+              {renderOrderList(dineInOrders, 'dine-in')}
             </TabsContent>
             <TabsContent value="take-away">
-              {loading ? (
-                <div className="text-center py-16">Loading...</div>
-              ) : takeawayOrders.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {takeawayOrders.map(order => (
-                    <OrderGridCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} onUpdateStatus={handleUpdateStatus}/>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center py-16">
-                  <div className="p-4 bg-gray-100 rounded-full mb-4">
-                    <ClipboardList className="w-12 h-12 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold">Belum Ada Pesanan Take Away</h3>
-                  <p className="text-muted-foreground">
-                    Saat ini tidak ada pesanan takeaway yang aktif.
-                  </p>
-                </div>
-              )}
+              {renderOrderList(takeawayOrders, 'take-away')}
             </TabsContent>
           </Tabs>
         </CardContent>
