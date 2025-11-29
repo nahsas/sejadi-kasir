@@ -12,9 +12,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// This is a mock user object. In a real app, you'd fetch this from your API.
-const MOCK_USER = { name: 'Admin', email: 'admin@example.com' };
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -22,12 +19,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // In a real app, you'd verify the user's session with your backend
-    const session = localStorage.getItem('user-session');
-    if (session) {
-      setUser(JSON.parse(session));
+    // Verify the user's session from localStorage
+    try {
+      const session = localStorage.getItem('sejadikopi-session');
+      if (session) {
+        const { user: userData, access_token } = JSON.parse(session);
+        if (userData && access_token) {
+          setUser(userData);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to parse session from localStorage", error);
+      // If parsing fails, clear the broken session
+      localStorage.removeItem('sejadikopi-session');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -37,26 +44,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, router]);
 
   const login = async (email: string, pass: string) => {
-    // !! IMPORTANT !!
-    // Replace this with your actual API call to your backend.
-    // This is a mock login function.
-    if (email === 'admin@example.com' && pass === 'password') {
-       localStorage.setItem('user-session', JSON.stringify(MOCK_USER));
-       setUser(MOCK_USER);
-       return Promise.resolve();
+    const response = await fetch('https://api.sejadikopi.com/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email, password: pass }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Login failed');
     }
-    return Promise.reject('Invalid credentials');
+
+    const data = await response.json();
+
+    if (data.access_token && data.user) {
+      localStorage.setItem('sejadikopi-session', JSON.stringify(data));
+      setUser(data.user);
+    } else {
+      throw new Error('Invalid credentials');
+    }
   };
 
   const logout = () => {
-    // Replace this with your actual API call to invalidate the session
-    localStorage.removeItem('user-session');
+    localStorage.removeItem('sejadikopi-session');
     setUser(null);
     router.push('/login');
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>; // Or a proper loading spinner
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return (

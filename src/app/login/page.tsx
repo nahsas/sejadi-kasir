@@ -10,16 +10,16 @@ import { Label } from '@/components/ui/label';
 import { Coffee } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@sejadikopi.com');
+  const [password, setPassword] = useState('adminkitabersama1');
   const [error, setError] = useState('');
   const { login } = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     try {
-      // Replace this with your actual API call
       await login(email, password);
       router.push('/');
     } catch (err) {
