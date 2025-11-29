@@ -1,4 +1,8 @@
 
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
@@ -46,6 +50,20 @@ function TabHeader({ icon: Icon, title, description, buttonText }: { icon: React
 }
 
 export default function MenuPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user?.role !== 'admin') {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+
+  if (loading || user?.role !== 'admin') {
+    return <div className="flex items-center justify-center h-screen">Access Denied</div>;
+  }
+
   const totalMenu = menuItems.length;
   const totalCoffee = menuItems.filter(item => item.category === 'Coffee').length;
   const totalFoodAndSnack = menuItems.filter(item => item.category === 'Pastry' || item.category === 'Tea').length;

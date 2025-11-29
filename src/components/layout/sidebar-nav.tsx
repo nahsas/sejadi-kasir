@@ -22,16 +22,20 @@ import { Separator } from "@/components/ui/separator";
 
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/orders", label: "Orders", icon: ClipboardList },
-  { href: "/menu", label: "Menu", icon: BookOpen },
-  { href: "/history", label: "History", icon: History },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, roles: ['admin', 'kasir'] },
+  { href: "/orders", label: "Orders", icon: ClipboardList, roles: ['admin', 'kasir'] },
+  { href: "/menu", label: "Menu", icon: BookOpen, roles: ['admin'] },
+  { href: "/history", label: "History", icon: History, roles: ['admin', 'kasir'] },
+  { href: "/reports", label: "Reports", icon: BarChart3, roles: ['admin'] },
 ];
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  const userRole = user?.role || '';
+
+  const availableNavItems = navItems.filter(item => item.roles.includes(userRole));
 
   return (
     <Sidebar>
@@ -43,7 +47,7 @@ export function SidebarNav() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {navItems.map((item) => (
+          {availableNavItems.map((item) => (
             <SidebarMenuItem key={item.label}>
               <Link href={item.href}>
                 <SidebarMenuButton
@@ -67,8 +71,8 @@ export function SidebarNav() {
                 </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-                <p className="font-bold text-sm">Admin</p>
-                <p className="text-xs text-muted-foreground">Administrator</p>
+                <p className="font-bold text-sm">{user?.email}</p>
+                <p className="text-xs text-muted-foreground">{user?.role}</p>
             </div>
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="h-9 w-9 bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700">

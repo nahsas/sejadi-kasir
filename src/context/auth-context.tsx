@@ -3,8 +3,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
+interface User {
+  id: number;
+  email: string;
+  role: string; // I will assume role is part of user metadata or can be inferred
+  // add other user properties here
+}
+
 interface AuthContextType {
-  user: any;
+  user: User | null;
   login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -12,8 +19,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// A mock role mapping based on email
+const getRoleFromEmail = (email: string) => {
+  if (email === 'admin@sejadikopi.com') {
+    return 'admin';
+  }
+  if (email === 'kasir@sejadikopi.com') {
+    return 'kasir';
+  }
+  return 'authenticated';
+}
+
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -25,7 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session) {
         const { user: userData, access_token } = JSON.parse(session);
         if (userData && access_token) {
-          setUser(userData);
+           const role = getRoleFromEmail(userData.email);
+           setUser({ ...userData, role });
         }
       }
     } catch (error) {
@@ -59,8 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await response.json();
 
     if (data.access_token && data.user) {
-      localStorage.setItem('sejadikopi-session', JSON.stringify(data));
-      setUser(data.user);
+      const role = getRoleFromEmail(data.user.email);
+      const userWithRole = { ...data.user, role };
+      localStorage.setItem('sejadikopi-session', JSON.stringify({ ...data, user: userWithRole }));
+      setUser(userWithRole);
     } else {
       throw new Error('Invalid credentials');
     }

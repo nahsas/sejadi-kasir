@@ -2,6 +2,8 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
@@ -112,10 +114,24 @@ const PaymentBreakdownCard = ({
 )
 
 export default function ReportsPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
   const [startDate, setStartDate] = React.useState<Date | undefined>();
   const [endDate, setEndDate] = React.useState<Date | undefined>();
   const [paymentMethod, setPaymentMethod] = React.useState<string>("All");
   const [filteredData, setFilteredData] = React.useState(aggregateSalesData());
+
+  React.useEffect(() => {
+    if (!loading && user?.role !== 'admin') {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+
+  if (loading || user?.role !== 'admin') {
+    return <div className="flex items-center justify-center h-screen">Access Denied</div>;
+  }
 
   const handleApplyFilter = () => {
     setFilteredData(aggregateSalesData(startDate, endDate, paymentMethod));
