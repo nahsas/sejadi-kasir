@@ -2,6 +2,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -13,10 +14,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Order } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { X, Landmark, QrCode, Pencil, Check, Receipt } from 'lucide-react';
+import { X, Landmark, QrCode, Pencil, Check, Receipt, Info } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+const banks = [
+    { id: 'BCA', name: 'BCA', logo: 'https://placehold.co/100x40/003087/FFFFFF?text=BCA' },
+    { id: 'BRI', name: 'BRI', logo: 'https://placehold.co/100x40/00529C/FFFFFF?text=BRI' },
+    { id: 'BSI', name: 'BSI', logo: 'https://placehold.co/100x40/00A59C/FFFFFF?text=BSI' },
+]
 
 export function PaymentModal({
   order,
@@ -29,6 +36,7 @@ export function PaymentModal({
 }) {
   const [paymentMethod, setPaymentMethod] = React.useState<'Cash' | 'QRIS'>('Cash');
   const [paymentAmount, setPaymentAmount] = React.useState('');
+  const [selectedBank, setSelectedBank] = React.useState<'BCA' | 'BRI' | 'BSI' | null>('BCA');
 
   const quickAddAmounts = [1000, 2000, 5000, 10000, 50000, 100000];
   const orderTotal = order ? parseInt(order.total, 10) : 0;
@@ -50,6 +58,7 @@ export function PaymentModal({
     if (!open) {
       setPaymentAmount('');
       setPaymentMethod('Cash');
+      setSelectedBank('BCA');
     }
   }, [open]);
 
@@ -89,7 +98,7 @@ export function PaymentModal({
             </div>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Label>Metode Pembayaran</Label>
             <div className="grid grid-cols-2 gap-2">
                  <Button
@@ -97,7 +106,7 @@ export function PaymentModal({
                     onClick={() => setPaymentMethod('Cash')}
                     className={cn(
                         "h-12 text-base",
-                        paymentMethod === 'Cash' && "bg-green-600 hover:bg-green-700 border-green-600 text-white"
+                        paymentMethod === 'Cash' ? "bg-green-600 hover:bg-green-700 border-green-600 text-white" : "bg-gray-100 text-gray-800"
                     )}
                  >
                     <Landmark className="mr-2 h-5 w-5"/> Cash
@@ -107,7 +116,7 @@ export function PaymentModal({
                     onClick={() => setPaymentMethod('QRIS')}
                     className={cn(
                         "h-12 text-base",
-                        paymentMethod === 'QRIS' && "bg-green-600 hover:bg-green-700 border-green-600 text-white"
+                         paymentMethod === 'QRIS' ? "bg-purple-600 hover:bg-purple-700 text-white" : "bg-gray-100 text-gray-800"
                     )}
                  >
                     <QrCode className="mr-2 h-5 w-5"/> QRIS
@@ -162,12 +171,61 @@ export function PaymentModal({
                     )}
                 </div>
             )}
+
+            {paymentMethod === 'QRIS' && (
+                <div className="space-y-4">
+                    <div>
+                        <Label>Pilih Bank untuk QRIS</Label>
+                        <div className="grid grid-cols-3 gap-2 mt-2">
+                            {banks.map((bank) => (
+                                <button
+                                    key={bank.id}
+                                    onClick={() => setSelectedBank(bank.id as any)}
+                                    className={cn(
+                                        "border-2 rounded-lg p-2 flex flex-col items-center justify-center space-y-1 transition-all",
+                                        selectedBank === bank.id ? "border-purple-600 bg-purple-50" : "border-gray-200 bg-white"
+                                    )}
+                                >
+                                    <Image src={bank.logo} alt={bank.name} width={60} height={24} className="object-contain" />
+                                    <span className="text-sm font-medium">{bank.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {selectedBank && (
+                        <div className="bg-purple-50 border border-dashed border-purple-200 rounded-lg p-3 space-y-2">
+                             <div className="flex items-center gap-2">
+                                <QrCode className="h-5 w-5 text-purple-600" />
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-purple-800">Metode QRIS</span>
+                                    <span className="text-sm text-purple-600">Bank: {selectedBank}</span>
+                                </div>
+                             </div>
+                             <div className="border-t border-purple-200 my-2"></div>
+                             <div className="flex justify-between items-center">
+                                <span className="font-medium text-purple-800">Total Pembayaran:</span>
+                                <span className="font-bold text-xl text-purple-900">
+                                    Rp {orderTotal.toLocaleString('id-ID')}
+                                </span>
+                             </div>
+                        </div>
+                    )}
+                    
+                    <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+                        <Info className="h-4 w-4 text-blue-500" />
+                        <AlertDescription>
+                            Pembayaran akan diproses melalui QRIS dengan total akhir secara otomatis
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            )}
         </div>
 
         <DialogFooter className="p-4 bg-slate-50 border-t grid grid-cols-2 gap-2">
-            <Button variant="secondary" className="bg-slate-600 hover:bg-slate-700 text-white">
+            <Button className="bg-green-600 hover:bg-green-700 text-white">
                 <Check className="mr-2 h-4 w-4" />
-                Bayar & Print Struk
+                Selesai & Print Struk
             </Button>
              <DialogClose asChild>
                 <Button variant="secondary" className="bg-gray-300 text-gray-800 hover:bg-gray-400">
