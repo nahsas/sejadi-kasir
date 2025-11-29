@@ -107,7 +107,7 @@ export default function DashboardPage() {
     
     const fetchCompletedTodayCount = async () => {
         try {
-            const response = await fetch(`https://api.sejadikopi.com/api/pesanan?select=id,created_at&status=completed`);
+            const response = await fetch(`https://api.sejadikopi.com/api/pesanan?select=id,created_at&status=selesai`);
             if (response.ok) {
                 const data = await response.json();
                 const today = new Date().toDateString();
@@ -130,7 +130,7 @@ export default function DashboardPage() {
     fetchTotalCategories();
     fetchTodaysOrders();
     fetchOrderStatusCount('pending', setPendingOrders);
-    fetchOrderStatusCount('processing', setProcessingOrders);
+    fetchOrderStatusCount('diproses', setProcessingOrders);
     fetchCompletedTodayCount();
   }, []);
 
@@ -235,3 +235,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
