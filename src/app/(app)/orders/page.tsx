@@ -18,7 +18,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { orders } from "@/lib/data";
+import { orders as mockOrders } from "@/lib/data";
 import {
   Users,
   Wallet,
@@ -55,18 +55,66 @@ function StatCard({
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = React.useState("dine-in");
+  const [orders, setOrders] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [occupiedTablesCount, setOccupiedTablesCount] = React.useState<number | null>(null);
 
+
+  React.useEffect(() => {
+    async function fetchOrdersData() {
+      setLoading(true);
+      try {
+        const [ordersRes, tablesRes] = await Promise.all([
+          fetch("https://api.sejadikopi.com/api/pesanans?status=pending,diproses"),
+          fetch("https://api.sejadikopi.com/api/pesanans?select=no_meja,created_at&status=pending,diproses")
+        ]);
+        
+        if (ordersRes.ok) {
+          const ordersData = await ordersRes.json();
+          setOrders(ordersData.data);
+        } else {
+          setOrders([]);
+        }
+
+        if (tablesRes.ok) {
+            const tablesData = await tablesRes.json();
+            const today = new Date().toDateString();
+            const uniqueTables = new Set(
+                tablesData.data
+                .filter((order: { created_at: string; no_meja: string }) => 
+                    new Date(order.created_at).toDateString() === today &&
+                    !order.no_meja.toLowerCase().includes('takeaway') &&
+                    !order.no_meja.toLowerCase().includes('take away')
+                )
+                .map((order: { no_meja: string }) => order.no_meja)
+            );
+            setOccupiedTablesCount(uniqueTables.size);
+        } else {
+            setOccupiedTablesCount(0);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setOrders([]);
+        setOccupiedTablesCount(0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrdersData();
+  }, []);
+  
   const activeOrders = orders.filter(
-    (o) => o.status === "Pending" || o.status === "Processing"
+    (o) => o.status === "pending" || o.status === "diproses"
   );
   
-  const dineInOrders = activeOrders.filter(o => o.orderType === 'Dine In');
-  const takeawayOrders = activeOrders.filter(o => o.orderType === 'Takeaway');
+  const dineInOrders = activeOrders.filter(o => o.location_type.toLowerCase() === 'dine_in');
+  const takeawayOrders = activeOrders.filter(o => o.location_type.toLowerCase() === 'takeaway');
 
-  const totalTransactions = activeOrders.reduce((sum, order) => sum + order.total, 0)
+  const totalTransactions = activeOrders.reduce((sum, order) => sum + parseFloat(order.total), 0)
     .toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 });
 
-  const totalItems = activeOrders.reduce((sum, order) => sum + order.items.length, 0);
+  const totalItems = activeOrders.reduce((sum, order) => sum + order.detail_pesanans.length, 0);
 
   return (
     <div className="space-y-6">
@@ -94,7 +142,7 @@ export default function OrdersPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard title="MEJA TERISI" value={dineInOrders.length.toString()} icon={Users} />
+        <StatCard title="MEJA TERISI" value={occupiedTablesCount !== null ? occupiedTablesCount.toString() : '...'} icon={Users} />
         <StatCard title="TOTAL TRANSAKSI" value={totalTransactions} icon={Wallet} />
         <StatCard title="TOTAL ITEM" value={totalItems.toString()} icon={ShoppingCart} />
       </div>
@@ -123,7 +171,9 @@ export default function OrdersPage() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="dine-in">
-              {dineInOrders.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-16">Loading...</div>
+              ) : dineInOrders.length > 0 ? (
                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {/* Dine In orders would be mapped here */}
                  </div>
@@ -140,7 +190,9 @@ export default function OrdersPage() {
               )}
             </TabsContent>
             <TabsContent value="take-away">
-              {takeawayOrders.length > 0 ? (
+             {loading ? (
+                <div className="text-center py-16">Loading...</div>
+              ) : takeawayOrders.length > 0 ? (
                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {/* Takeaway orders would be mapped here */}
                  </div>
