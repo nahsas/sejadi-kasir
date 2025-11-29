@@ -33,6 +33,7 @@ function StatCard({ title, value, icon: Icon, description, bgColor = "bg-white",
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = React.useState("dine-in");
   const [totalMenu, setTotalMenu] = React.useState<number | null>(null);
+  const [totalCategories, setTotalCategories] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     const fetchTotalMenu = async () => {
@@ -49,8 +50,24 @@ export default function DashboardPage() {
         setTotalMenu(0);
       }
     };
+    
+    const fetchTotalCategories = async () => {
+      try {
+        const response = await fetch("https://api.sejadikopi.com/api/categories?select=nama");
+        if (response.ok) {
+          const data = await response.json();
+          setTotalCategories(data.data.length);
+        } else {
+          setTotalCategories(0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch total categories:", error);
+        setTotalCategories(0);
+      }
+    };
 
     fetchTotalMenu();
+    fetchTotalCategories();
   }, []);
 
 
@@ -59,8 +76,6 @@ export default function DashboardPage() {
   const completedOrders = orders.filter(o => o.status === 'Completed' && new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
   const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
   
-  const totalCategories = [...new Set(menuItems.map(item => item.category))].length;
-
   const activeOrders = orders.filter(
     (o) => o.status === "Pending" || o.status === "Processing"
   );
@@ -80,7 +95,14 @@ export default function DashboardPage() {
           bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" 
           textColor="text-white" 
         />
-        <StatCard title="Kategori Menu" value={totalCategories.toString()} icon={Layers} description="Kategori aktif" bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" textColor="text-white" />
+        <StatCard 
+            title="Kategori Menu" 
+            value={totalCategories !== null ? totalCategories.toString() : "..."} 
+            icon={Layers} 
+            description="Kategori aktif" 
+            bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" 
+            textColor="text-white" 
+        />
         <StatCard title="Pesanan Hari Ini" value={todaysOrders.toString()} icon={ClipboardList} description="Total pesanan" bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" textColor="text-white" />
         <StatCard title="Pending" value={pendingOrders.toString()} icon={Clock} description="Menunggu" bgColor="bg-yellow-400" textColor="text-white" />
         <StatCard title="Diproses" value={processingOrders.toString()} icon={Loader} description="Sedang diproses" bgColor="bg-blue-500" textColor="text-white" />
