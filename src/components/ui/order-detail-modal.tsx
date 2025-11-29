@@ -80,9 +80,6 @@ export function OrderDetailModal({
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive-foreground/70 hover:text-destructive-foreground hover:bg-destructive-foreground/10">
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <button onClick={() => onOpenChange(false)} className="text-destructive-foreground/70 hover:text-destructive-foreground">
-                    <X className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm pt-2">
