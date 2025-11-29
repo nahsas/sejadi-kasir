@@ -163,11 +163,6 @@ export function OrderDetailModal({
             </DialogHeader>
 
             <div className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-yellow-400 pb-2 mb-4">
-                    <List className="text-primary h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Detail Menu Pesanan</h3>
-                </div>
-
                 <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
                     {order.detail_pesanans.map((item) => {
                     const menuItem = getMenuDetails(item.menu_id);
