@@ -34,6 +34,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = React.useState("dine-in");
   const [totalMenu, setTotalMenu] = React.useState<number | null>(null);
   const [totalCategories, setTotalCategories] = React.useState<number | null>(null);
+  const [todaysOrdersCount, setTodaysOrdersCount] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     const fetchTotalMenu = async () => {
@@ -66,15 +67,35 @@ export default function DashboardPage() {
       }
     };
 
+    const fetchTodaysOrders = async () => {
+      try {
+        const response = await fetch("https://api.sejadikopi.com/api/pesanan?select=id,created_at");
+        if (response.ok) {
+          const data = await response.json();
+          const today = new Date().toDateString();
+          const count = data.data.filter((order: { created_at: string }) => {
+            const orderDate = new Date(order.created_at).toDateString();
+            return orderDate === today;
+          }).length;
+          setTodaysOrdersCount(count);
+        } else {
+          setTodaysOrdersCount(0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch today's orders:", error);
+        setTodaysOrdersCount(0);
+      }
+    };
+
     fetchTotalMenu();
     fetchTotalCategories();
+    fetchTodaysOrders();
   }, []);
 
 
   const pendingOrders = orders.filter(o => o.status === 'Pending').length;
   const processingOrders = orders.filter(o => o.status === 'Processing').length;
   const completedOrders = orders.filter(o => o.status === 'Completed' && new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
-  const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
   
   const activeOrders = orders.filter(
     (o) => o.status === "Pending" || o.status === "Processing"
@@ -103,7 +124,14 @@ export default function DashboardPage() {
             bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" 
             textColor="text-white" 
         />
-        <StatCard title="Pesanan Hari Ini" value={todaysOrders.toString()} icon={ClipboardList} description="Total pesanan" bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" textColor="text-white" />
+        <StatCard 
+            title="Pesanan Hari Ini" 
+            value={todaysOrdersCount !== null ? todaysOrdersCount.toString() : "..."} 
+            icon={ClipboardList} 
+            description="Total pesanan" 
+            bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" 
+            textColor="text-white" 
+        />
         <StatCard title="Pending" value={pendingOrders.toString()} icon={Clock} description="Menunggu" bgColor="bg-yellow-400" textColor="text-white" />
         <StatCard title="Diproses" value={processingOrders.toString()} icon={Loader} description="Sedang diproses" bgColor="bg-blue-500" textColor="text-white" />
         <StatCard title="Selesai" value={completedOrders.toString()} icon={CheckCircle2} description="Selesai hari ini" bgColor="bg-green-500" textColor="text-white" />
