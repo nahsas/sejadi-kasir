@@ -18,6 +18,7 @@ import { Order } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { X, Landmark, QrCode, Pencil, Check, Receipt, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 const banks = [
     { id: 'BCA', name: 'BCA', logo: 'https://placehold.co/100x40/003087/FFFFFF?text=BCA' },
@@ -34,9 +35,11 @@ export function PaymentModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = React.useState<'Cash' | 'QRIS'>('Cash');
   const [paymentAmount, setPaymentAmount] = React.useState('');
   const [selectedBank, setSelectedBank] = React.useState<'BCA' | 'BRI' | 'BSI' | null>('BCA');
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const quickAddAmounts = [1000, 2000, 5000, 10000, 50000, 100000];
   const orderTotal = order ? parseInt(order.total, 10) : 0;
@@ -53,12 +56,68 @@ export function PaymentModal({
   const isShortfall = changeAmount < 0;
   const changeText = `Rp ${Math.abs(changeAmount).toLocaleString('id-ID')}`;
 
+  const handleFinishPayment = async () => {
+    if (!order) return;
+    setIsLoading(true);
+
+    let payload = {};
+
+    if (paymentMethod === 'QRIS') {
+        payload = {
+            status: "selesai",
+            updated_at: new Date().toISOString(),
+            completed_at: new Date().toISOString(),
+            is_final: true,
+            metode_pembayaran: "qris",
+            bank_qris: selectedBank,
+            discount_code: null, // Assuming no discount for now
+            discount_amount: 0,
+            total_after_discount: order.total
+        };
+    } else { // Cash
+        // TODO: Implement cash payment logic
+    }
+    
+    try {
+        const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Gagal menyelesaikan pembayaran.');
+        }
+
+        toast({
+            title: "Pembayaran Berhasil",
+            description: `Pesanan #${order.id} telah ditandai sebagai selesai.`,
+        });
+        onOpenChange(false);
+        // Here you might want to trigger a data refresh on the parent page
+        // e.g., by calling a prop function like `onPaymentSuccess()`
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message || "Terjadi kesalahan saat memproses pembayaran.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+
   React.useEffect(() => {
     // Reset state when modal is closed or order changes
     if (!open) {
       setPaymentAmount('');
       setPaymentMethod('Cash');
       setSelectedBank('BCA');
+      setIsLoading(false);
     }
   }, [open]);
 
@@ -223,12 +282,16 @@ export function PaymentModal({
         </div>
 
         <DialogFooter className="p-4 bg-slate-50 border-t grid grid-cols-2 gap-2">
-            <Button className="bg-green-600 hover:bg-green-700 text-white">
-                <Check className="mr-2 h-4 w-4" />
-                Selesai & Print Struk
+            <Button onClick={handleFinishPayment} className="bg-green-600 hover:bg-green-700 text-white" disabled={isLoading}>
+                {isLoading ? "Memproses..." : (
+                    <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Selesai & Print Struk
+                    </>
+                )}
             </Button>
              <DialogClose asChild>
-                <Button variant="secondary" className="bg-gray-300 text-gray-800 hover:bg-gray-400">
+                <Button variant="secondary" className="bg-gray-300 text-gray-800 hover:bg-gray-400" disabled={isLoading}>
                     <X className="mr-2 h-4 w-4" />
                     Batal
                 </Button>
