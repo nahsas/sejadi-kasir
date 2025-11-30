@@ -36,23 +36,30 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
 
   const handleUpdateStock = async (menuItem: MenuItem, newStock: number) => {
     try {
-      const fullMenuItemData = new FormData();
-      fullMenuItemData.append('nama', menuItem.nama);
-      fullMenuItemData.append('kategori_id', String(menuItem.kategori_id));
-      fullMenuItemData.append('harga', String(menuItem.harga));
-      fullMenuItemData.append('stok', String(newStock));
-      fullMenuItemData.append('is_available', newStock > 0 ? '1' : '0');
-      fullMenuItemData.append('is_recommendation', String(menuItem.is_recommendation ? 1: 0));
-      fullMenuItemData.append('description', menuItem.description || '');
+      const payload = {
+        ...menuItem,
+        stok: newStock,
+        is_available: newStock > 0,
+        harga: Number(menuItem.harga) // Ensure harga is a number if API expects it
+      };
+       // Remove fields that shouldn't be in the PUT payload if any
+      delete payload.created_at;
+      delete payload.updated_at;
 
 
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${menuItem.id}`, {
         method: 'PUT',
-        body: fullMenuItemData,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('Gagal memperbarui stok.');
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        throw new Error(errorData.message || 'Gagal memperbarui stok.');
       }
 
       toast({
