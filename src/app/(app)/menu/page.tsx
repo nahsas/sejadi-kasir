@@ -9,8 +9,10 @@ import { columns as menuColumns } from "./columns";
 import { columns as categoryColumns } from "./category-columns";
 import { columns as discountColumns } from "./discount-columns";
 import { columns as stockColumns } from "./stock-columns";
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Star } from "lucide-react";
+import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Star, Search, Filter } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -65,6 +67,9 @@ export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
 
+  const [stockSearchTerm, setStockSearchTerm] = useState('');
+  const [stockFilterAvailability, setStockFilterAvailability] = useState('all');
+
   const [stats, setStats] = useState({
     totalMenu: 0,
     totalCoffee: 0,
@@ -98,7 +103,6 @@ export default function MenuPage() {
       const discountData = discountRes.ok ? await discountRes.json() : { data: [] };
       setDiscounts(discountData.data || []);
       
-      // The stats can be derived from the fetched menu items
        if (menuData.data) {
         const foodAndSnackCategoryIds = [3, 4, 5, 6, 7];
         const coffeeCategoryId = 1;
@@ -154,6 +158,16 @@ export default function MenuPage() {
 
   const menuColumnsWithCategories = menuColumns({ onEdit: handleMenuFormOpen, onDeleteSuccess: fetchData, categories });
   const stockColumnsWithHandlers = stockColumns({ onUpdateSuccess: fetchData, categories });
+
+  const filteredStockItems = menuItems.filter(item => {
+    const nameMatch = item.nama.toLowerCase().includes(stockSearchTerm.toLowerCase());
+    
+    const availabilityMatch = stockFilterAvailability === 'all' 
+      || (stockFilterAvailability === 'available' && item.stok > 0)
+      || (stockFilterAvailability === 'unavailable' && (item.stok === 0 || item.stok === null));
+
+    return nameMatch && availabilityMatch;
+  });
 
 
   return (
@@ -211,10 +225,35 @@ export default function MenuPage() {
             />
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
-           <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Perbarui Semua Stok" onButtonClick={() => {}} buttonDisabled={true} />
+          <Card className="mb-6">
+              <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
+                <div className="relative flex-grow w-full md:w-auto">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Cari nama item..."
+                    className="pl-10"
+                    value={stockSearchTerm}
+                    onChange={(e) => setStockSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select value={stockFilterAvailability} onValueChange={setStockFilterAvailability}>
+                  <SelectTrigger className="w-full md:w-[240px]">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      <SelectValue placeholder="Filter Ketersediaan" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua</SelectItem>
+                    <SelectItem value="available">Tersedia</SelectItem>
+                    <SelectItem value="unavailable">Habis</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
            <DataTable 
               columns={stockColumnsWithHandlers}
-              data={menuItems} 
+              data={filteredStockItems} 
             />
         </TabsContent>
         <TabsContent value="discount" className="mt-6">
