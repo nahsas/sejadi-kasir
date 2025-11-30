@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi'),
@@ -66,6 +67,7 @@ export function MenuForm({
 }: MenuFormProps) {
   const { toast } = useToast();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(formSchema),
@@ -135,6 +137,7 @@ export function MenuForm({
   };
 
   const onSubmit = async (values: MenuFormValues) => {
+    setIsSubmitting(true);
     try {
       let imageUrl = menuItem?.image_url || '';
 
@@ -155,6 +158,7 @@ export function MenuForm({
       
       const payload: any = {
         ...values,
+        harga: Number(values.harga),
         image_url: imageUrl,
         available_variants: JSON.stringify(values.available_variants).replace(/"/g, "'"),
         is_available: true, 
@@ -195,6 +199,8 @@ export function MenuForm({
         title: 'Error',
         description: error.message || 'Tidak dapat menyimpan item menu.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -366,10 +372,13 @@ export function MenuForm({
                 />
 
                 <DialogFooter className="sticky bottom-0 bg-background py-4">
-                    <Button type="button" variant="outline" onClick={onClose}>
+                    <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
                         Batal
                     </Button>
-                    <Button type="submit">Simpan</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+                    </Button>
                 </DialogFooter>
             </form>
             </Form>
