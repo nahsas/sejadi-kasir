@@ -2,7 +2,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Pencil, XCircle } from "lucide-react"
+import { ArrowUpDown, XCircle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MenuItem } from "@/lib/data"
 import { Badge } from "@/components/ui/badge"
@@ -21,12 +21,11 @@ import { useToast } from "@/hooks/use-toast"
 import { Category } from "@/lib/types"
 
 type StockColumnsProps = {
-  onEdit: (menuItem: MenuItem) => void;
   onUpdateSuccess: () => void;
   categories: Category[];
 }
 
-export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsProps): ColumnDef<MenuItem>[] => {
+export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): ColumnDef<MenuItem>[] => {
   const { toast } = useToast();
   
   const getCategoryName = (kategori_id: number) => {
@@ -35,14 +34,14 @@ export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsPro
     return category ? category.nama : 'N/A';
   }
 
-  const handleMarkAsSold = async (menuItem: MenuItem) => {
+  const handleUpdateStock = async (menuItem: MenuItem, newStock: number) => {
     try {
       const fullMenuItemData = new FormData();
       fullMenuItemData.append('nama', menuItem.nama);
       fullMenuItemData.append('kategori_id', String(menuItem.kategori_id));
       fullMenuItemData.append('harga', String(menuItem.harga));
-      fullMenuItemData.append('stok', '0');
-      fullMenuItemData.append('is_available', '0');
+      fullMenuItemData.append('stok', String(newStock));
+      fullMenuItemData.append('is_available', newStock > 0 ? '1' : '0');
       fullMenuItemData.append('is_recommendation', String(menuItem.is_recommendation ? 1: 0));
       fullMenuItemData.append('description', menuItem.description || '');
       fullMenuItemData.append('_method', 'PUT');
@@ -54,12 +53,12 @@ export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsPro
       });
 
       if (!response.ok) {
-        throw new Error('Gagal menandai sebagai habis.');
+        throw new Error('Gagal memperbarui stok.');
       }
 
       toast({
         title: 'Sukses',
-        description: `${menuItem.nama} telah ditandai sebagai habis.`,
+        description: `Stok untuk ${menuItem.nama} telah diperbarui.`,
       });
       onUpdateSuccess();
     } catch (error) {
@@ -117,37 +116,58 @@ export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsPro
       cell: ({ row }) => {
         const menuItem = row.original
         return (
-            <AlertDialog>
-              <div className="text-right space-x-2">
+            <div className="text-right space-x-2">
+                <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm" disabled={(menuItem.stok || 0) === 0}>
                       <XCircle className="mr-2 h-4 w-4" />
                       Tandai Habis
                     </Button>
                   </AlertDialogTrigger>
-                  <Button onClick={() => onEdit(menuItem)} size="sm">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Perbarui Stok
-                  </Button>
-              </div>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Ini akan mengatur stok untuk "{menuItem.nama}" menjadi 0. Tindakan ini dapat dibatalkan dengan memperbarui stok secara manual.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => handleMarkAsSold(menuItem)}
-                    className="bg-destructive hover:bg-destructive/90"
-                  >
-                    Ya, Tandai Habis
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Ini akan mengatur stok untuk "{menuItem.nama}" menjadi 0.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleUpdateStock(menuItem, 0)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Ya, Tandai Habis
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                     <Button variant="outline" size="sm" className="bg-green-600 text-white hover:bg-green-700 hover:text-white">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Tandai Tersedia
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                          Ini akan mengatur stok untuk "{menuItem.nama}" menjadi 1000.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleUpdateStock(menuItem, 1000)}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Ya, Tandai Tersedia
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+            </div>
         )
       },
     },

@@ -19,7 +19,6 @@ import { Category, Discount } from '@/lib/types';
 import { MenuForm } from './menu-form';
 import { CategoryForm } from './category-form';
 import { DiscountForm } from './discount-form';
-import { StockForm } from './stock-form';
 
 function StatCard({ title, value, icon: Icon, description, color }: { title: string, value: string, icon: React.ElementType, description: string, color: string }) {
   return (
@@ -82,10 +81,6 @@ export default function MenuPage() {
   const [isDiscountFormOpen, setIsDiscountFormOpen] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
   
-  const [isStockFormOpen, setIsStockFormOpen] = useState(false);
-  const [editingStockItem, setEditingStockItem] = useState<MenuItem | null>(null);
-
-
   const fetchData = useCallback(async () => {
     try {
       const [menuRes, categoryRes, discountRes] = await Promise.all([
@@ -157,13 +152,8 @@ export default function MenuPage() {
     setIsDiscountFormOpen(true);
   };
 
-  const handleStockFormOpen = (menuItem: MenuItem | null = null) => {
-    setEditingStockItem(menuItem);
-    setIsStockFormOpen(true);
-  };
-  
   const menuColumnsWithCategories = menuColumns({ onEdit: handleMenuFormOpen, onDeleteSuccess: fetchData, categories });
-  const stockColumnsWithCategories = stockColumns({ onEdit: handleStockFormOpen, onUpdateSuccess: fetchData, categories });
+  const stockColumnsWithHandlers = stockColumns({ onUpdateSuccess: fetchData, categories });
 
 
   return (
@@ -193,15 +183,6 @@ export default function MenuPage() {
           discount={editingDiscount}
         />
       )}
-      {isStockFormOpen && (
-        <StockForm
-          isOpen={isStockFormOpen}
-          onClose={() => setIsStockFormOpen(false)}
-          onSuccess={fetchData}
-          menuItem={editingStockItem}
-        />
-      )}
-
 
       <div>
         <h1 className="text-3xl font-headline font-bold tracking-tight">Manajemen Menu</h1>
@@ -216,12 +197,11 @@ export default function MenuPage() {
       </div>
       
       <Tabs defaultValue="menu">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="menu">Menu</TabsTrigger>
           <TabsTrigger value="stock">Stok</TabsTrigger>
           <TabsTrigger value="discount">Diskon</TabsTrigger>
           <TabsTrigger value="category">Kategori</TabsTrigger>
-          <TabsTrigger value="bestseller">Best Seller</TabsTrigger>
         </TabsList>
         <TabsContent value="menu" className="mt-6">
            <TabHeader icon={BookOpen} title="Kelola Menu" description="Tambah dan kelola menu kopi & makanan" buttonText="Buat Menu Baru" onButtonClick={() => handleMenuFormOpen()} />
@@ -233,7 +213,7 @@ export default function MenuPage() {
         <TabsContent value="stock" className="mt-6">
            <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Perbarui Semua Stok" onButtonClick={() => {}} buttonDisabled={true} />
            <DataTable 
-              columns={stockColumnsWithCategories}
+              columns={stockColumnsWithHandlers}
               data={menuItems} 
             />
         </TabsContent>
@@ -250,14 +230,6 @@ export default function MenuPage() {
             columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
             data={categories}
           />
-        </TabsContent>
-        <TabsContent value="bestseller" className="mt-6">
-          <TabHeader icon={Star} title="Kelola Best Seller" description="Tandai dan atur item menu yang paling populer" buttonText="Atur Best Seller" onButtonClick={() => {}} buttonDisabled={true} />
-          <Card>
-            <CardContent className="pt-6">
-              <p>Manajemen best seller tidak tersedia melalui API.</p>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>
