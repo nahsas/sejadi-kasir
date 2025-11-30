@@ -14,11 +14,33 @@ export function useOrderNotification() {
   const router = useRouter();
   const isFirstLoad = useRef(true);
 
+  // This effect runs only once on the client to initialize the audio object.
   useEffect(() => {
-    // Initialize Audio object on the client side only once
     if (typeof window !== 'undefined' && !audioRef.current) {
         audioRef.current = new Audio('/notification.mp3');
+        audioRef.current.preload = 'auto'; // Preload the audio file
     }
+
+    // Function to unlock audio on first user interaction
+    const unlockAudio = () => {
+        if (audioRef.current && audioRef.current.paused) {
+            audioRef.current.play().catch(() => {});
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+            // Remove the listener after the first interaction
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('keydown', unlockAudio);
+        }
+    };
+
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+
+    return () => {
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+    };
+
   }, []);
 
   const fetchPendingOrders = useCallback(async () => {
@@ -47,21 +69,16 @@ export function useOrderNotification() {
 
       if (newOrderIds.length > 0) {
         if (audioRef.current) {
-          // Reset and play to ensure it plays every time
           audioRef.current.currentTime = 0;
-          // The catch block prevents the console error you saw.
-          // Browsers block autoplay until user interaction.
           audioRef.current.play().catch(error => {
-            // This error is expected if the user hasn't interacted with the page yet.
-            // We can safely ignore it.
-            console.log("Audio playback failed, likely due to browser autoplay policy.");
+            console.log("Audio playback failed, user may need to interact with the page first.", error);
           });
         }
         
         const newOrders = pendingOrders.filter(order => newOrderIds.includes(order.id));
 
         newOrders.forEach(newOrder => {
-            const customer = newOrder.location_type === 'dine-in' ? `Meja ${newOrder.no_meja}`: newOrder.no_meja;
+            const customer = newOrder.location_type.toLowerCase() === 'dine_in' ? `Meja ${newOrder.no_meja}`: newOrder.no_meja;
             toast({
                 title: '🔔 Pesanan Baru Diterima!',
                 description: `Pesanan baru dari ${customer} telah diterima.`,
