@@ -58,15 +58,26 @@ export function PaymentModal({
 
   const handleFinishPayment = async () => {
     if (!order) return;
+    
+    if (paymentMethod === 'Cash' && (paymentAmount === '' || isShortfall)) {
+        toast({
+            variant: "destructive",
+            title: "Pembayaran Kurang",
+            description: "Jumlah pembayaran tidak boleh kurang dari total pesanan.",
+        });
+        return;
+    }
+
     setIsLoading(true);
 
     let payload = {};
+    const now = new Date().toISOString();
 
     if (paymentMethod === 'QRIS') {
         payload = {
             status: "selesai",
-            updated_at: new Date().toISOString(),
-            completed_at: new Date().toISOString(),
+            updated_at: now,
+            completed_at: now,
             is_final: true,
             metode_pembayaran: "qris",
             bank_qris: selectedBank,
@@ -75,7 +86,17 @@ export function PaymentModal({
             total_after_discount: order.total
         };
     } else { // Cash
-        // TODO: Implement cash payment logic
+        payload = {
+            status: "selesai",
+            updated_at: now,
+            completed_at: now,
+            is_final: true,
+            metode_pembayaran: "cash",
+            bank_qris: null,
+            discount_code: null, // Assuming no discount for now
+            discount_amount: 0,
+            total_after_discount: order.total
+        };
     }
     
     try {
@@ -215,7 +236,7 @@ export function PaymentModal({
                         ))}
                     </div>
                     <Button onClick={handleAutoFill} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                        <Pencil className="mr-2 h-4 w-4" /> Auto Pas Total
+                        <Pencil className="mr-2 h-4 w-4" /> Uang Pas
                     </Button>
                     {paymentAmount && (
                          <div className={cn(
