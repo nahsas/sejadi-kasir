@@ -30,6 +30,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -227,9 +228,27 @@ export function SidebarNav() {
               >
                 {isShopOpen ? <Store className="h-5 w-5" /> : <DoorClosed className="h-5 w-5" />}
               </Button>
-              <Button onClick={logout} variant="ghost" size="icon" className="h-10 w-10 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
-                <LogOut className="h-5 w-5" />
-              </Button>
+               <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700">
+                        <LogOut className="h-5 w-5" />
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Apakah Anda yakin ingin keluar?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Anda akan dikembalikan ke halaman login.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={logout} className="bg-destructive hover:bg-destructive/90">
+                        Keluar
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
             </div>
           </div>
           <div className="md:hidden">
