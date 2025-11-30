@@ -8,34 +8,41 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Coffee } from 'lucide-react';
+import { Coffee, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
     try {
       await login(email, password);
       router.push('/');
     } catch (err) {
       setError('Email atau kata sandi salah. Silakan coba lagi.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-            <div className="flex justify-center items-center mb-4">
-                <Coffee className="w-12 h-12 text-primary" />
+    <div className="flex items-center justify-center min-h-screen bg-background px-4">
+      <Card className="w-full max-w-sm shadow-xl">
+        <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center items-center mb-2">
+                 <div className="p-4 bg-primary/10 rounded-full">
+                    <Coffee className="w-8 h-8 text-primary" />
+                </div>
             </div>
-          <CardTitle className="text-2xl">SejadiKopi</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">SejadiKopi</CardTitle>
           <CardDescription>Masukkan kredensial Anda untuk mengakses dasbor</CardDescription>
         </CardHeader>
         <CardContent>
@@ -45,10 +52,11 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="admin@sejadikopi.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
               />
             </div>
             <div className="space-y-2">
@@ -60,11 +68,13 @@ export default function LoginPage() {
                 value={password}
                 placeholder="********"
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
               />
             </div>
-             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-            <Button type="submit" className="w-full">
-              Masuk
+             {error && <p className="text-sm font-medium text-destructive pt-2 text-center">{error}</p>}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting ? 'Memproses...' : 'Masuk'}
             </Button>
           </form>
         </CardContent>
