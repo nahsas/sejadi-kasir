@@ -43,19 +43,19 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
       });
 
       if (!response.ok) {
-        throw new Error('Failed to mark as sold.');
+        throw new Error('Gagal menandai sebagai habis.');
       }
 
       toast({
-        title: 'Success',
-        description: `${menuItem.nama} has been marked as sold out.`,
+        title: 'Sukses',
+        description: `${menuItem.nama} telah ditandai sebagai habis.`,
       });
       onUpdateSuccess();
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not update stock.',
+        description: 'Tidak dapat memperbarui stok.',
       });
     }
   }
@@ -69,7 +69,7 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            Nama
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -78,7 +78,7 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
     },
     {
       accessorKey: "kategori",
-      header: "Category",
+      header: "Kategori",
       cell: ({ row }) => {
         const menuItem = row.original as any;
         return menuItem.kategori ? menuItem.kategori.nama : 'N/A';
@@ -86,7 +86,7 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
     },
     {
       accessorKey: "stok",
-      header: () => <div className="text-right">Stock</div>,
+      header: () => <div className="text-right">Stok</div>,
       cell: ({ row }) => {
         const stock = row.getValue("stok") as number;
         return <div className="text-right font-medium">{stock}</div>
@@ -94,11 +94,11 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
     },
     {
         accessorKey: "is_available",
-        header: "Availability",
+        header: "Ketersediaan",
         cell: ({ row }) => {
           const stock = row.original.stok as number;
           const isAvailable = stock > 0;
-          return <Badge variant={isAvailable ? "outline" : "secondary"}>{isAvailable ? "Available" : "Sold Out"}</Badge>
+          return <Badge variant={isAvailable ? "outline" : "secondary"}>{isAvailable ? "Tersedia" : "Habis"}</Badge>
         }
       },
     {
@@ -111,28 +111,28 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm" disabled={menuItem.stok === 0}>
                       <XCircle className="mr-2 h-4 w-4" />
-                      Mark as Sold
+                      Tandai Habis
                     </Button>
                   </AlertDialogTrigger>
                   <Button onClick={() => onEdit(menuItem)} size="sm">
                     <Pencil className="mr-2 h-4 w-4" />
-                    Update Stock
+                    Perbarui Stok
                   </Button>
               </div>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will set the stock for "{menuItem.nama}" to 0. This action can be reversed by manually updating the stock.
+                    Ini akan mengatur stok untuk "{menuItem.nama}" menjadi 0. Tindakan ini dapat dibatalkan dengan memperbarui stok secara manual.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => handleMarkAsSold(menuItem)}
                     className="bg-destructive hover:bg-destructive/90"
                   >
-                    Yes, Mark as Sold
+                    Ya, Tandai Habis
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

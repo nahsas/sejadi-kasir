@@ -39,9 +39,9 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 const formSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
+  code: z.string().min(1, 'Kode wajib diisi'),
   type: z.enum(['percentage', 'fixed']),
-  value: z.coerce.number().min(0, 'Value must be a positive number'),
+  value: z.coerce.number().min(0, 'Nilai harus angka positif'),
   is_active: z.boolean(),
   valid_from: z.date().optional(),
   valid_to: z.date().optional(),
@@ -116,11 +116,11 @@ export function DiscountForm({
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) throw new Error('Failed to save discount.');
+      if (!response.ok) throw new Error('Gagal menyimpan diskon.');
 
       toast({
-        title: 'Success',
-        description: `Discount successfully ${discount ? 'updated' : 'created'}.`,
+        title: 'Sukses',
+        description: `Diskon berhasil ${discount ? 'diperbarui' : 'dibuat'}.`,
       });
       onSuccess();
       onClose();
@@ -128,7 +128,7 @@ export function DiscountForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not save discount.',
+        description: 'Tidak dapat menyimpan diskon.',
       });
     }
   };
@@ -137,7 +137,7 @@ export function DiscountForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{discount ? 'Edit Discount' : 'Create Discount'}</DialogTitle>
+          <DialogTitle>{discount ? 'Ubah Diskon' : 'Buat Diskon'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -146,9 +146,9 @@ export function DiscountForm({
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code</FormLabel>
+                  <FormLabel>Kode</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. KOPIHEMAT" {...field} />
+                    <Input placeholder="cth. KOPIHEMAT" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,16 +160,16 @@ export function DiscountForm({
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>Tipe</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a type" />
+                          <SelectValue placeholder="Pilih tipe" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="percentage">Percentage</SelectItem>
-                        <SelectItem value="fixed">Fixed</SelectItem>
+                        <SelectItem value="percentage">Persentase</SelectItem>
+                        <SelectItem value="fixed">Tetap</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -181,7 +181,7 @@ export function DiscountForm({
                 name="value"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Value</FormLabel>
+                    <FormLabel>Nilai</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -196,7 +196,7 @@ export function DiscountForm({
                     name="valid_from"
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
-                        <FormLabel>Valid From</FormLabel>
+                        <FormLabel>Berlaku Dari</FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
                             <FormControl>
@@ -210,7 +210,7 @@ export function DiscountForm({
                                 {field.value ? (
                                     format(field.value, "PPP")
                                 ) : (
-                                    <span>Pick a date</span>
+                                    <span>Pilih tanggal</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
@@ -235,7 +235,7 @@ export function DiscountForm({
                     name="valid_to"
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
-                        <FormLabel>Valid To</FormLabel>
+                        <FormLabel>Berlaku Hingga</FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
                             <FormControl>
@@ -249,7 +249,7 @@ export function DiscountForm({
                                 {field.value ? (
                                     format(field.value, "PPP")
                                 ) : (
-                                    <span>Pick a date</span>
+                                    <span>Pilih tanggal</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
@@ -276,7 +276,7 @@ export function DiscountForm({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                   <div className="space-y-0.5">
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Aktif</FormLabel>
                   </div>
                   <FormControl>
                     <Switch
@@ -289,9 +289,9 @@ export function DiscountForm({
             />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Batal
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -299,5 +299,3 @@ export function DiscountForm({
     </Dialog>
   );
 }
-
-    

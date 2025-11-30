@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -23,7 +24,7 @@ export default function LoginPage() {
       await login(email, password);
       router.push('/');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setError('Email atau kata sandi salah. Silakan coba lagi.');
     }
   };
 
@@ -35,7 +36,7 @@ export default function LoginPage() {
                 <Coffee className="w-12 h-12 text-primary" />
             </div>
           <CardTitle className="text-2xl">SejadiKopi</CardTitle>
-          <CardDescription>Enter your credentials to access the dashboard</CardDescription>
+          <CardDescription>Masukkan kredensial Anda untuk mengakses dasbor</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -51,7 +52,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <Input
                 id="password"
                 type="password"
@@ -63,12 +64,12 @@ export default function LoginPage() {
             </div>
              {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             <Button type="submit" className="w-full">
-              Login
+              Masuk
             </Button>
           </form>
         </CardContent>
         <CardFooter>
-           <p className="text-xs text-muted-foreground text-center w-full">© 2024 SejadiKopi. All rights reserved.</p>
+           <p className="text-xs text-muted-foreground text-center w-full">© 2024 SejadiKopi. Hak cipta dilindungi.</p>
         </CardFooter>
       </Card>
     </div>

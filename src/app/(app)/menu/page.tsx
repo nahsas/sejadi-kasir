@@ -134,7 +134,7 @@ export default function MenuPage() {
       }
 
     } catch (error) {
-      console.error("Failed to fetch menu data", error);
+      console.error("Gagal mengambil data menu", error);
     }
   }, []);
 
@@ -151,7 +151,7 @@ export default function MenuPage() {
   }, [user, loading, router]);
 
   if (loading || user?.role !== 'admin') {
-    return <div className="flex items-center justify-center h-screen">Access Denied</div>;
+    return <div className="flex items-center justify-center h-screen">Akses Ditolak</div>;
   }
 
   const handleMenuFormOpen = (menuItem: MenuItem | null = null) => {
@@ -225,24 +225,24 @@ export default function MenuPage() {
 
 
       <div>
-        <h1 className="text-3xl font-headline font-bold tracking-tight">Menu Management</h1>
-        <p className="text-muted-foreground">Add, edit, and manage your coffee shop's menu.</p>
+        <h1 className="text-3xl font-headline font-bold tracking-tight">Manajemen Menu</h1>
+        <p className="text-muted-foreground">Tambah, ubah, dan kelola menu kedai kopi Anda.</p>
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Menu" value={stats.totalMenu.toString()} icon={BookOpen} description="All items on your menu." color="bg-blue-500 text-white" />
-        <StatCard title="Coffee" value={stats.totalCoffee.toString()} icon={Coffee} description="Number of coffee varieties." color="bg-amber-600 text-white" />
-        <StatCard title="Food & Snack" value={stats.totalFoodAndSnack.toString()} icon={Utensils} description="Pastries and other snacks." color="bg-green-500 text-white" />
-        <StatCard title="Total Stock" value={stats.totalStock.toString()} icon={Archive} description="Items currently available." color="bg-slate-700 text-white" />
+        <StatCard title="Total Menu" value={stats.totalMenu.toString()} icon={BookOpen} description="Semua item di menu Anda." color="bg-blue-500 text-white" />
+        <StatCard title="Kopi" value={stats.totalCoffee.toString()} icon={Coffee} description="Jumlah varian kopi." color="bg-amber-600 text-white" />
+        <StatCard title="Makanan & Snack" value={stats.totalFoodAndSnack.toString()} icon={Utensils} description="Kue kering dan makanan ringan lainnya." color="bg-green-500 text-white" />
+        <StatCard title="Total Stok" value={stats.totalStock.toString()} icon={Archive} description="Item yang saat ini tersedia." color="bg-slate-700 text-white" />
       </div>
       
       <Tabs defaultValue="menu">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="menu">Menu</TabsTrigger>
-          <TabsTrigger value="stock">Stock</TabsTrigger>
-          <TabsTrigger value="discount">Discount</TabsTrigger>
-          <TabsTrigger value="category">Category</TabsTrigger>
-          <TabsTrigger value="additional">Additional</TabsTrigger>
+          <TabsTrigger value="stock">Stok</TabsTrigger>
+          <TabsTrigger value="discount">Diskon</TabsTrigger>
+          <TabsTrigger value="category">Kategori</TabsTrigger>
+          <TabsTrigger value="additional">Tambahan</TabsTrigger>
           <TabsTrigger value="bestseller">Best Seller</TabsTrigger>
         </TabsList>
         <TabsContent value="menu" className="mt-6">
@@ -253,7 +253,7 @@ export default function MenuPage() {
             />
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
-           <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Update All Stock" onButtonClick={() => {}} buttonDisabled={true} />
+           <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Perbarui Semua Stok" onButtonClick={() => {}} buttonDisabled={true} />
            <DataTable 
               columns={stockColumns({ onEdit: handleStockFormOpen, onUpdateSuccess: fetchData })} 
               data={menuItems} 
@@ -284,7 +284,7 @@ export default function MenuPage() {
           <TabHeader icon={Star} title="Kelola Best Seller" description="Tandai dan atur item menu yang paling populer" buttonText="Atur Best Seller" onButtonClick={() => {}} buttonDisabled={true} />
           <Card>
             <CardContent className="pt-6">
-              <p>Best seller management is not available through the API.</p>
+              <p>Manajemen best seller tidak tersedia melalui API.</p>
             </CardContent>
           </Card>
         </TabsContent>

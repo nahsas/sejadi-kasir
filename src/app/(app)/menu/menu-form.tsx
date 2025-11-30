@@ -36,10 +36,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
 const formSchema = z.object({
-  nama: z.string().min(1, 'Name is required'),
-  kategori_id: z.coerce.number().min(1, 'Category is required'),
-  harga: z.coerce.number().min(0, 'Price must be a positive number'),
-  stok: z.coerce.number().min(0, 'Stock must be a positive number'),
+  nama: z.string().min(1, 'Nama wajib diisi'),
+  kategori_id: z.coerce.number().min(1, 'Kategori wajib diisi'),
+  harga: z.coerce.number().min(0, 'Harga harus angka positif'),
+  stok: z.coerce.number().min(0, 'Stok harus angka positif'),
   description: z.string().optional(),
   is_available: z.boolean(),
   is_recommendation: z.boolean(),
@@ -113,11 +113,11 @@ export function MenuForm({
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Failed to save menu item.');
+      if (!response.ok) throw new Error('Gagal menyimpan item menu.');
 
       toast({
-        title: 'Success',
-        description: `Menu item successfully ${menuItem ? 'updated' : 'created'}.`,
+        title: 'Sukses',
+        description: `Item menu berhasil ${menuItem ? 'diperbarui' : 'dibuat'}.`,
       });
       onSuccess();
       onClose();
@@ -125,7 +125,7 @@ export function MenuForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not save menu item.',
+        description: 'Tidak dapat menyimpan item menu.',
       });
     }
   };
@@ -134,7 +134,7 @@ export function MenuForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{menuItem ? 'Edit Menu' : 'Create Menu'}</DialogTitle>
+          <DialogTitle>{menuItem ? 'Ubah Menu' : 'Buat Menu'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -143,9 +143,9 @@ export function MenuForm({
               name="nama"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Espresso" {...field} />
+                    <Input placeholder="cth. Espresso" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -156,11 +156,11 @@ export function MenuForm({
               name="kategori_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Kategori</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder="Pilih kategori" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -181,7 +181,7 @@ export function MenuForm({
                 name="harga"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Price</FormLabel>
+                    <FormLabel>Harga</FormLabel>
                     <FormControl>
                         <Input type="number" {...field} />
                     </FormControl>
@@ -194,7 +194,7 @@ export function MenuForm({
                 name="stok"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Stock</FormLabel>
+                    <FormLabel>Stok</FormLabel>
                     <FormControl>
                         <Input type="number" {...field} />
                     </FormControl>
@@ -208,9 +208,9 @@ export function MenuForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Describe the item..." {...field} />
+                    <Textarea placeholder="Jelaskan item..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -223,7 +223,7 @@ export function MenuForm({
                 render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                     <div className="space-y-0.5">
-                        <FormLabel>Available</FormLabel>
+                        <FormLabel>Tersedia</FormLabel>
                     </div>
                     <FormControl>
                         <Switch
@@ -240,7 +240,7 @@ export function MenuForm({
                 render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                     <div className="space-y-0.5">
-                        <FormLabel>Recommended</FormLabel>
+                        <FormLabel>Direkomendasikan</FormLabel>
                     </div>
                     <FormControl>
                         <Switch
@@ -254,9 +254,9 @@ export function MenuForm({
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Batal
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -264,5 +264,3 @@ export function MenuForm({
     </Dialog>
   );
 }
-
-    

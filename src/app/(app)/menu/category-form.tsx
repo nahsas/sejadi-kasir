@@ -26,7 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
 const formSchema = z.object({
-  nama: z.string().min(1, 'Name is required'),
+  nama: z.string().min(1, 'Nama wajib diisi'),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>;
@@ -77,11 +77,11 @@ export function CategoryForm({
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Failed to save category.');
+      if (!response.ok) throw new Error('Gagal menyimpan kategori.');
 
       toast({
-        title: 'Success',
-        description: `Category successfully ${category ? 'updated' : 'created'}.`,
+        title: 'Sukses',
+        description: `Kategori berhasil ${category ? 'diperbarui' : 'dibuat'}.`,
       });
       onSuccess();
       onClose();
@@ -89,7 +89,7 @@ export function CategoryForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not save category.',
+        description: 'Tidak dapat menyimpan kategori.',
       });
     }
   };
@@ -98,7 +98,7 @@ export function CategoryForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{category ? 'Edit Category' : 'Create Category'}</DialogTitle>
+          <DialogTitle>{category ? 'Ubah Kategori' : 'Buat Kategori'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -107,9 +107,9 @@ export function CategoryForm({
               name="nama"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Coffee" {...field} />
+                    <Input placeholder="cth. Kopi" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,9 +117,9 @@ export function CategoryForm({
             />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Batal
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -127,5 +127,3 @@ export function CategoryForm({
     </Dialog>
   );
 }
-
-    

@@ -91,7 +91,7 @@ export default function DashboardPage() {
             setCompletedOrders(0);
         }
     } catch (error) {
-        console.error("Failed to fetch dashboard stats:", error);
+        console.error("Gagal mengambil statistik dasbor:", error);
         setTotalMenu(0);
         setMenuItems([]);
         setTotalCategories(0);
@@ -113,18 +113,18 @@ export default function DashboardPage() {
               const data = await dineInRes.json();
               setDineInOrders(data.data);
           } else {
-              throw new Error('Failed to fetch dine-in orders');
+              throw new Error('Gagal mengambil pesanan dine-in');
           }
 
           if (takeawayRes.ok) {
               const data = await takeawayRes.json();
               setTakeawayOrders(data.data);
           } else {
-              throw new Error('Failed to fetch takeaway orders');
+              throw new Error('Gagal mengambil pesanan takeaway');
           }
       } catch (error: any) {
-          console.error("Failed to fetch active orders:", error);
-          setOrdersError(error.message || "An unexpected error occurred.");
+          console.error("Gagal mengambil pesanan aktif:", error);
+          setOrdersError(error.message || "Terjadi kesalahan tak terduga.");
       } finally {
           setOrdersLoading(false);
       }
@@ -154,7 +154,7 @@ export default function DashboardPage() {
           return (
              <div className="flex flex-col items-center justify-center text-center py-16 text-red-500">
                 <AlertTriangle className="w-12 h-12 mb-4" />
-                <h3 className="text-xl font-bold">Error Fetching Orders</h3>
+                <h3 className="text-xl font-bold">Error Mengambil Pesanan</h3>
                 <p className="text-muted-foreground">{ordersError}</p>
              </div>
           )
@@ -213,7 +213,7 @@ export default function DashboardPage() {
             />
           </>
         )}
-        <StatCard title="Pending" value={pendingOrders !== null ? pendingOrders.toString() : "..."} icon={Clock} description="Menunggu" bgColor="bg-yellow-400" textColor="text-white" />
+        <StatCard title="Tertunda" value={pendingOrders !== null ? pendingOrders.toString() : "..."} icon={Clock} description="Menunggu" bgColor="bg-yellow-400" textColor="text-white" />
         <StatCard title="Diproses" value={processingOrders !== null ? processingOrders.toString() : "..."} icon={Loader} description="Sedang diproses" bgColor="bg-blue-500" textColor="text-white" />
         <StatCard title="Selesai" value={completedOrders !== null ? completedOrders.toString() : "..."} icon={CheckCircle2} description="Selesai hari ini" bgColor="bg-green-500" textColor="text-white" />
       </div>
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                 </Tabs>
               <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
+                Segarkan
               </Button>
             </div>
           </div>

@@ -37,14 +37,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 
 const mainNavItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, roles: ['admin', 'kasir'] },
-  { href: "/orders", label: "Order", icon: ShoppingCart, roles: ['admin', 'kasir'] },
-  { href: "/history", label: "History", icon: History, roles: ['admin', 'kasir'] },
+  { href: "/", label: "Dasbor", icon: LayoutDashboard, roles: ['admin', 'kasir'] },
+  { href: "/orders", label: "Pesanan", icon: ShoppingCart, roles: ['admin', 'kasir'] },
+  { href: "/history", label: "Riwayat", icon: History, roles: ['admin', 'kasir'] },
 ];
 
 const managementNavItems = [
     { href: "/reports", label: "Pembukuan", icon: BarChart3, roles: ['admin', 'kasir'] },
-    { href: "/menu", label: "Menu Manager", icon: BookOpen, roles: ['admin'] },
+    { href: "/menu", label: "Manajer Menu", icon: BookOpen, roles: ['admin'] },
 ];
 
 function ShopStatusModal({ isOpen, onOpenChange, shopStatus, onConfirm, loading }: { isOpen: boolean, onOpenChange: (open: boolean) => void, shopStatus: boolean | null, onConfirm: () => void, loading: boolean }) {
@@ -92,7 +92,7 @@ export function SidebarNav() {
   const userRole = user?.role || '';
   const userName = user?.email.split('@')[0];
   const displayName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : 'Admin';
-  const roleDisplay = user?.role === 'admin' ? 'Administrator' : 'Cashier';
+  const roleDisplay = user?.role === 'admin' ? 'Administrator' : 'Kasir';
 
   const availableMainNavItems = mainNavItems.filter(item => item.roles.includes(userRole));
   const availableManagementNavItems = managementNavItems.filter(item => item.roles.includes(userRole));
@@ -103,11 +103,11 @@ export function SidebarNav() {
         const data = await response.json();
         setIsShopOpen(data.is_open);
     } catch (error) {
-        console.error("Failed to fetch shop status:", error);
+        console.error("Gagal mengambil status toko:", error);
         toast({
             variant: "destructive",
             title: "Error",
-            description: "Could not fetch shop status.",
+            description: "Tidak dapat mengambil status toko.",
         });
     }
   };
@@ -132,7 +132,7 @@ export function SidebarNav() {
             body: JSON.stringify({ is_open: newStatus }),
         });
         if (!response.ok) {
-            throw new Error('Failed to update status');
+            throw new Error('Gagal memperbarui status');
         }
         setIsShopOpen(newStatus);
         toast({
@@ -140,11 +140,11 @@ export function SidebarNav() {
             description: `Toko berhasil di${newStatus ? 'buka' : 'tutup'}.`,
         });
     } catch (error) {
-        console.error("Failed to update shop status:", error);
+        console.error("Gagal memperbarui status toko:", error);
          toast({
             variant: "destructive",
             title: "Error",
-            description: "Could not update shop status.",
+            description: "Tidak dapat memperbarui status toko.",
         });
     } finally {
         setIsLoading(false);
@@ -182,7 +182,7 @@ export function SidebarNav() {
             </div>
             <div>
               <h1 className="text-lg font-headline font-bold">SEJADI KOPI</h1>
-              <p className="text-sm text-muted-foreground">Admin Panel</p>
+              <p className="text-sm text-muted-foreground">Panel Admin</p>
             </div>
           </div>
         </SidebarHeader>

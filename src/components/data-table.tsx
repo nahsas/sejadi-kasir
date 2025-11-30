@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -83,7 +84,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Tidak ada hasil.
                 </TableCell>
               </TableRow>
             )}
@@ -97,7 +98,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          Sebelumnya
         </Button>
         <Button
           variant="outline"
@@ -105,7 +106,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          Berikutnya
         </Button>
       </div>
     </div>

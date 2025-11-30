@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -49,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch (error) {
-      console.error("Failed to parse session from localStorage", error);
+      console.error("Gagal mengurai sesi dari localStorage", error);
       // If parsing fails, clear the broken session
       localStorage.removeItem('sejadikopi-session');
     } finally {
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error('Gagal masuk');
     }
 
     const data = await response.json();
@@ -84,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('sejadikopi-session', JSON.stringify({ ...data, user: userWithRole }));
       setUser(userWithRole);
     } else {
-      throw new Error('Invalid credentials');
+      throw new Error('Kredensial tidak valid');
     }
   };
 
@@ -95,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">Memuat...</div>;
   }
 
   return (
@@ -108,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth harus digunakan di dalam AuthProvider');
   }
   return context;
 }

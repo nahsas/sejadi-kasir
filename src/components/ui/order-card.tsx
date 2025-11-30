@@ -19,10 +19,10 @@ const statusConfig: {
     color: string;
   };
 } = {
-  pending: { variant: 'secondary', label: 'Pending', color: 'bg-yellow-400 text-yellow-900' },
-  diproses: { variant: 'default', label: 'Processing', color: 'bg-blue-500 text-white' },
-  selesai: { variant: 'outline', label: 'Completed', color: 'bg-green-500 text-white' },
-  dibatalkan: { variant: 'destructive', label: 'Cancelled', color: 'bg-red-500 text-white' },
+  pending: { variant: 'secondary', label: 'Tertunda', color: 'bg-yellow-400 text-yellow-900' },
+  diproses: { variant: 'default', label: 'Diproses', color: 'bg-blue-500 text-white' },
+  selesai: { variant: 'outline', label: 'Selesai', color: 'bg-green-500 text-white' },
+  dibatalkan: { variant: 'destructive', label: 'Dibatalkan', color: 'bg-red-500 text-white' },
 };
 
 export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuItem[] }) {
@@ -31,7 +31,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
 
   const getMenuName = (menuId: number) => {
     const menuItem = menuItems.find((item) => item.id === menuId);
-    return menuItem ? menuItem.nama : 'Unknown Item';
+    return menuItem ? menuItem.nama : 'Item Tidak Dikenal';
   };
   
   const handleRedirect = () => {

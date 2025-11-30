@@ -40,11 +40,11 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${id}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error("Failed to delete menu item.");
-      toast({ title: "Success", description: "Menu item deleted successfully." });
+      if (!response.ok) throw new Error("Gagal menghapus item menu.");
+      toast({ title: "Sukses", description: "Item menu berhasil dihapus." });
       onDeleteSuccess();
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Could not delete menu item." });
+      toast({ variant: "destructive", title: "Error", description: "Tidak dapat menghapus item menu." });
     }
   };
   
@@ -57,7 +57,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            Nama
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -66,7 +66,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
     },
     {
       accessorKey: "kategori",
-      header: "Category",
+      header: "Kategori",
       cell: ({ row }) => {
         const menuItem = row.original as any;
         return menuItem.kategori ? menuItem.kategori.nama : 'N/A';
@@ -74,7 +74,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
     },
     {
       accessorKey: "harga",
-      header: () => <div className="text-right">Price</div>,
+      header: () => <div className="text-right">Harga</div>,
       cell: ({ row }) => {
         const price = parseFloat(row.getValue("harga"))
         const formatted = new Intl.NumberFormat("id-ID", {
@@ -87,10 +87,10 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
     },
     {
       accessorKey: "is_available",
-      header: "Availability",
+      header: "Ketersediaan",
       cell: ({ row }) => {
         const isAvailable = row.getValue("is_available")
-        return <Badge variant={isAvailable ? "outline" : "secondary"}>{isAvailable ? "Available" : "Unavailable"}</Badge>
+        return <Badge variant={isAvailable ? "outline" : "secondary"}>{isAvailable ? "Tersedia" : "Habis"}</Badge>
       }
     },
     {
@@ -102,39 +102,39 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Buka menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => onEdit(menuItem)}>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edit item
+                  Ubah item
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem className="text-destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete item
+                    Hapus item
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the menu item.
+                  Tindakan ini tidak bisa dibatalkan. Ini akan menghapus item menu secara permanen.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => handleDelete(menuItem.id)}
                   className="bg-destructive hover:bg-destructive/90"
                 >
-                  Delete
+                  Hapus
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -144,5 +144,3 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
     },
   ]
 }
-
-    

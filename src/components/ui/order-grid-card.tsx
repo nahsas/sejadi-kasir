@@ -28,7 +28,7 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
 
   const getMenuName = (menuId: number) => {
     const menuItem = menuItems.find((item) => item.id === menuId);
-    return menuItem ? menuItem.nama : 'Unknown Item';
+    return menuItem ? menuItem.nama : 'Item Tidak Dikenal';
   };
 
   const totalItems = order.detail_pesanans.reduce((acc, item) => acc + item.jumlah, 0);

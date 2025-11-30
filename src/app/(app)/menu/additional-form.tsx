@@ -27,8 +27,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
 const formSchema = z.object({
-  nama: z.string().min(1, 'Name is required'),
-  harga: z.coerce.number().min(0, 'Price must be a positive number'),
+  nama: z.string().min(1, 'Nama wajib diisi'),
+  harga: z.coerce.number().min(0, 'Harga harus angka positif'),
   is_active: z.boolean(),
 });
 
@@ -86,11 +86,11 @@ export function AdditionalForm({
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Failed to save additional item.');
+      if (!response.ok) throw new Error('Gagal menyimpan item tambahan.');
 
       toast({
-        title: 'Success',
-        description: `Additional item successfully ${additional ? 'updated' : 'created'}.`,
+        title: 'Sukses',
+        description: `Item tambahan berhasil ${additional ? 'diperbarui' : 'dibuat'}.`,
       });
       onSuccess();
       onClose();
@@ -98,7 +98,7 @@ export function AdditionalForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not save additional item.',
+        description: 'Tidak dapat menyimpan item tambahan.',
       });
     }
   };
@@ -107,7 +107,7 @@ export function AdditionalForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{additional ? 'Edit Additional' : 'Create Additional'}</DialogTitle>
+          <DialogTitle>{additional ? 'Ubah Tambahan' : 'Buat Tambahan'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -116,9 +116,9 @@ export function AdditionalForm({
               name="nama"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Extra Shot" {...field} />
+                    <Input placeholder="cth. Ekstra Shot" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +129,7 @@ export function AdditionalForm({
               name="harga"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Harga</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
@@ -143,7 +143,7 @@ export function AdditionalForm({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                   <div className="space-y-0.5">
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Aktif</FormLabel>
                   </div>
                   <FormControl>
                     <Switch
@@ -156,9 +156,9 @@ export function AdditionalForm({
             />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Batal
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -166,5 +166,3 @@ export function AdditionalForm({
     </Dialog>
   );
 }
-
-    

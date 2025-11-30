@@ -1,3 +1,4 @@
+
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -24,7 +25,7 @@ const statusVariant: { [key in Order['status']]: 'default' | 'secondary' | 'dest
 export const columns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
-    header: "Order ID",
+    header: "ID Pesanan",
   },
   {
     accessorKey: "customerName",
@@ -34,7 +35,7 @@ export const columns: ColumnDef<Order>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Customer / Table
+          Pelanggan / Meja
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -47,7 +48,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "orderType",
-    header: "Type",
+    header: "Tipe",
   },
   {
     accessorKey: "status",
@@ -62,9 +63,9 @@ export const columns: ColumnDef<Order>[] = [
     header: () => <div className="text-right">Total</div>,
     cell: ({ row }) => {
       const total = parseFloat(row.getValue("total"))
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("id-ID", {
         style: "currency",
-        currency: "USD",
+        currency: "IDR",
       }).format(total)
 
       return <div className="text-right font-medium">{formatted}</div>
@@ -72,7 +73,7 @@ export const columns: ColumnDef<Order>[] = [
   },
    {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Tanggal",
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"))
       return <div>{date.toLocaleDateString()}</div>
@@ -86,21 +87,21 @@ export const columns: ColumnDef<Order>[] = [
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Buka menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(order.id)}
+              onClick={() => navigator.clipboard.writeText(order.id.toString())}
             >
-              Copy order ID
+              Salin ID Pesanan
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Update status</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">Cancel order</DropdownMenuItem>
+            <DropdownMenuItem>Lihat detail</DropdownMenuItem>
+            <DropdownMenuItem>Perbarui status</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">Batalkan pesanan</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

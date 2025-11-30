@@ -24,11 +24,11 @@ const statusVariant: { [key in Order['status']]: 'default' | 'secondary' | 'dest
 export const columns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
-    header: "Order ID",
+    header: "ID Pesanan",
   },
   {
     accessorKey: "customerName",
-    header: "Customer / Table",
+    header: "Pelanggan / Meja",
     cell: ({ row }) => {
       const order = row.original;
       const displayValue = order.orderType === 'Dine In' ? order.tableName : order.customerName;
@@ -37,7 +37,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "orderType",
-    header: "Type",
+    header: "Tipe",
   },
   {
     accessorKey: "status",
@@ -52,9 +52,9 @@ export const columns: ColumnDef<Order>[] = [
     header: () => <div className="text-right">Total</div>,
     cell: ({ row }) => {
       const total = parseFloat(row.getValue("total"))
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("id-ID", {
         style: "currency",
-        currency: "USD",
+        currency: "IDR",
       }).format(total)
 
       return <div className="text-right font-medium">{formatted}</div>
@@ -62,7 +62,7 @@ export const columns: ColumnDef<Order>[] = [
   },
    {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Tanggal",
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"))
       return <div>{date.toLocaleDateString()}</div>
@@ -76,13 +76,13 @@ export const columns: ColumnDef<Order>[] = [
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Buka menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>View details</DropdownMenuItem>
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuItem>Lihat detail</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
         </div>

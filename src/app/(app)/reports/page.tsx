@@ -130,7 +130,7 @@ export default function ReportsPage() {
 
 
   if (loading || !user) {
-    return <div className="flex items-center justify-center h-screen">Access Denied</div>;
+    return <div className="flex items-center justify-center h-screen">Akses Ditolak</div>;
   }
 
   const handleApplyFilter = () => {
@@ -147,7 +147,7 @@ export default function ReportsPage() {
 
   const chartConfig = {
     sales: {
-      label: "Sales",
+      label: "Penjualan",
       color: "hsl(var(--primary))",
     },
   }
@@ -158,7 +158,7 @@ export default function ReportsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-headline font-bold tracking-tight">Pembukuan</h1>
-        <p className="text-muted-foreground">Analyze your sales and performance.</p>
+        <p className="text-muted-foreground">Analisis penjualan dan kinerja Anda.</p>
       </div>
 
       <Card>
@@ -181,7 +181,7 @@ export default function ReportsPage() {
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>Pick a date</span>}
+                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
                     </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -204,7 +204,7 @@ export default function ReportsPage() {
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, "dd/MM/yyyy") : <span>Pick a date</span>}
+                        {endDate ? format(endDate, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
                     </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -229,9 +229,9 @@ export default function ReportsPage() {
                         </div>
                     </SelectTrigger>
                     <SelectContent>
-                    <SelectItem value="All">All</SelectItem>
-                    <SelectItem value="Cash">Cash</SelectItem>
-                    <SelectItem value="Credit Card">Credit Card</SelectItem>
+                    <SelectItem value="All">Semua</SelectItem>
+                    <SelectItem value="Cash">Tunai</SelectItem>
+                    <SelectItem value="Credit Card">Kartu Kredit</SelectItem>
                     <SelectItem value="GoPay">GoPay</SelectItem>
                     </SelectContent>
                 </Select>
@@ -282,7 +282,7 @@ export default function ReportsPage() {
           <ReportStatCard
             title="Total Transaksi"
             value="0"
-            date="Avg: Rp 0"
+            date="Rata-rata: Rp 0"
             icon={<ShoppingCart className="h-5 w-5" />}
             bgColor="bg-orange-500"
             textColor="text-white"
@@ -295,10 +295,10 @@ export default function ReportsPage() {
                 <div className="p-2 bg-purple-100 rounded-md">
                     <Wallet className="w-5 h-5 text-purple-600" />
                 </div>
-                <h2 className="text-xl font-bold">Breakdown Pembayaran</h2>
+                <h2 className="text-xl font-bold">Rincian Pembayaran</h2>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                <PaymentBreakdownCard title="Cash" amount="Rp 0" transactions={0} icon={<Landmark className="h-6 w-6 text-green-500"/>} borderColor="border-green-500" />
+                <PaymentBreakdownCard title="Tunai" amount="Rp 0" transactions={0} icon={<Landmark className="h-6 w-6 text-green-500"/>} borderColor="border-green-500" />
                 <PaymentBreakdownCard title="QRIS (Semua)" amount="Rp 0" transactions={0} icon={<Grip className="h-6 w-6 text-purple-500"/>} borderColor="border-purple-500" />
                 <PaymentBreakdownCard title="QRIS BCA" amount="Rp 0" transactions={0} icon={<Grip className="h-6 w-6 text-blue-500"/>} borderColor="border-blue-500" />
                 <PaymentBreakdownCard title="QRIS BRI" amount="Rp 0" transactions={0} icon={<Grip className="h-6 w-6 text-sky-500"/>} borderColor="border-sky-500" />
@@ -313,10 +313,10 @@ export default function ReportsPage() {
           <div className="p-3 rounded-md bg-yellow-100">
             <Layers className="w-5 h-5 text-yellow-600" />
           </div>
-          <CardTitle className="text-xl">Performa per Kategori</CardTitle>
+          <CardTitle className="text-xl">Kinerja per Kategori</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Performance by category will be displayed here.</p>
+          <p className="text-muted-foreground">Kinerja berdasarkan kategori akan ditampilkan di sini.</p>
         </CardContent>
       </Card>
 
@@ -325,7 +325,7 @@ export default function ReportsPage() {
             <CardTitle className="text-xl">Pelacakan Pengeluaran</CardTitle>
             <div className="flex gap-2">
                 <Button variant="outline" className="bg-blue-500 hover:bg-blue-600 text-white border-none">
-                    <RefreshCw className="mr-2 h-4 w-4" /> Refresh
+                    <RefreshCw className="mr-2 h-4 w-4" /> Segarkan
                 </Button>
                 <Button variant="destructive" className="bg-red-500 hover:bg-red-600 text-white">
                     <Plus className="mr-2 h-4 w-4" /> Tambah Pengeluaran
@@ -347,7 +347,7 @@ export default function ReportsPage() {
             <TableBody>
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-muted-foreground py-12">
-                   No expense data available.
+                   Tidak ada data pengeluaran yang tersedia.
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -366,7 +366,7 @@ export default function ReportsPage() {
                     <TableHead>ID Transaksi</TableHead>
                     <TableHead>Tanggal</TableHead>
                     <TableHead>Meja</TableHead>
-                    <TableHead>Items</TableHead>
+                    <TableHead>Item</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Status</TableHead>
                 </TableRow>

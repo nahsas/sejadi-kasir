@@ -27,7 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
 const formSchema = z.object({
-  stok: z.coerce.number().min(0, 'Stock must be a non-negative number'),
+  stok: z.coerce.number().min(0, 'Stok harus angka non-negatif'),
 });
 
 type StockFormValues = z.infer<typeof formSchema>;
@@ -81,13 +81,13 @@ export function StockForm({
       });
 
       if (!response.ok) {
-        console.error("Failed to update stock:", await response.json());
-        throw new Error('Failed to update stock.');
+        console.error("Gagal memperbarui stok:", await response.json());
+        throw new Error('Gagal memperbarui stok.');
       }
 
       toast({
-        title: 'Success',
-        description: `Stock for ${menuItem.nama} has been updated.`,
+        title: 'Sukses',
+        description: `Stok untuk ${menuItem.nama} telah diperbarui.`,
       });
       onSuccess();
       onClose();
@@ -95,7 +95,7 @@ export function StockForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not update stock.',
+        description: 'Tidak dapat memperbarui stok.',
       });
     }
   };
@@ -104,9 +104,9 @@ export function StockForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update Stock</DialogTitle>
+          <DialogTitle>Perbarui Stok</DialogTitle>
           <DialogDescription>
-            Update the stock quantity for {menuItem?.nama}.
+            Perbarui jumlah stok untuk {menuItem?.nama}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -116,7 +116,7 @@ export function StockForm({
               name="stok"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Stock Quantity</FormLabel>
+                  <FormLabel>Jumlah Stok Baru</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
@@ -126,9 +126,9 @@ export function StockForm({
             />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Batal
               </Button>
-              <Button type="submit">Save Stock</Button>
+              <Button type="submit">Simpan Stok</Button>
             </DialogFooter>
           </form>
         </Form>

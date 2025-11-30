@@ -39,11 +39,11 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
       const response = await fetch(`https://api.sejadikopi.com/api/categories/${id}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error("Failed to delete category.");
-      toast({ title: "Success", description: "Category deleted successfully." });
+      if (!response.ok) throw new Error("Gagal menghapus kategori.");
+      toast({ title: "Sukses", description: "Kategori berhasil dihapus." });
       onDeleteSuccess();
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Could not delete category." });
+      toast({ variant: "destructive", title: "Error", description: "Tidak dapat menghapus kategori." });
     }
   };
 
@@ -56,7 +56,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            Nama
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -72,39 +72,39 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Buka menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => onEdit(category)}>
                    <Pencil className="mr-2 h-4 w-4" />
-                  Edit
+                  Ubah
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem className="text-destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    Hapus
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the category.
+                  Tindakan ini tidak bisa dibatalkan. Ini akan menghapus kategori secara permanen.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => handleDelete(category.id)}
                   className="bg-destructive hover:bg-destructive/90"
                 >
-                  Delete
+                  Hapus
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -114,5 +114,3 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
     },
   ]
 }
-
-    

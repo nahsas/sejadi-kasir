@@ -109,7 +109,7 @@ export function PaymentModal({
                         paymentMethod === 'Cash' ? "bg-green-600 hover:bg-green-700 border-green-600 text-white" : "bg-gray-100 text-gray-800"
                     )}
                  >
-                    <Landmark className="mr-2 h-5 w-5"/> Cash
+                    <Landmark className="mr-2 h-5 w-5"/> Tunai
                 </Button>
                  <Button
                     variant={paymentMethod === 'QRIS' ? 'default' : 'outline'}
