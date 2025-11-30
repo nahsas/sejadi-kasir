@@ -762,7 +762,7 @@ export default function ReportsPage() {
                 </div>
                 <h2 className="text-xl font-bold">Rincian Pembayaran</h2>
             </div>
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <PaymentBreakdownCard title="Tunai" amount={toRupiah(paymentBreakdown.cash.amount)} transactions={paymentBreakdown.cash.count} icon={<Landmark className="h-6 w-6 text-green-500"/>} borderColor="border-green-500" />
                 <PaymentBreakdownCard title="QRIS (Semua)" amount={toRupiah(paymentBreakdown.qris.amount)} transactions={paymentBreakdown.qris.count} icon={<Grip className="h-6 w-6 text-purple-500"/>} borderColor="border-purple-500" />
                 <PaymentBreakdownCard title="QRIS BCA" amount={toRupiah(paymentBreakdown.qris_bca.amount)} transactions={paymentBreakdown.qris_bca.count} icon={<Grip className="h-6 w-6 text-blue-500"/>} borderColor="border-blue-500" />
@@ -788,7 +788,9 @@ export default function ReportsPage() {
           {dataLoading ? (
             <div className="text-center h-24 flex items-center justify-center">Memuat data...</div>
           ) : (
-            <DataTable columns={memoizedExpenseColumns} data={expenses} />
+            <div className="w-full overflow-x-auto">
+              <DataTable columns={memoizedExpenseColumns} data={expenses} />
+            </div>
           )}
         </CardContent>
       </Card>
@@ -801,7 +803,9 @@ export default function ReportsPage() {
           {dataLoading ? (
             <div className="text-center h-48 flex items-center justify-center">Memuat data...</div>
           ) : (
-            <DataTable columns={memoizedTransactionColumns} data={transactions} />
+            <div className="w-full overflow-x-auto">
+              <DataTable columns={memoizedTransactionColumns} data={transactions} />
+            </div>
           )}
         </CardContent>
       </Card>

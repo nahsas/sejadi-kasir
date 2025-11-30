@@ -274,10 +274,12 @@ export default function MenuPage() {
                 </CardContent>
               </Card>
           </div>
-           <DataTable 
-              columns={menuColumnsWithCategories} 
-              data={filteredMenuItems} 
-            />
+          <div className="w-full overflow-x-auto">
+            <DataTable 
+                columns={menuColumnsWithCategories} 
+                data={filteredMenuItems} 
+              />
+          </div>
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
           <Card className="mb-6">
@@ -306,24 +308,30 @@ export default function MenuPage() {
                 </Select>
               </CardContent>
             </Card>
-           <DataTable 
-              columns={stockColumnsWithHandlers}
-              data={filteredStockItems} 
-            />
+          <div className="w-full overflow-x-auto">
+            <DataTable 
+                columns={stockColumnsWithHandlers}
+                data={filteredStockItems} 
+              />
+          </div>
         </TabsContent>
         <TabsContent value="discount" className="mt-6">
           <TabHeader icon={Percent} title="Kelola Diskon" description="Buat dan kelola promosi untuk item menu" buttonText="Buat Diskon Baru" onButtonClick={() => handleDiscountFormOpen()} />
-          <DataTable 
-            columns={discountColumns({ onEdit: handleDiscountFormOpen, onDeleteSuccess: fetchData })}
-            data={discounts}
-          />
+          <div className="w-full overflow-x-auto">
+            <DataTable 
+              columns={discountColumns({ onEdit: handleDiscountFormOpen, onDeleteSuccess: fetchData })}
+              data={discounts}
+            />
+          </div>
         </TabsContent>
         <TabsContent value="category" className="mt-6">
           <TabHeader icon={Utensils} title="Kelola Kategori" description="Kelompokkan item menu ke dalam kategori" buttonText="Buat Kategori Baru" onButtonClick={() => handleCategoryFormOpen()} />
-          <DataTable
-            columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
-            data={categories}
-          />
+          <div className="w-full overflow-x-auto">
+            <DataTable
+              columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
+              data={categories}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
