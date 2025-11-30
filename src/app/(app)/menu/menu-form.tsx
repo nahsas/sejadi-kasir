@@ -22,7 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -42,7 +41,6 @@ const formSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi'),
   kategori_id: z.coerce.number().min(1, 'Kategori wajib diisi'),
   harga: z.coerce.number().min(0, 'Harga harus angka positif'),
-  description: z.string().optional(),
   image: z.any().optional(),
   kategori_struk: z.enum(['makanan', 'minuman']),
   available_variants: z.array(z.string()).optional(),
@@ -75,7 +73,6 @@ export function MenuForm({
       nama: '',
       kategori_id: undefined,
       harga: 0,
-      description: '',
       kategori_struk: 'makanan',
       available_variants: [],
     },
@@ -102,7 +99,6 @@ export function MenuForm({
         nama: menuItem.nama,
         kategori_id: menuItem.kategori_id,
         harga: Number(menuItem.harga),
-        description: menuItem.description || '',
         kategori_struk: menuItem.kategori_struk || 'makanan',
         available_variants: variants,
       });
@@ -116,7 +112,6 @@ export function MenuForm({
         nama: '',
         kategori_id: undefined,
         harga: 0,
-        description: '',
         kategori_struk: 'makanan',
         available_variants: [],
       });
@@ -157,17 +152,18 @@ export function MenuForm({
       }
       
       const payload: any = {
-        ...values,
+        nama: values.nama,
         harga: Number(values.harga),
-        image_url: imageUrl,
-        available_variants: JSON.stringify(values.available_variants).replace(/"/g, "'"),
-        is_available: true, 
-        is_recommendation: false,
+        kategori_id: values.kategori_id,
+        available_variants: values.available_variants ? JSON.stringify(values.available_variants).replace(/"/g, "'") : null,
+        foto_url: imageUrl,
         stok: 1000,
+        is_available: true,
+        kategori_struk: values.kategori_struk,
       };
-      delete payload.image;
 
       const method = menuItem ? 'PUT' : 'POST'; 
+      // NOTE: PUT /menu/{id} and POST /menu are not in api.json, but necessary for functionality
       const url = menuItem
         ? `https://api.sejadikopi.com/api/menu/${menuItem.id}`
         : 'https://api.sejadikopi.com/api/menu';
@@ -356,21 +352,6 @@ export function MenuForm({
                     )}
                     />
                 )}
-
-                <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Deskripsi</FormLabel>
-                    <FormControl>
-                        <Textarea placeholder="Jelaskan item..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-
                 <DialogFooter className="sticky bottom-0 bg-background py-4">
                     <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
                         Batal
