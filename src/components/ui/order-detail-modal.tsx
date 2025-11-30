@@ -100,16 +100,31 @@ export function OrderDetailModal({
   
   const handleCancelOrder = async () => {
     if (!order) return;
-
+  
     try {
+      // Fetch the full, most recent order data first
+      const getOrderResponse = await fetch(`https://api.sejadikopi.com/api/pesanan/${order.id}`);
+      if (!getOrderResponse.ok) {
+        throw new Error('Gagal mengambil data pesanan terbaru sebelum membatalkan.');
+      }
+      const fullOrderData = await getOrderResponse.json();
+  
+      // Now, update the status and send the full object back
+      const updatedOrder = {
+        ...fullOrderData.data,
+        status: 'cancelled',
+      };
+  
       const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' }),
+        body: JSON.stringify(updatedOrder),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Gagal membatalkan pesanan');
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        throw new Error('Gagal membatalkan pesanan.');
       }
       
       toast({
@@ -118,13 +133,13 @@ export function OrderDetailModal({
       });
       onOpenChange(false);
       onOrderDeleted();
-
+  
     } catch (error) {
        console.error('Error cancelling order:', error);
        toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Tidak dapat membatalkan pesanan.',
+        description: (error as Error).message || 'Tidak dapat membatalkan pesanan.',
       });
     }
   };
