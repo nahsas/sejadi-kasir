@@ -8,19 +8,17 @@ import { DataTable } from "@/components/data-table";
 import { columns as menuColumns } from "./columns";
 import { columns as categoryColumns } from "./category-columns";
 import { columns as discountColumns } from "./discount-columns";
-import { columns as additionalColumns } from "./additional-columns";
 import { columns as stockColumns } from "./stock-columns";
 
-import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Package, Star } from "lucide-react";
+import { PlusCircle, Coffee, Utensils, BookOpen, Archive, Percent, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MenuItem } from '@/lib/data';
-import { Category, Discount, Additional } from '@/lib/types';
+import { Category, Discount } from '@/lib/types';
 import { MenuForm } from './menu-form';
 import { CategoryForm } from './category-form';
 import { DiscountForm } from './discount-form';
-import { AdditionalForm } from './additional-form';
 import { StockForm } from './stock-form';
 
 function StatCard({ title, value, icon: Icon, description, color }: { title: string, value: string, icon: React.ElementType, description: string, color: string }) {
@@ -67,7 +65,6 @@ export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [additionals, setAdditionals] = useState<Additional[]>([]);
 
   const [stats, setStats] = useState({
     totalMenu: 0,
@@ -84,9 +81,6 @@ export default function MenuPage() {
 
   const [isDiscountFormOpen, setIsDiscountFormOpen] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
-
-  const [isAdditionalFormOpen, setIsAdditionalFormOpen] = useState(false);
-  const [editingAdditional, setEditingAdditional] = useState<Additional | null>(null);
   
   const [isStockFormOpen, setIsStockFormOpen] = useState(false);
   const [editingStockItem, setEditingStockItem] = useState<MenuItem | null>(null);
@@ -94,11 +88,10 @@ export default function MenuPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [menuRes, categoryRes, discountRes, additionalRes] = await Promise.all([
+      const [menuRes, categoryRes, discountRes] = await Promise.all([
         fetch('https://api.sejadikopi.com/api/menu'),
         fetch('https://api.sejadikopi.com/api/categories'),
         fetch('https://api.sejadikopi.com/api/discount-codes'),
-        fetch('https://api.sejadikopi.com/api/additionals')
       ]);
       
       const menuData = menuRes.ok ? await menuRes.json() : { data: [] };
@@ -109,9 +102,6 @@ export default function MenuPage() {
 
       const discountData = discountRes.ok ? await discountRes.json() : { data: [] };
       setDiscounts(discountData.data || []);
-      
-      const additionalData = additionalRes.ok ? await additionalRes.json() : { data: [] };
-      setAdditionals(additionalData.data || []);
       
       // The stats can be derived from the fetched menu items
        if (menuData.data) {
@@ -166,11 +156,6 @@ export default function MenuPage() {
     setEditingDiscount(discount);
     setIsDiscountFormOpen(true);
   };
-  
-  const handleAdditionalFormOpen = (additional: Additional | null = null) => {
-    setEditingAdditional(additional);
-    setIsAdditionalFormOpen(true);
-  };
 
   const handleStockFormOpen = (menuItem: MenuItem | null = null) => {
     setEditingStockItem(menuItem);
@@ -208,14 +193,6 @@ export default function MenuPage() {
           discount={editingDiscount}
         />
       )}
-       {isAdditionalFormOpen && (
-        <AdditionalForm
-          isOpen={isAdditionalFormOpen}
-          onClose={() => setIsAdditionalFormOpen(false)}
-          onSuccess={fetchData}
-          additional={editingAdditional}
-        />
-      )}
       {isStockFormOpen && (
         <StockForm
           isOpen={isStockFormOpen}
@@ -239,12 +216,11 @@ export default function MenuPage() {
       </div>
       
       <Tabs defaultValue="menu">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="menu">Menu</TabsTrigger>
           <TabsTrigger value="stock">Stok</TabsTrigger>
           <TabsTrigger value="discount">Diskon</TabsTrigger>
           <TabsTrigger value="category">Kategori</TabsTrigger>
-          <TabsTrigger value="additional">Tambahan</TabsTrigger>
           <TabsTrigger value="bestseller">Best Seller</TabsTrigger>
         </TabsList>
         <TabsContent value="menu" className="mt-6">
@@ -273,13 +249,6 @@ export default function MenuPage() {
           <DataTable
             columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
             data={categories}
-          />
-        </TabsContent>
-        <TabsContent value="additional" className="mt-6">
-           <TabHeader icon={Package} title="Kelola Tambahan" description="Atur topping, sirup, atau tambahan lainnya" buttonText="Buat Tambahan Baru" onButtonClick={() => handleAdditionalFormOpen()} />
-          <DataTable 
-             columns={additionalColumns({ onEdit: handleAdditionalFormOpen, onDeleteSuccess: fetchData })}
-             data={additionals}
           />
         </TabsContent>
         <TabsContent value="bestseller" className="mt-6">
