@@ -33,7 +33,8 @@ import {
 import { MenuItem } from '@/lib/data';
 import { Category } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const formSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi'),
@@ -43,6 +44,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   is_available: z.boolean(),
   is_recommendation: z.boolean(),
+  image: z.any().optional(),
 });
 
 type MenuFormValues = z.infer<typeof formSchema>;
@@ -63,6 +65,8 @@ export function MenuForm({
   categories,
 }: MenuFormProps) {
   const { toast } = useToast();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -87,6 +91,11 @@ export function MenuForm({
         is_available: menuItem.is_available,
         is_recommendation: menuItem.is_recommendation,
       });
+      if(menuItem.image_url) {
+        setImagePreview(`https://api.sejadikopi.com/storage/${menuItem.image_url}`);
+      } else {
+        setImagePreview(null);
+      }
     } else {
        form.reset({
         nama: '',
@@ -97,23 +106,73 @@ export function MenuForm({
         is_available: true,
         is_recommendation: false,
       });
+      setImagePreview(null);
     }
   }, [menuItem, form]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      form.setValue('image', file);
+    }
+  };
+
   const onSubmit = async (values: MenuFormValues) => {
     try {
-      const method = menuItem ? 'PUT' : 'POST';
+      const formData = new FormData();
+      
+      let imageUrl = menuItem?.image_url || '';
+
+      if (values.image) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', values.image);
+        imageFormData.append('folder', 'menu');
+        const res = await fetch('https://api.sejadikopi.com/api/images/upload', {
+            method: 'POST',
+            body: imageFormData,
+        });
+        const uploadResult = await res.json();
+        if (!res.ok) {
+            throw new Error(uploadResult.message || 'Gagal mengunggah gambar');
+        }
+        imageUrl = uploadResult.data.path;
+      }
+      
+      const payload: any = {
+        ...values,
+        image_url: imageUrl,
+      };
+      delete payload.image;
+
+
+      const method = menuItem ? 'POST' : 'POST'; // API uses POST for update with _method: 'PUT'
       const url = menuItem
         ? `https://api.sejadikopi.com/api/menu/${menuItem.id}`
         : 'https://api.sejadikopi.com/api/menu';
+      
+      const finalFormData = new FormData();
+      for (const key in payload) {
+          finalFormData.append(key, payload[key]);
+      }
+      if (menuItem) {
+        finalFormData.append('_method', 'PUT');
+      }
 
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: finalFormData,
       });
 
-      if (!response.ok) throw new Error('Gagal menyimpan item menu.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        throw new Error(errorData.message || 'Gagal menyimpan item menu.');
+      }
 
       toast({
         title: 'Sukses',
@@ -121,11 +180,11 @@ export function MenuForm({
       });
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Tidak dapat menyimpan item menu.',
+        description: error.message || 'Tidak dapat menyimpan item menu.',
       });
     }
   };
@@ -151,6 +210,18 @@ export function MenuForm({
                 </FormItem>
               )}
             />
+            {imagePreview && (
+              <div className="w-full h-40 relative">
+                <Image src={imagePreview} alt="Pratinjau Gambar" layout="fill" objectFit="cover" className="rounded-md" />
+              </div>
+            )}
+             <FormItem>
+              <FormLabel>Gambar Menu</FormLabel>
+              <FormControl>
+                <Input type="file" accept="image/*" onChange={handleImageChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
             <FormField
               control={form.control}
               name="kategori_id"

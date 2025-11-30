@@ -65,6 +65,8 @@ export function CategoryForm({
   }, [category, form]);
 
   const onSubmit = async (values: CategoryFormValues) => {
+    // NOTE: The endpoints for POST/PUT on /categories are not defined in api.json.
+    // This will likely fail if the endpoints don't exist on the server.
     try {
       const method = category ? 'PUT' : 'POST';
       const url = category
@@ -77,7 +79,7 @@ export function CategoryForm({
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Gagal menyimpan kategori.');
+      if (!response.ok) throw new Error('Gagal menyimpan kategori. Endpoint tidak ada.');
 
       toast({
         title: 'Sukses',
@@ -119,7 +121,7 @@ export function CategoryForm({
               <Button type="button" variant="outline" onClick={onClose}>
                 Batal
               </Button>
-              <Button type="submit">Simpan</Button>
+              <Button type="submit" disabled>Simpan</Button>
             </DialogFooter>
           </form>
         </Form>

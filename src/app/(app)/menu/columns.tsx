@@ -26,14 +26,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
 
 type MenuColumnsProps = {
   onEdit: (menuItem: MenuItem) => void;
   onDeleteSuccess: () => void;
+  categories: any[];
 }
 
-export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDef<MenuItem>[] => {
+export const columns = ({ onEdit, onDeleteSuccess, categories }: MenuColumnsProps): ColumnDef<MenuItem>[] => {
   const { toast } = useToast();
+
+  const getCategoryName = (kategori_id: number) => {
+    const category = categories.find(c => c.id === kategori_id);
+    return category ? category.nama : 'N/A';
+  }
 
   const handleDelete = async (id: number) => {
     try {
@@ -50,6 +57,15 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
   
   return [
     {
+        accessorKey: "image_url",
+        header: "Gambar",
+        cell: ({ row }) => {
+            const imageUrl = row.getValue("image_url") as string;
+            const fullUrl = imageUrl ? `https://api.sejadikopi.com/storage/${imageUrl}` : 'https://placehold.co/40x40/FFFAF0/6F4E37?text=Kopi';
+            return <Image src={fullUrl} alt={row.getValue("nama")} width={40} height={40} className="rounded-md object-cover" />
+        }
+    },
+    {
       accessorKey: "nama",
       header: ({ column }) => {
         return (
@@ -65,11 +81,11 @@ export const columns = ({ onEdit, onDeleteSuccess }: MenuColumnsProps): ColumnDe
       cell: ({ row }) => <div className="pl-4">{row.getValue("nama")}</div>
     },
     {
-      accessorKey: "kategori",
+      accessorKey: "kategori_id",
       header: "Kategori",
       cell: ({ row }) => {
-        const menuItem = row.original as any;
-        return menuItem.kategori ? menuItem.kategori.nama : 'N/A';
+        const kategori_id = row.getValue("kategori_id") as number;
+        return getCategoryName(kategori_id);
       }
     },
     {

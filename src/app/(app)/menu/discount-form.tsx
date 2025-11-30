@@ -106,6 +106,7 @@ export function DiscountForm({
 
       const body = {
         ...values,
+        is_active: values.is_active ? 1 : 0,
         valid_from: values.valid_from ? format(values.valid_from, 'yyyy-MM-dd') : null,
         valid_to: values.valid_to ? format(values.valid_to, 'yyyy-MM-dd') : null,
       };

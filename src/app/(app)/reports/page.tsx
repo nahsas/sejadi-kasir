@@ -106,10 +106,12 @@ const PaymentBreakdownCard = ({
 )
 
 const expenseFormSchema = z.object({
+  id: z.string().optional(),
   kategori: z.string().min(1, 'Kategori wajib diisi'),
   deskripsi: z.string().min(1, 'Deskripsi wajib diisi'),
   jumlah: z.coerce.number().min(1, 'Jumlah harus lebih dari 0'),
-  created_by: z.string(), // Hidden field
+  created_by: z.string().optional(), // Is not in the POST body but is in the response.
+  tanggal: z.string(), // Added for API
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
@@ -122,28 +124,32 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
             kategori: expense.kategori,
             deskripsi: expense.deskripsi,
             jumlah: expense.jumlah,
-            created_by: userEmail,
+            tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd'),
         } : {
             kategori: '',
             deskripsi: '',
             jumlah: 0,
-            created_by: userEmail,
+            tanggal: format(new Date(), 'yyyy-MM-dd'),
         },
     });
 
     React.useEffect(() => {
-        form.reset(expense ? {
-            kategori: expense.kategori,
-            deskripsi: expense.deskripsi,
-            jumlah: expense.jumlah,
-            created_by: userEmail,
-        } : {
-            kategori: '',
-            deskripsi: '',
-            jumlah: 0,
-            created_by: userEmail,
-        });
-    }, [expense, userEmail, form]);
+        const defaultDate = format(new Date(), 'yyyy-MM-dd');
+        if (expense) {
+             form.reset({
+                ...expense,
+                tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd')
+            });
+        } else {
+             form.reset({
+                kategori: '',
+                deskripsi: '',
+                jumlah: 0,
+                tanggal: defaultDate,
+                id: `EXP-${Date.now()}` // Generate a unique ID for new expenses
+            });
+        }
+    }, [expense, form]);
 
     const onSubmit = async (values: ExpenseFormValues) => {
         try {
@@ -152,10 +158,12 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                 ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
                 : 'https://api.sejadikopi.com/api/pengeluarans';
             
+            const payload = { ...values };
+
             const response = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) throw new Error('Gagal menyimpan pengeluaran.');
@@ -233,22 +241,26 @@ export default function ReportsPage() {
     try {
         const sDate = startDate ? format(startOfDay(startDate), "yyyy-MM-dd'T'HH:mm:ss") : '';
         const eDate = endDate ? format(endOfDay(endDate), "yyyy-MM-dd'T'HH:mm:ss") : '';
+        
         const sDateOnly = startDate ? format(startDate, 'yyyy-MM-dd') : '';
         const eDateOnly = endDate ? format(endDate, 'yyyy-MM-dd') : '';
 
         const transactionUrl = new URL('https://api.sejadikopi.com/api/pesanans');
         transactionUrl.searchParams.set('status', 'selesai');
-        transactionUrl.searchParams.set('created_from', sDate);
-        transactionUrl.searchParams.set('created_to', eDate);
+        if(sDate) transactionUrl.searchParams.set('created_from', sDate);
+        if(eDate) transactionUrl.searchParams.set('created_to', eDate);
         if (paymentMethod !== 'all') {
             transactionUrl.searchParams.set('metode_pembayaran', paymentMethod);
         }
 
-        const expenseUrl = `https://api.sejadikopi.com/api/pengeluarans?tanggal_from=${sDateOnly}&tanggal_to=${eDateOnly}&order=tanggal.desc`;
+        const expenseUrl = new URL('https://api.sejadikopi.com/api/pengeluarans');
+        if(sDateOnly) expenseUrl.searchParams.set('tanggal_from', sDateOnly);
+        if(eDateOnly) expenseUrl.searchParams.set('tanggal_to', eDateOnly);
+        expenseUrl.searchParams.set('order', 'tanggal.desc');
         
         const [transactionRes, expenseRes] = await Promise.all([
             fetch(transactionUrl.toString()),
-            fetch(expenseUrl),
+            fetch(expenseUrl.toString()),
         ]);
 
         if (transactionRes.ok) {
@@ -371,7 +383,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-8">
-      {isExpenseFormOpen && <ExpenseForm isOpen={isExpenseFormOpen} onClose={() => setIsExpenseFormOpen(false)} onSuccess={fetchData} userEmail={user.email} expense={editingExpense}/>}
+      {isExpenseFormOpen && user && <ExpenseForm isOpen={isExpenseFormOpen} onClose={() => setIsExpenseFormOpen(false)} onSuccess={fetchData} userEmail={user.email} expense={editingExpense}/>}
 
       <div>
         <h1 className="text-3xl font-headline font-bold tracking-tight">Pembukuan</h1>

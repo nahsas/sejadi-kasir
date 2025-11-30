@@ -35,11 +35,13 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
   const { toast } = useToast();
 
   const handleDelete = async (id: number) => {
+    // NOTE: DELETE /categories/{id} is not defined in api.json.
+    // This will likely fail if the endpoint doesn't exist on the server.
     try {
       const response = await fetch(`https://api.sejadikopi.com/api/categories/${id}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error("Gagal menghapus kategori.");
+      if (!response.ok) throw new Error("Gagal menghapus kategori. Endpoint tidak ada.");
       toast({ title: "Sukses", description: "Kategori berhasil dihapus." });
       onDeleteSuccess();
     } catch (error) {
@@ -84,7 +86,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" disabled>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Hapus
                   </DropdownMenuItem>

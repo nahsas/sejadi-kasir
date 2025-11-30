@@ -22,24 +22,33 @@ import { useToast } from "@/hooks/use-toast"
 type StockColumnsProps = {
   onEdit: (menuItem: MenuItem) => void;
   onUpdateSuccess: () => void;
+  categories: any[];
 }
 
-export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnDef<MenuItem>[] => {
+export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsProps): ColumnDef<MenuItem>[] => {
   const { toast } = useToast();
+  
+  const getCategoryName = (kategori_id: number) => {
+    const category = categories.find(c => c.id === kategori_id);
+    return category ? category.nama : 'N/A';
+  }
 
   const handleMarkAsSold = async (menuItem: MenuItem) => {
     try {
-      const fullMenuItemData = {
-        ...menuItem,
-        stok: 0,
-        is_available: false,
-        harga: Number(menuItem.harga)
-      };
+      const fullMenuItemData = new FormData();
+      fullMenuItemData.append('nama', menuItem.nama);
+      fullMenuItemData.append('kategori_id', String(menuItem.kategori_id));
+      fullMenuItemData.append('harga', String(menuItem.harga));
+      fullMenuItemData.append('stok', '0');
+      fullMenuItemData.append('is_available', '0');
+      fullMenuItemData.append('is_recommendation', String(menuItem.is_recommendation ? 1: 0));
+      fullMenuItemData.append('description', menuItem.description || '');
+      fullMenuItemData.append('_method', 'PUT');
+
 
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${menuItem.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fullMenuItemData),
+        method: 'POST',
+        body: fullMenuItemData,
       });
 
       if (!response.ok) {
@@ -77,19 +86,19 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
       cell: ({ row }) => <div className="pl-4">{row.getValue("nama")}</div>
     },
     {
-      accessorKey: "kategori",
+      accessorKey: "kategori_id",
       header: "Kategori",
       cell: ({ row }) => {
-        const menuItem = row.original as any;
-        return menuItem.kategori ? menuItem.kategori.nama : 'N/A';
+        const kategori_id = row.getValue("kategori_id") as number;
+        return getCategoryName(kategori_id);
       }
     },
     {
       accessorKey: "stok",
       header: () => <div className="text-right">Stok</div>,
       cell: ({ row }) => {
-        const stock = row.getValue("stok") as number;
-        return <div className="text-right font-medium">{stock}</div>
+        const stock = row.original.stok as number;
+        return <div className="text-right font-medium">{stock || 0}</div>
       },
     },
     {
@@ -109,7 +118,7 @@ export const columns = ({ onEdit, onUpdateSuccess }: StockColumnsProps): ColumnD
             <AlertDialog>
               <div className="text-right space-x-2">
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm" disabled={menuItem.stok === 0}>
+                    <Button variant="destructive" size="sm" disabled={(menuItem.stok || 0) === 0}>
                       <XCircle className="mr-2 h-4 w-4" />
                       Tandai Habis
                     </Button>

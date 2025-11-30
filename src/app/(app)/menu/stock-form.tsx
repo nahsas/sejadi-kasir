@@ -65,19 +65,20 @@ export function StockForm({
     if (!menuItem) return;
 
     try {
-      // The API requires the full object for a PUT request, not just the stock.
-      // We spread the original item and override the stock and availability.
-      const fullMenuItemData = {
-        ...menuItem,
-        stok: values.stok,
-        is_available: values.stok > 0,
-        harga: Number(menuItem.harga) // Ensure price is a number
-      };
+      const formData = new FormData();
+      formData.append('nama', menuItem.nama);
+      formData.append('kategori_id', String(menuItem.kategori_id));
+      formData.append('harga', String(menuItem.harga));
+      formData.append('stok', String(values.stok));
+      formData.append('is_available', values.stok > 0 ? '1' : '0');
+      formData.append('is_recommendation', menuItem.is_recommendation ? '1' : '0');
+      formData.append('description', menuItem.description || '');
+      formData.append('_method', 'PUT');
+
 
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${menuItem.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fullMenuItemData),
+        method: 'POST', // Using POST with _method override
+        body: formData,
       });
 
       if (!response.ok) {

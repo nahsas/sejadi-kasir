@@ -74,6 +74,8 @@ export function AdditionalForm({
   }, [additional, form]);
 
   const onSubmit = async (values: AdditionalFormValues) => {
+    // NOTE: The endpoints for POST/PUT on /additionals are not defined in api.json.
+    // This will likely fail if the endpoints don't exist on the server.
     try {
       const method = additional ? 'PUT' : 'POST';
       const url = additional
@@ -86,7 +88,7 @@ export function AdditionalForm({
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Gagal menyimpan item tambahan.');
+      if (!response.ok) throw new Error('Gagal menyimpan item tambahan. Endpoint tidak ada.');
 
       toast({
         title: 'Sukses',
@@ -158,7 +160,7 @@ export function AdditionalForm({
               <Button type="button" variant="outline" onClick={onClose}>
                 Batal
               </Button>
-              <Button type="submit">Simpan</Button>
+              <Button type="submit" disabled>Simpan</Button>
             </DialogFooter>
           </form>
         </Form>

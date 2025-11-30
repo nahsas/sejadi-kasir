@@ -36,11 +36,13 @@ export const columns = ({ onEdit, onDeleteSuccess }: AdditionalColumnsProps): Co
   const { toast } = useToast();
 
   const handleDelete = async (id: number) => {
+    // NOTE: DELETE /additionals/{id} is not in api.json.
+    // Assuming it should exist based on UI. If not, this will fail.
     try {
       const response = await fetch(`https://api.sejadikopi.com/api/additionals/${id}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error("Gagal menghapus item tambahan.");
+      if (!response.ok) throw new Error("Gagal menghapus item tambahan. Endpoint tidak ada.");
       toast({ title: "Sukses", description: "Item tambahan berhasil dihapus." });
       onDeleteSuccess();
     } catch (error) {
@@ -93,7 +95,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: AdditionalColumnsProps): Co
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" disabled>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Hapus
                   </DropdownMenuItem>
