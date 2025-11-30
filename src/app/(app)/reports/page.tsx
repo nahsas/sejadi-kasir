@@ -1,14 +1,16 @@
 
+
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { Calendar as CalendarIcon, Download, Filter, Check, RotateCcw, Wallet, DollarSign, Receipt, LineChart, ShoppingCart, Landmark, Grip, RefreshCw, Plus } from "lucide-react"
+import { Camera, Folder, Calendar as CalendarIcon, Download, Filter, Check, RotateCcw, Wallet, DollarSign, Receipt, LineChart, ShoppingCart, Landmark, Grip, RefreshCw, Plus, UploadCloud } from "lucide-react"
 import { format, startOfMonth, endOfMonth, startOfDay, endOfDay } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -36,6 +39,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast"
+import { Textarea } from "@/components/ui/textarea"
 
 const ReportStatCard = ({
   title,
@@ -110,26 +114,28 @@ const expenseFormSchema = z.object({
   kategori: z.string().min(1, 'Kategori wajib diisi'),
   deskripsi: z.string().min(1, 'Deskripsi wajib diisi'),
   jumlah: z.coerce.number().min(1, 'Jumlah harus lebih dari 0'),
-  created_by: z.string().optional(), // Is not in the POST body but is in the response.
-  tanggal: z.string(), // Added for API
+  created_by: z.string().optional(),
+  tanggal: z.string(),
+  image: z.any().optional(),
+  bukti_url: z.string().optional(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
 
 function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpen: boolean, onClose: () => void, onSuccess: () => void, userEmail: string, expense: any | null }) {
     const { toast } = useToast();
+    const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
     const form = useForm<ExpenseFormValues>({
         resolver: zodResolver(expenseFormSchema),
-        defaultValues: expense ? {
-            kategori: expense.kategori,
-            deskripsi: expense.deskripsi,
-            jumlah: expense.jumlah,
-            tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd'),
-        } : {
-            kategori: '',
+        defaultValues: {
+            kategori: 'Operasional',
             deskripsi: '',
             jumlah: 0,
             tanggal: format(new Date(), 'yyyy-MM-dd'),
+            image: null,
+            bukti_url: '',
         },
     });
 
@@ -138,27 +144,71 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
         if (expense) {
              form.reset({
                 ...expense,
-                tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd')
+                tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd'),
+                image: null,
             });
+            if(expense.bukti_url) {
+                setImagePreview(`https://api.sejadikopi.com/storage/${expense.bukti_url}`);
+            } else {
+                setImagePreview(null);
+            }
         } else {
              form.reset({
-                kategori: '',
+                kategori: 'Operasional',
                 deskripsi: '',
                 jumlah: 0,
                 tanggal: defaultDate,
-                id: `EXP-${Date.now()}` // Generate a unique ID for new expenses
+                id: `EXP-${Date.now()}`,
+                image: null,
+                bukti_url: '',
             });
+            setImagePreview(null);
         }
-    }, [expense, form]);
+    }, [expense, form, isOpen]);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+            form.setValue('image', file);
+        }
+    };
 
     const onSubmit = async (values: ExpenseFormValues) => {
         try {
+            let buktiUrl = expense?.bukti_url || '';
+
+            if (values.image) {
+                const imageFormData = new FormData();
+                imageFormData.append('image', values.image);
+                imageFormData.append('folder', 'expenses');
+                const res = await fetch('https://api.sejadikopi.com/api/images/upload', {
+                    method: 'POST',
+                    body: imageFormData,
+                });
+                const uploadResult = await res.json();
+                if (!res.ok) {
+                    throw new Error(uploadResult.message || 'Gagal mengunggah gambar');
+                }
+                buktiUrl = uploadResult.data.path;
+            }
+
+            const payload: any = {
+                ...values,
+                bukti_url: buktiUrl,
+                created_by: userEmail,
+            };
+            delete payload.image;
+
+
             const method = expense ? 'PUT' : 'POST';
             const url = expense
                 ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
                 : 'https://api.sejadikopi.com/api/pengeluarans';
-            
-            const payload = { ...values };
 
             const response = await fetch(url, {
                 method,
@@ -166,7 +216,10 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) throw new Error('Gagal menyimpan pengeluaran.');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal menyimpan pengeluaran.');
+            }
 
             toast({ title: 'Sukses', description: `Pengeluaran berhasil ${expense ? 'diperbarui' : 'ditambahkan'}.` });
             onSuccess();
@@ -178,36 +231,88 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
     
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
                     <DialogTitle>{expense ? 'Ubah Pengeluaran' : 'Tambah Pengeluaran'}</DialogTitle>
+                    <DialogDescription>Isi detail pengeluaran baru di bawah ini.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField control={form.control} name="kategori" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Kategori</FormLabel>
-                                <FormControl><Input placeholder="cth. Bahan Baku" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="deskripsi" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Deskripsi</FormLabel>
-                                <FormControl><Input placeholder="cth. Pembelian biji kopi" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="jumlah" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Jumlah</FormLabel>
-                                <FormControl><Input type="number" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <DialogFooter>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <FormField control={form.control} name="kategori" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Kategori</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Pilih kategori" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Bahan Baku">Bahan Baku</SelectItem>
+                                                <SelectItem value="Gaji Karyawan">Gaji Karyawan</SelectItem>
+                                                <SelectItem value="Operasional">Operasional</SelectItem>
+                                                <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                                <FormField control={form.control} name="deskripsi" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Deskripsi</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="cth. Pembelian biji kopi Arabica 5kg" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                                <FormField control={form.control} name="jumlah" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Jumlah (Rp)</FormLabel>
+                                        <FormControl><Input type="number" placeholder="cth. 15.000" {...field} /></FormControl>
+                                        <FormMessage />
+                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis (contoh: 80.001)</p>
+                                    </FormItem>
+                                )} />
+                            </div>
+                            <div className="space-y-2">
+                                <FormLabel>Foto Bukti (Opsional, Max 15MB)</FormLabel>
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
+                                    {imagePreview ? (
+                                        <div className="relative w-full h-48 mb-4">
+                                            <Image src={imagePreview} alt="Pratinjau Bukti" layout="fill" objectFit="cover" className="rounded-md" />
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
+                                            <UploadCloud className="w-12 h-12 mb-2" />
+                                            <p className="font-semibold">Pilih foto bukti pengeluaran</p>
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/jpeg,image/png"
+                                        onChange={handleImageChange}
+                                    />
+                                    <div className="flex gap-4 mt-4">
+                                        <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                                            <Camera className="mr-2 h-4 w-4" /> Kamera
+                                        </Button>
+                                        <Button type="button" variant="secondary" className="bg-green-600 text-white hover:bg-green-700" onClick={() => fileInputRef.current?.click()}>
+                                            <Folder className="mr-2 h-4 w-4" /> Galeri
+                                        </Button>
+                                    </div>
+                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, (Max 15MB). Foto akan dikompres otomatis untuk upload cepat.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={onClose}>Batal</Button>
-                            <Button type="submit">Simpan</Button>
+                            <Button type="submit" className="bg-red-600 text-white hover:bg-red-700">Simpan</Button>
                         </DialogFooter>
                     </form>
                 </Form>
@@ -377,7 +482,7 @@ export default function ReportsPage() {
   const toRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`;
   const filterDateRangeStr = `${startDate ? format(startDate, 'd MMM yyyy') : ''} - ${endDate ? format(endDate, 'd MMM yyyy') : ''}`;
 
-  const memoizedExpenseColumns = React.useMemo(() => expenseColumns({ onEdit: handleEditExpense, onDelete: handleDeleteExpense }), [handleEditExpense, handleDeleteExpense]);
+  const memoizedExpenseColumns = React.useMemo(() => expenseColumns({ onEdit: handleEditExpense, onDelete: handleDeleteExpense }), []);
   const memoizedTransactionColumns = React.useMemo(() => transactionColumns(), []);
 
 
@@ -398,7 +503,7 @@ export default function ReportsPage() {
             <CardTitle className="text-xl">Filter Data</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-4">
                 <div className="space-y-2">
                     <Label>Tanggal Mulai</Label>
                     <Popover>
@@ -544,7 +649,7 @@ export default function ReportsPage() {
                 <Button variant="outline" className="bg-blue-500 hover:bg-blue-600 text-white border-none" onClick={fetchData}>
                     <RefreshCw className="mr-2 h-4 w-4" /> Segarkan
                 </Button>
-                <Button variant="destructive" className="bg-red-500 hover:bg-red-600 text-white" onClick={handleAddExpense}>
+                <Button variant="destructive" className="bg-red-600 hover:bg-red-700 text-white" onClick={handleAddExpense}>
                     <Plus className="mr-2 h-4 w-4" /> Tambah Pengeluaran
                 </Button>
             </div>
