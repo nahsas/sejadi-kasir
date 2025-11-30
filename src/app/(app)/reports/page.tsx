@@ -434,19 +434,19 @@ export default function ReportsPage() {
   }, [startDate, endDate, paymentMethod, toast]);
 
   React.useEffect(() => {
-    if (user?.role === 'admin') {
+    if (user && ['admin', 'kasir'].includes(user.role)) {
       fetchData();
     }
   }, [user, fetchData]);
 
   React.useEffect(() => {
-    if (!loading && user?.role !== 'admin') {
+    if (!loading && user && !['admin', 'kasir'].includes(user.role)) {
       router.push('/');
     }
   }, [user, loading, router]);
 
 
-  if (loading || user?.role !== 'admin') {
+  if (loading || !user || !['admin', 'kasir'].includes(user.role)) {
     return <div className="flex items-center justify-center h-screen">Akses Ditolak</div>;
   }
   
