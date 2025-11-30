@@ -4,8 +4,6 @@ import * as React from "react";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,10 +23,11 @@ import {
   XCircle,
   Wallet,
   Receipt,
+  AlertTriangle,
 } from "lucide-react";
-import { orders, menuItems } from "@/lib/data";
+import { Order, MenuItem } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, startOfToday } from "date-fns";
 import { id } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +51,7 @@ function StatCard({
           <Icon className={`w-8 h-8 ${iconColor}`} />
         </div>
         <div className="flex flex-col">
-          <p className="text-sm text-muted-foreground font-semibold">{title}</p>
+          <p className="text-sm text-muted-foreground font-semibold uppercase">{title}</p>
           <p className="text-2xl font-bold">{value}</p>
         </div>
       </CardContent>
@@ -60,44 +59,59 @@ function StatCard({
   );
 }
 
-function OrderCard({ order }: { order: (typeof orders)[0] }) {
-  const getMenuItemName = (id: string) => {
-    return menuItems.find((item) => item.id === id)?.name || "Unknown Item";
+function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuItem[] }) {
+  const getMenuItemName = (id: number) => {
+    return menuItems.find((item) => item.id === id)?.nama || "Item Tidak Dikenal";
   };
 
-  const statusVariant: { [key: string]: "default" | "destructive" | "outline" } = {
-    Completed: 'outline',
-    Cancelled: 'destructive'
-  }
-
   const statusColor: { [key: string]: string } = {
-    Completed: 'bg-yellow-400 text-yellow-900',
-    Cancelled: 'bg-red-500 text-white'
+    selesai: 'bg-green-100 text-green-700 border-green-300',
+    cancelled: 'bg-red-100 text-red-700 border-red-300'
+  };
+  
+  const statusBorder: { [key: string]: string } = {
+    selesai: 'border-green-400',
+    cancelled: 'border-red-400'
+  };
+  
+  const paymentMethodColor: { [key: string]: string } = {
+      cash: 'bg-blue-100 text-blue-700 border-blue-300',
+      qris: 'bg-purple-100 text-purple-700 border-purple-300',
   }
 
+  const paymentMethodText: { [key: string]: string } = {
+      cash: 'Tunai',
+      qris: `QRIS (${order.bank_qris || 'N/A'})`,
+  }
 
   return (
-    <Card className="shadow-md border-l-4 border-yellow-400">
+    <Card className={cn("shadow-md border-l-4", statusBorder[order.status.toLowerCase()])}>
       <CardContent className="p-4 space-y-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-bold flex items-center gap-2">
-              {order.orderType === "Dine In"
-                ? order.tableName
-                : order.customerName}
-              <Badge className={cn("text-xs", statusColor[order.status])}>{order.status}</Badge>
+              {order.location_type.toLowerCase() === "dine-in"
+                ? `Meja ${order.no_meja}`
+                : order.no_meja}
+              <Badge className={cn("text-xs capitalize", statusColor[order.status.toLowerCase()])}>{order.status}</Badge>
             </h3>
             <div className="flex items-center gap-2 mt-2">
-                <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">QRIS (BCA)</Badge>
-                <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300">Indoor</Badge>
+                {order.metode_pembayaran && (
+                    <Badge variant="outline" className={paymentMethodColor[order.metode_pembayaran]}>
+                        {paymentMethodText[order.metode_pembayaran]}
+                    </Badge>
+                )}
+                {order.location_area && (
+                     <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-300">{order.location_area}</Badge>
+                )}
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm font-medium">
-              {format(order.createdAt, "HH:mm")}
+              {format(new Date(order.created_at), "HH:mm")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {format(order.createdAt, "eeee, dd MMMM yyyy", { locale: id })}
+              {format(new Date(order.created_at), "eeee, dd MMMM yyyy", { locale: id })}
             </p>
           </div>
         </div>
@@ -105,18 +119,18 @@ function OrderCard({ order }: { order: (typeof orders)[0] }) {
         <div className="border-t border-dashed pt-4">
           <div className="flex justify-between items-center text-sm font-medium mb-2">
             <h4>Detail Pesanan</h4>
-            <span className="text-muted-foreground">{order.items.reduce((acc, item) => acc + item.quantity, 0)} item</span>
+            <span className="text-muted-foreground">{order.detail_pesanans.reduce((acc, item) => acc + item.jumlah, 0)} item</span>
           </div>
           <div className="space-y-1 text-sm text-muted-foreground">
-            {order.items.slice(0, 2).map((item, index) => (
+            {order.detail_pesanans.slice(0, 2).map((item, index) => (
               <div key={index} className="flex justify-between">
-                <span>{getMenuItemName(item.menuItemId)}</span>
-                <span>x {item.quantity}</span>
+                <span>{getMenuItemName(item.menu_id)}</span>
+                <span>x {item.jumlah}</span>
               </div>
             ))}
-             {order.items.length > 2 && (
+             {order.detail_pesanans.length > 2 && (
                 <div className="text-center text-xs text-primary pt-2">
-                    + {order.items.length - 2} menu lainnya...
+                    + {order.detail_pesanans.length - 2} menu lainnya...
                 </div>
             )}
           </div>
@@ -125,11 +139,11 @@ function OrderCard({ order }: { order: (typeof orders)[0] }) {
         <div className="border-t pt-4 space-y-2 text-sm">
             <div className="flex justify-between">
                 <span className="text-muted-foreground">Total:</span>
-                <span className="font-semibold">Rp {order.total.toLocaleString('id-ID')}</span>
+                <span className="font-semibold">Rp {parseInt(order.total).toLocaleString('id-ID')}</span>
             </div>
              <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Pembayaran:</span>
-                <span className="font-bold text-base">Rp {order.total.toLocaleString('id-ID')}</span>
+                <span className="font-bold text-base">Rp {(order.total_after_discount ?? order.total).toLocaleString('id-ID')}</span>
             </div>
         </div>
 
@@ -139,18 +153,73 @@ function OrderCard({ order }: { order: (typeof orders)[0] }) {
 }
 
 export default function HistoryPage() {
-  const pastOrders = orders.filter(
-    (o) => o.status === "Completed" || o.status === "Cancelled"
-  );
-  const completedOrders = pastOrders.filter(
-    (o) => o.status === "Completed"
-  ).length;
-  const cancelledOrders = pastOrders.filter(
-    (o) => o.status === "Cancelled"
-  ).length;
-  const totalRevenue = pastOrders
-    .filter((o) => o.status === "Completed")
-    .reduce((sum, order) => sum + order.total, 0);
+  const [orders, setOrders] = React.useState<Order[]>([]);
+  const [menuItems, setMenuItems] = React.useState<MenuItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filterStatus, setFilterStatus] = React.useState('all');
+
+  const fetchData = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const today = format(startOfToday(), 'yyyy-MM-dd');
+      const [orderRes, menuRes] = await Promise.all([
+        fetch(`https://api.sejadikopi.com/api/pesanans?status=selesai,cancelled&payment_date=${today}`),
+        fetch('https://api.sejadikopi.com/api/menu')
+      ]);
+
+      if (!orderRes.ok) throw new Error("Gagal mengambil riwayat pesanan.");
+      const orderData = await orderRes.json();
+      setOrders(orderData.data || []);
+      
+      if (menuRes.ok) {
+        const menuData = await menuRes.json();
+        setMenuItems(menuData.data || []);
+      } else {
+        setMenuItems([]);
+      }
+
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan tidak terduga.');
+      setOrders([]);
+      setMenuItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  
+  const getMenuItemName = (id: number) => {
+    return menuItems.find((item) => item.id === id)?.nama || "";
+  };
+
+  const filteredOrders = orders.filter(order => {
+    const statusMatch = filterStatus === 'all' || order.status.toLowerCase() === filterStatus;
+    
+    if (!statusMatch) return false;
+    
+    if (searchTerm === "") return true;
+
+    const lowerCaseSearch = searchTerm.toLowerCase();
+    
+    const nameMatch = order.no_meja.toLowerCase().includes(lowerCaseSearch);
+    const itemMatch = order.detail_pesanans.some(detail => getMenuItemName(detail.menu_id).toLowerCase().includes(lowerCaseSearch));
+
+    return nameMatch || itemMatch;
+  });
+
+  const completedOrders = orders.filter(o => o.status === "selesai").length;
+  const cancelledOrders = orders.filter(o => o.status === "cancelled").length;
+  const totalRevenue = orders
+    .filter((o) => o.status === "selesai")
+    .reduce((sum, order) => sum + (order.total_after_discount ?? parseInt(order.total, 10)), 0);
+
 
   return (
     <div className="space-y-6">
@@ -160,10 +229,12 @@ export default function HistoryPage() {
           <Input
             placeholder="Cari meja, pelanggan, atau item..."
             className="pl-10"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
-        <Select defaultValue="all">
-          <SelectTrigger className="w-full sm:w-[120px]">
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-full sm:w-[200px]">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
               <SelectValue placeholder="Filter" />
@@ -171,15 +242,12 @@ export default function HistoryPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua</SelectItem>
-            <SelectItem value="completed">Selesai</SelectItem>
+            <SelectItem value="selesai">Selesai</SelectItem>
             <SelectItem value="cancelled">Dibatalkan</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline">
+        <Button variant="outline" onClick={fetchData}>
           <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button variant="destructive" className="bg-red-500 text-white">
-          C
         </Button>
       </div>
 
@@ -191,7 +259,7 @@ export default function HistoryPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="TOTAL TRANSAKSI"
-          value={pastOrders.length.toString()}
+          value={orders.length.toString()}
           icon={Receipt}
           bgColor="bg-yellow-100"
           iconColor="text-yellow-600"
@@ -220,15 +288,36 @@ export default function HistoryPage() {
       </div>
 
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">History Transaksi Pembelian</h2>
-        <Badge variant="secondary">{pastOrders.length} transaksi ditemukan</Badge>
+        <h2 className="text-xl font-bold">Riwayat Transaksi Pembelian</h2>
+        <Badge variant="secondary">{filteredOrders.length} transaksi ditemukan</Badge>
       </div>
 
-      <div className="space-y-4">
-        {pastOrders.map((order) => (
-          <OrderCard key={order.id} order={order} />
-        ))}
-      </div>
+       {loading && <div className="text-center p-8">Memuat data riwayat...</div>}
+       {error && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3">
+                <AlertTriangle className="h-6 w-6"/>
+                <div>
+                    <p className="font-bold">Gagal memuat data</p>
+                    <p className="text-sm">{error}</p>
+                </div>
+            </div>
+        )}
+
+      {!loading && !error && (
+        <div className="space-y-4">
+          {filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => (
+              <OrderCard key={order.id} order={order} menuItems={menuItems}/>
+            ))
+          ) : (
+            <div className="text-center py-16 text-muted-foreground">
+              <p>Tidak ada riwayat transaksi untuk filter yang dipilih.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
+
+    
