@@ -194,19 +194,25 @@ export const printOperationalStruk = (
             currentPrint.fn(); // Print the first one directly
             if (printQueue.length > 1) {
                 // If there's more to print, queue up the next one
-                onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
+                setTimeout(() => {
+                    onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
+                }, 500); // Adding a small delay to ensure intent is processed
             }
         } else {
             // For subsequent prints, the function is called via the dialog action
             currentPrint.fn();
             if (index + 1 < printQueue.length) {
                 // Queue up the next one after this
-                onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
+                 setTimeout(() => {
+                    onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
+                }, 500);
             }
         }
     }
     
-    runNextPrint(0);
+    if (printQueue.length > 0) {
+      runNextPrint(0);
+    }
 
   } catch (error) {
     console.error("Error printing receipt:", error);
