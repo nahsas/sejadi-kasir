@@ -336,13 +336,13 @@ export default function OrdersPage() {
         <CardHeader className="flex items-center justify-center p-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
             <TabsList className="grid grid-cols-2 rounded-lg bg-gray-200 p-1 h-auto">
-              <TabsTrigger value="dine-in" className="rounded-md data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+              <TabsTrigger value="dine-in" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Dine-in
-                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{filteredDineInOrders.length}</Badge>
+                <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{filteredDineInOrders.length}</Badge>
               </TabsTrigger>
-              <TabsTrigger value="take-away" className="rounded-md data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+              <TabsTrigger value="take-away" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Take Away
-                <Badge className="bg-white/20 text-white rounded-full h-6 w-6 flex items-center justify-center">{filteredTakeawayOrders.length}</Badge>
+                <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{filteredTakeawayOrders.length}</Badge>
               </TabsTrigger>
             </TabsList>
           </Tabs>

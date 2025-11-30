@@ -225,13 +225,13 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
                     <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full">
-                        <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2">
+                        <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
                           Dine-in
-                          <Badge className="bg-white/20 text-white rounded-full">{dineInOrders.length}</Badge>
+                          <Badge className="bg-primary-foreground/90 text-primary rounded-full">{dineInOrders.length}</Badge>
                         </TabsTrigger>
-                        <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-amber-600 data-[state=active]:text-white flex items-center gap-2">
+                        <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
                           Take Away
-                          <Badge className="bg-white/20 text-white rounded-full">{takeawayOrders.length}</Badge>
+                          <Badge className="bg-primary-foreground/90 text-primary rounded-full">{takeawayOrders.length}</Badge>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
