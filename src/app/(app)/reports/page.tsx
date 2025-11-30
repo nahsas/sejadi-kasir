@@ -228,6 +228,8 @@ export default function ReportsPage() {
 
   const fetchData = React.useCallback(async () => {
     setDataLoading(true);
+    setTransactions([]);
+    setExpenses([]);
     try {
         const sDate = startDate ? format(startOfDay(startDate), "yyyy-MM-dd'T'HH:mm:ss") : '';
         const eDate = endDate ? format(endOfDay(endDate), "yyyy-MM-dd'T'HH:mm:ss") : '';
