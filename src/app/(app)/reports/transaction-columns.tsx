@@ -3,19 +3,27 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { Eye } from "lucide-react"
 
 type Transaction = {
     id: number;
     completed_at: string;
     created_at: string;
     no_meja: string;
-    metode_pembayaran: string;
+    metode_pembayaran: 'cash' | 'qris';
     total_after_discount: number;
+    bank_qris?: string;
 }
+
+type TransactionColumnsProps = {
+    onViewDetails: (transaction: Transaction) => void;
+}
+
 
 const toRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`;
 
-export const transactionColumns = (): ColumnDef<Transaction>[] => [
+export const transactionColumns = ({ onViewDetails }: TransactionColumnsProps): ColumnDef<Transaction>[] => [
     {
         accessorKey: "id",
         header: "ID",
@@ -38,7 +46,14 @@ export const transactionColumns = (): ColumnDef<Transaction>[] => [
     {
         accessorKey: "metode_pembayaran",
         header: "Metode",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("metode_pembayaran") || 'N/A'}</div>
+        cell: ({ row }) => {
+            const transaction = row.original;
+            const method = transaction.metode_pembayaran;
+            if (method === 'qris') {
+                return `QRIS (${transaction.bank_qris || 'N/A'})`
+            }
+            return <div className="capitalize">{method || 'N/A'}</div>
+        }
     },
     {
         accessorKey: "total_after_discount",
@@ -46,6 +61,21 @@ export const transactionColumns = (): ColumnDef<Transaction>[] => [
         cell: ({ row }) => {
             const total = row.getValue("total_after_discount") as number;
             return <div className="text-right font-medium">{toRupiah(total || 0)}</div>
+        }
+    },
+    {
+        id: "actions",
+        header: "Aksi",
+        cell: ({ row }) => {
+            const transaction = row.original
+            return (
+                <div className="text-center">
+                    <Button variant="ghost" size="sm" onClick={() => onViewDetails(transaction)}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Lihat Detail
+                    </Button>
+                </div>
+            )
         }
     }
 ]

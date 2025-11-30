@@ -40,6 +40,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
+import { Order, MenuItem } from "@/lib/data"
+import { OrderDetailModal } from "@/components/ui/order-detail-modal"
 
 const ReportStatCard = ({
   title,
@@ -213,7 +215,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
         tanggal: values.tanggal,
         created_by: userEmail,
         bukti_url: imageUrl,
-        foto_url: imageUrl, // Keep this for now, might be used elsewhere
+        foto_url: imageUrl,
       };
       
       const response = await fetch(url, {
@@ -347,11 +349,15 @@ export default function ReportsPage() {
 
   const [transactions, setTransactions] = React.useState<any[]>([]);
   const [expenses, setExpenses] = React.useState<any[]>([]);
+  const [menuItems, setMenuItems] = React.useState<MenuItem[]>([]);
   
   const [dataLoading, setDataLoading] = React.useState(true);
 
   const [isExpenseFormOpen, setIsExpenseFormOpen] = React.useState(false);
   const [editingExpense, setEditingExpense] = React.useState<any | null>(null);
+
+  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
   
   const { toast } = useToast();
 
@@ -371,7 +377,6 @@ export default function ReportsPage() {
         if(sDate) transactionUrl.searchParams.set('created_from', sDate);
         if(eDate) transactionUrl.searchParams.set('created_to', eDate);
         
-        // Fetch based on primary method (cash/qris)
         const fetchMethod = paymentMethod.startsWith('qris') ? 'qris' : paymentMethod;
         if (fetchMethod !== 'all') {
             transactionUrl.searchParams.set('metode_pembayaran', fetchMethod);
@@ -382,9 +387,10 @@ export default function ReportsPage() {
         if(eDateOnly) expenseUrl.searchParams.set('tanggal_to', eDateOnly);
         expenseUrl.searchParams.set('order', 'tanggal.desc');
         
-        const [transactionRes, expenseRes] = await Promise.all([
+        const [transactionRes, expenseRes, menuRes] = await Promise.all([
             fetch(transactionUrl.toString()),
             fetch(expenseUrl.toString()),
+            fetch('https://api.sejadikopi.com/api/menu'),
         ]);
 
         if (transactionRes.ok) {
@@ -399,7 +405,13 @@ export default function ReportsPage() {
             setExpenses([]);
         }
 
-        // Client-side filtering for QRIS banks
+        if (menuRes.ok) {
+            const menuData = await menuRes.json();
+            setMenuItems(menuData.data || []);
+        } else {
+            setMenuItems([]);
+        }
+
         if (paymentMethod.startsWith('qris-')) {
             const bank = paymentMethod.split('-')[1];
             setTransactions(
@@ -454,6 +466,11 @@ export default function ReportsPage() {
   const handleAddExpense = () => {
     setEditingExpense(null);
     setIsExpenseFormOpen(true);
+  };
+
+  const handleViewTransactionDetails = (transaction: Order) => {
+    setSelectedOrder(transaction);
+    setIsDetailModalOpen(true);
   };
 
   const handleDeleteExpense = async (id: string) => {
@@ -511,12 +528,19 @@ export default function ReportsPage() {
   const filterDateRangeStr = `${startDate ? format(startDate, 'd MMM yyyy') : ''} - ${endDate ? format(endDate, 'd MMM yyyy') : ''}`;
 
   const memoizedExpenseColumns = React.useMemo(() => expenseColumns({ onEdit: handleEditExpense, onDelete: handleDeleteExpense }), [expenses]);
-  const memoizedTransactionColumns = React.useMemo(() => transactionColumns(), [transactions]);
+  const memoizedTransactionColumns = React.useMemo(() => transactionColumns({ onViewDetails: handleViewTransactionDetails }), [transactions]);
 
 
   return (
     <div className="space-y-8">
       {isExpenseFormOpen && user && <ExpenseForm isOpen={isExpenseFormOpen} onClose={() => setIsExpenseFormOpen(false)} onSuccess={fetchData} userEmail={user.email} expense={editingExpense}/>}
+      <OrderDetailModal 
+        order={selectedOrder}
+        open={isDetailModalOpen}
+        onOpenChange={setIsDetailModalOpen}
+        menuItems={menuItems}
+        onOrderDeleted={fetchData}
+      />
 
       <div>
         <h1 className="text-3xl font-headline font-bold tracking-tight">Pembukuan</h1>
