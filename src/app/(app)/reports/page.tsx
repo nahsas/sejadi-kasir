@@ -318,7 +318,7 @@ export default function ReportsPage() {
   
   // Calculate stats
   const totalRevenue = transactions.reduce((sum, t) => sum + (t.total_after_discount || 0), 0);
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.jumlah, 0);
+  const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.jumlah), 0);
   const netProfit = totalRevenue - totalExpenses;
   const margin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
   const averageTransaction = transactions.length > 0 ? totalRevenue / transactions.length : 0;
@@ -589,5 +589,3 @@ export default function ReportsPage() {
     </div>
   )
 }
-
-    
