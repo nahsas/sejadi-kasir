@@ -14,6 +14,8 @@ export type MenuItem = {
   image_url: string;
   kategori_id: number;
   stok: number;
+  kategori_struk?: 'makanan' | 'minuman';
+  available_variants?: string; // e.g., "['Hot','Ice']"
 };
 
 export type OrderItem = {

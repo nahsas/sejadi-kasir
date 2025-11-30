@@ -15,6 +15,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,7 +23,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -35,16 +35,16 @@ import { Category } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi'),
   kategori_id: z.coerce.number().min(1, 'Kategori wajib diisi'),
   harga: z.coerce.number().min(0, 'Harga harus angka positif'),
-  stok: z.coerce.number().min(0, 'Stok harus angka positif'),
   description: z.string().optional(),
-  is_available: z.boolean(),
-  is_recommendation: z.boolean(),
   image: z.any().optional(),
+  kategori_struk: z.enum(['makanan', 'minuman']),
+  available_variants: z.array(z.string()).optional(),
 });
 
 type MenuFormValues = z.infer<typeof formSchema>;
@@ -73,23 +73,36 @@ export function MenuForm({
       nama: '',
       kategori_id: undefined,
       harga: 0,
-      stok: 0,
       description: '',
-      is_available: true,
-      is_recommendation: false,
+      kategori_struk: 'makanan',
+      available_variants: [],
     },
   });
+
+  const kategoriStruk = form.watch('kategori_struk');
   
   useEffect(() => {
+    let variants: string[] = [];
+    if (menuItem?.available_variants) {
+      try {
+        // The value from API is a string like "['Hot','Ice']"
+        const parsed = JSON.parse(menuItem.available_variants.replace(/'/g, '"'));
+        if(Array.isArray(parsed)) {
+          variants = parsed;
+        }
+      } catch(e) {
+        console.error("Failed to parse available_variants", e);
+      }
+    }
+
     if (menuItem) {
       form.reset({
         nama: menuItem.nama,
         kategori_id: menuItem.kategori_id,
         harga: Number(menuItem.harga),
-        stok: menuItem.stok || 0,
         description: menuItem.description || '',
-        is_available: menuItem.is_available,
-        is_recommendation: menuItem.is_recommendation,
+        kategori_struk: menuItem.kategori_struk || 'makanan',
+        available_variants: variants,
       });
       if(menuItem.image_url) {
         setImagePreview(`https://api.sejadikopi.com/storage/${menuItem.image_url}`);
@@ -101,10 +114,9 @@ export function MenuForm({
         nama: '',
         kategori_id: undefined,
         harga: 0,
-        stok: 0,
         description: '',
-        is_available: true,
-        is_recommendation: false,
+        kategori_struk: 'makanan',
+        available_variants: [],
       });
       setImagePreview(null);
     }
@@ -144,6 +156,11 @@ export function MenuForm({
       const payload: any = {
         ...values,
         image_url: imageUrl,
+        available_variants: JSON.stringify(values.available_variants).replace(/"/g, "'"),
+        // API expects is_available and is_recommendation, so let's provide default values
+        is_available: true,
+        is_recommendation: false,
+        stok: 1000,
       };
       delete payload.image;
 
@@ -220,58 +237,125 @@ export function MenuForm({
                 </FormControl>
                 <FormMessage />
                 </FormItem>
-                <FormField
-                control={form.control}
-                name="kategori_id"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Kategori</FormLabel>
-                    <Select onValueChange={field.onChange} value={String(field.value || '')}>
-                        <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Pilih kategori" />
-                        </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                        {categories.map((cat) => (
-                            <SelectItem key={cat.id} value={String(cat.id)}>
-                            {cat.nama}
-                            </SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
+                
                 <div className="grid grid-cols-2 gap-4">
                     <FormField
                     control={form.control}
-                    name="harga"
+                    name="kategori_id"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Harga</FormLabel>
-                        <FormControl>
-                            <Input type="number" {...field} />
-                        </FormControl>
+                        <FormLabel>Kategori Menu</FormLabel>
+                        <Select onValueChange={field.onChange} value={String(field.value || '')}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih kategori" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={String(cat.id)}>
+                                {cat.nama}
+                                </SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
                         <FormMessage />
                         </FormItem>
                     )}
                     />
+                     <FormField
+                        control={form.control}
+                        name="kategori_struk"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Kategori Struk</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih kategori struk" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                <SelectItem value="minuman">Minuman</SelectItem>
+                                <SelectItem value="makanan">Makanan</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                </div>
+
+                <FormItem>
+                    <FormLabel>Harga</FormLabel>
+                    <div className="relative">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">Rp</span>
+                        <FormField
+                        control={form.control}
+                        name="harga"
+                        render={({ field }) => (
+                            <FormControl>
+                                <Input type="number" className="pl-8" {...field} />
+                            </FormControl>
+                        )}
+                        />
+                    </div>
+                    <FormMessage />
+                </FormItem>
+
+                {kategoriStruk === 'minuman' && (
                     <FormField
                     control={form.control}
-                    name="stok"
-                    render={({ field }) => (
+                    name="available_variants"
+                    render={() => (
                         <FormItem>
-                        <FormLabel>Stok</FormLabel>
-                        <FormControl>
-                            <Input type="number" {...field} />
-                        </FormControl>
+                        <div className="mb-4">
+                            <FormLabel className="text-base">Varian</FormLabel>
+                            <FormDescription>
+                                Pilih varian yang tersedia untuk minuman ini.
+                            </FormDescription>
+                        </div>
+                        <div className="flex gap-4">
+                        {['Hot', 'Ice'].map((item) => (
+                            <FormField
+                                key={item}
+                                control={form.control}
+                                name="available_variants"
+                                render={({ field }) => {
+                                return (
+                                    <FormItem
+                                    key={item}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                    <FormControl>
+                                        <Checkbox
+                                        checked={field.value?.includes(item)}
+                                        onCheckedChange={(checked) => {
+                                            return checked
+                                            ? field.onChange([...(field.value || []), item])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                (value) => value !== item
+                                                )
+                                            )
+                                        }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        {item}
+                                    </FormLabel>
+                                    </FormItem>
+                                )
+                                }}
+                            />
+                            ))}
+                        </div>
                         <FormMessage />
                         </FormItem>
                     )}
                     />
-                </div>
+                )}
+
                 <FormField
                 control={form.control}
                 name="description"
@@ -285,42 +369,7 @@ export function MenuForm({
                     </FormItem>
                 )}
                 />
-                <div className="flex items-center space-x-4">
-                    <FormField
-                    control={form.control}
-                    name="is_available"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm flex-1">
-                        <div className="space-y-0.5">
-                            <FormLabel>Tersedia</FormLabel>
-                        </div>
-                        <FormControl>
-                            <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="is_recommendation"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm flex-1">
-                        <div className="space-y-0.5">
-                            <FormLabel>Direkomendasikan</FormLabel>
-                        </div>
-                        <FormControl>
-                            <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                    />
-                </div>
+
                 <DialogFooter className="sticky bottom-0 bg-background py-4">
                     <Button type="button" variant="outline" onClick={onClose}>
                         Batal
