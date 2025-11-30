@@ -101,29 +101,27 @@ export default function MenuPage() {
         fetch('https://api.sejadikopi.com/api/additionals')
       ]);
       
-      const menuData = await menuRes.json();
+      const menuData = menuRes.ok ? await menuRes.json() : { data: [] };
       setMenuItems(menuData.data || []);
       
-      const categoryData = await categoryRes.json();
+      const categoryData = categoryRes.ok ? await categoryRes.json() : { data: [] };
       setCategories(categoryData.data || []);
 
-      const discountData = await discountRes.json();
+      const discountData = discountRes.ok ? await discountRes.json() : { data: [] };
       setDiscounts(discountData.data || []);
       
-      const additionalData = await additionalRes.json();
+      const additionalData = additionalRes.ok ? await additionalRes.json() : { data: [] };
       setAdditionals(additionalData.data || []);
-
-      const menuStatsRes = await fetch('https://api.sejadikopi.com/api/menu?select=id,kategori_id,stok');
-      const menuStatsData = await menuStatsRes.json();
-
-      if (menuStatsData.data) {
+      
+      // The stats can be derived from the fetched menu items
+       if (menuData.data) {
         const foodAndSnackCategoryIds = [3, 4, 5, 6, 7];
         const coffeeCategoryId = 1;
 
-        const totalMenu = menuStatsData.data.length;
-        const totalStock = menuStatsData.data.reduce((acc: number, item: { stok: number }) => acc + (item.stok || 0), 0);
-        const totalCoffee = menuStatsData.data.filter((item: { kategori_id: number }) => item.kategori_id === coffeeCategoryId).length;
-        const totalFoodAndSnack = menuStatsData.data.filter((item: { kategori_id: number }) => foodAndSnackCategoryIds.includes(item.kategori_id)).length;
+        const totalMenu = menuData.data.length;
+        const totalStock = menuData.data.reduce((acc: number, item: { stok: number }) => acc + (item.stok || 0), 0);
+        const totalCoffee = menuData.data.filter((item: { kategori_id: number }) => item.kategori_id === coffeeCategoryId).length;
+        const totalFoodAndSnack = menuData.data.filter((item: { kategori_id: number }) => foodAndSnackCategoryIds.includes(item.kategori_id)).length;
         
         setStats({
           totalMenu,
@@ -178,6 +176,10 @@ export default function MenuPage() {
     setEditingStockItem(menuItem);
     setIsStockFormOpen(true);
   };
+  
+  const menuColumnsWithCategories = menuColumns({ onEdit: handleMenuFormOpen, onDeleteSuccess: fetchData, categories });
+  const stockColumnsWithCategories = stockColumns({ onEdit: handleStockFormOpen, onUpdateSuccess: fetchData, categories });
+
 
   return (
     <div className="space-y-8">
@@ -248,14 +250,14 @@ export default function MenuPage() {
         <TabsContent value="menu" className="mt-6">
            <TabHeader icon={BookOpen} title="Kelola Menu" description="Tambah dan kelola menu kopi & makanan" buttonText="Buat Menu Baru" onButtonClick={() => handleMenuFormOpen()} />
            <DataTable 
-              columns={menuColumns({ onEdit: handleMenuFormOpen, onDeleteSuccess: fetchData })} 
+              columns={menuColumnsWithCategories} 
               data={menuItems} 
             />
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
            <TabHeader icon={Archive} title="Kelola Stok" description="Atur dan perbarui jumlah stok untuk setiap item" buttonText="Perbarui Semua Stok" onButtonClick={() => {}} buttonDisabled={true} />
            <DataTable 
-              columns={stockColumns({ onEdit: handleStockFormOpen, onUpdateSuccess: fetchData })} 
+              columns={stockColumnsWithCategories}
               data={menuItems} 
             />
         </TabsContent>

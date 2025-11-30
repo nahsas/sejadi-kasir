@@ -18,17 +18,19 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { Category } from "@/lib/types"
 
 type StockColumnsProps = {
   onEdit: (menuItem: MenuItem) => void;
   onUpdateSuccess: () => void;
-  categories: any[];
+  categories: Category[];
 }
 
 export const columns = ({ onEdit, onUpdateSuccess, categories }: StockColumnsProps): ColumnDef<MenuItem>[] => {
   const { toast } = useToast();
   
   const getCategoryName = (kategori_id: number) => {
+    if (!categories) return 'N/A';
     const category = categories.find(c => c.id === kategori_id);
     return category ? category.nama : 'N/A';
   }

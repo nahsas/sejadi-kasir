@@ -62,11 +62,11 @@ export function CategoryForm({
         nama: '',
       });
     }
-  }, [category, form]);
+  }, [category, form, isOpen]);
 
   const onSubmit = async (values: CategoryFormValues) => {
-    // NOTE: The endpoints for POST/PUT on /categories are not defined in api.json.
-    // This will likely fail if the endpoints don't exist on the server.
+    // The API spec does not provide POST/PUT for /categories.
+    // Assuming it's missing and implementing optimistically.
     try {
       const method = category ? 'PUT' : 'POST';
       const url = category
@@ -121,7 +121,7 @@ export function CategoryForm({
               <Button type="button" variant="outline" onClick={onClose}>
                 Batal
               </Button>
-              <Button type="submit" disabled>Simpan</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>

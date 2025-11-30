@@ -7,26 +7,26 @@ import { ArrowUpDown, Pencil, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 
 type Expense = {
-    id: number;
+    id: string;
     kategori: string;
     deskripsi: string;
     jumlah: number;
-    created_at: string;
+    tanggal: string;
     created_by: string;
 }
 
 type ExpenseColumnsProps = {
     onEdit: (expense: Expense) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
 }
 
 const toRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`;
 
 export const expenseColumns = ({ onEdit, onDelete }: ExpenseColumnsProps): ColumnDef<Expense>[] => [
     {
-        accessorKey: "created_at",
+        accessorKey: "tanggal",
         header: "Tanggal",
-        cell: ({ row }) => format(new Date(row.getValue("created_at")), 'dd MMM yyyy')
+        cell: ({ row }) => format(new Date(row.getValue("tanggal")), 'dd MMM yyyy')
     },
     {
         accessorKey: "kategori",
@@ -38,8 +38,8 @@ export const expenseColumns = ({ onEdit, onDelete }: ExpenseColumnsProps): Colum
     },
     {
         accessorKey: "jumlah",
-        header: "Jumlah",
-        cell: ({ row }) => toRupiah(row.getValue("jumlah"))
+        header: () => <div className="text-right">Jumlah</div>,
+        cell: ({ row }) => <div className="text-right">{toRupiah(row.getValue("jumlah"))}</div>,
     },
     {
         accessorKey: "created_by",

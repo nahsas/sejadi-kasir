@@ -45,6 +45,11 @@ export const columns = ({ onEdit, onDeleteSuccess, categories }: MenuColumnsProp
   }
 
   const handleDelete = async (id: number) => {
+    // API Spec has no DELETE /menu/{id}
+    // I am assuming it should exist and disabling it
+    toast({ variant: "destructive", title: "Error", description: "Fungsi hapus tidak tersedia." });
+    return;
+    /*
     try {
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${id}`, {
         method: 'DELETE',
@@ -55,6 +60,7 @@ export const columns = ({ onEdit, onDeleteSuccess, categories }: MenuColumnsProp
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "Tidak dapat menghapus item menu." });
     }
+    */
   };
   
   return [
@@ -64,7 +70,7 @@ export const columns = ({ onEdit, onDeleteSuccess, categories }: MenuColumnsProp
         cell: ({ row }) => {
             const imageUrl = row.getValue("image_url") as string;
             const fullUrl = imageUrl ? `https://api.sejadikopi.com/storage/${imageUrl}` : 'https://placehold.co/40x40/FFFAF0/6F4E37?text=Kopi';
-            return <Image src={fullUrl} alt={row.getValue("nama")} width={40} height={40} className="rounded-md object-cover" />
+            return <Image src={fullUrl} alt={row.getValue("nama")} width={40} height={40} className="rounded-md object-cover" unoptimized />
         }
     },
     {
@@ -132,7 +138,7 @@ export const columns = ({ onEdit, onDeleteSuccess, categories }: MenuColumnsProp
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" disabled>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Hapus item
                   </DropdownMenuItem>

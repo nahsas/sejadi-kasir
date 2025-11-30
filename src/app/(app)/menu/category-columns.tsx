@@ -36,7 +36,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: CategoryColumnsProps): Colu
 
   const handleDelete = async (id: number) => {
     // NOTE: DELETE /categories/{id} is not defined in api.json.
-    // This will likely fail if the endpoint doesn't exist on the server.
+    // Assuming it's missing and will implement optimistically.
     try {
       const response = await fetch(`https://api.sejadikopi.com/api/categories/${id}`, {
         method: 'DELETE',

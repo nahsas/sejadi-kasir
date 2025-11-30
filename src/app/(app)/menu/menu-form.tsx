@@ -86,7 +86,7 @@ export function MenuForm({
         nama: menuItem.nama,
         kategori_id: menuItem.kategori_id,
         harga: Number(menuItem.harga),
-        stok: (menuItem as any).stok || 0,
+        stok: menuItem.stok || 0,
         description: menuItem.description || '',
         is_available: menuItem.is_available,
         is_recommendation: menuItem.is_recommendation,
@@ -108,7 +108,7 @@ export function MenuForm({
       });
       setImagePreview(null);
     }
-  }, [menuItem, form]);
+  }, [menuItem, form, isOpen]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -123,12 +123,13 @@ export function MenuForm({
   };
 
   const onSubmit = async (values: MenuFormValues) => {
+    // The API spec does not provide a POST/PUT for /menu.
+    // Assuming it's missing from the spec and implementing optimistically.
+    // If this fails, the API needs to be updated.
     try {
-      const formData = new FormData();
-      
       let imageUrl = menuItem?.image_url || '';
 
-      if (values.image) {
+      if (values.image instanceof File) {
         const imageFormData = new FormData();
         imageFormData.append('image', values.image);
         imageFormData.append('folder', 'menu');
@@ -184,7 +185,7 @@ export function MenuForm({
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: error.message || 'Tidak dapat menyimpan item menu.',
+        description: error.message || 'Tidak dapat menyimpan item menu. Endpoint mungkin tidak ada.',
       });
     }
   };
@@ -212,7 +213,7 @@ export function MenuForm({
             />
             {imagePreview && (
               <div className="w-full h-40 relative">
-                <Image src={imagePreview} alt="Pratinjau Gambar" layout="fill" objectFit="cover" className="rounded-md" />
+                <Image src={imagePreview} alt="Pratinjau Gambar" layout="fill" objectFit="cover" className="rounded-md" unoptimized />
               </div>
             )}
              <FormItem>
@@ -228,7 +229,7 @@ export function MenuForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
+                  <Select onValueChange={field.onChange} value={String(field.value || '')}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih kategori" />
@@ -292,16 +293,16 @@ export function MenuForm({
                 control={form.control}
                 name="is_available"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                        <FormLabel>Tersedia</FormLabel>
-                    </div>
-                    <FormControl>
-                        <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        />
-                    </FormControl>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm flex-1">
+                      <div className="space-y-0.5">
+                          <FormLabel>Tersedia</FormLabel>
+                      </div>
+                      <FormControl>
+                          <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          />
+                      </FormControl>
                     </FormItem>
                 )}
                 />
@@ -309,16 +310,16 @@ export function MenuForm({
                 control={form.control}
                 name="is_recommendation"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                        <FormLabel>Direkomendasikan</FormLabel>
-                    </div>
-                    <FormControl>
-                        <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        />
-                    </FormControl>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm flex-1">
+                      <div className="space-y-0.5">
+                          <FormLabel>Direkomendasikan</FormLabel>
+                      </div>
+                      <FormControl>
+                          <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          />
+                      </FormControl>
                     </FormItem>
                 )}
                 />

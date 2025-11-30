@@ -71,11 +71,11 @@ export function AdditionalForm({
         is_active: true,
       });
     }
-  }, [additional, form]);
+  }, [additional, form, isOpen]);
 
   const onSubmit = async (values: AdditionalFormValues) => {
     // NOTE: The endpoints for POST/PUT on /additionals are not defined in api.json.
-    // This will likely fail if the endpoints don't exist on the server.
+    // Assuming they are missing and implementing optimistically.
     try {
       const method = additional ? 'PUT' : 'POST';
       const url = additional
@@ -160,7 +160,7 @@ export function AdditionalForm({
               <Button type="button" variant="outline" onClick={onClose}>
                 Batal
               </Button>
-              <Button type="submit" disabled>Simpan</Button>
+              <Button type="submit">Simpan</Button>
             </DialogFooter>
           </form>
         </Form>

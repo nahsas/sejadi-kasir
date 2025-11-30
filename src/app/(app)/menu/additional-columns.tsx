@@ -37,7 +37,7 @@ export const columns = ({ onEdit, onDeleteSuccess }: AdditionalColumnsProps): Co
 
   const handleDelete = async (id: number) => {
     // NOTE: DELETE /additionals/{id} is not in api.json.
-    // Assuming it should exist based on UI. If not, this will fail.
+    // Assuming it's missing and implementing optimistically
     try {
       const response = await fetch(`https://api.sejadikopi.com/api/additionals/${id}`, {
         method: 'DELETE',

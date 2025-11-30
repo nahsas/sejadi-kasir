@@ -113,10 +113,8 @@ const expenseFormSchema = z.object({
   kategori: z.string().min(1, 'Kategori wajib diisi'),
   deskripsi: z.string().min(1, 'Deskripsi wajib diisi'),
   jumlah: z.coerce.number().min(1, 'Jumlah harus lebih dari 0'),
-  created_by: z.string().optional(),
   tanggal: z.string(),
   image: z.any().optional(),
-  bukti_url: z.string().optional(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
@@ -134,7 +132,6 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
             jumlah: 0,
             tanggal: format(new Date(), 'yyyy-MM-dd'),
             image: null,
-            bukti_url: '',
         },
     });
 
@@ -142,7 +139,10 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
         const defaultDate = format(new Date(), 'yyyy-MM-dd');
         if (expense) {
              form.reset({
-                ...expense,
+                id: expense.id,
+                kategori: expense.kategori,
+                deskripsi: expense.deskripsi,
+                jumlah: expense.jumlah,
                 tanggal: format(new Date(expense.tanggal), 'yyyy-MM-dd'),
                 image: null,
             });
@@ -159,7 +159,6 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                 tanggal: defaultDate,
                 id: `EXP-${Date.now()}`,
                 image: null,
-                bukti_url: '',
             });
             setImagePreview(null);
         }
@@ -181,10 +180,10 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
     try {
       let imageUrl = expense?.bukti_url || '';
 
-      // 1. Upload image if a new one is selected
-      if (values.image) {
+      const imageFile = form.getValues('image');
+      if (imageFile instanceof File) {
         const imageFormData = new FormData();
-        imageFormData.append('image', values.image);
+        imageFormData.append('image', imageFile);
         imageFormData.append('folder', 'expenses');
 
         const imageUploadRes = await fetch('https://api.sejadikopi.com/api/images/upload', {
@@ -197,23 +196,24 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
         }
 
         const imageUploadResult = await imageUploadRes.json();
-        imageUrl = imageUploadResult.data.path; // Use the path returned by the API
+        imageUrl = imageUploadResult.data.path;
       }
-
-      // 2. Prepare payload for expense creation/update
-      const payload = {
-        ...values,
-        id: values.id || `EXP-${Date.now()}`,
-        created_by: userEmail,
-        bukti_url: imageUrl,
-        foto_url: imageUrl,
-      };
-      delete payload.image;
 
       const method = expense ? 'PUT' : 'POST';
       const url = expense
         ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
         : 'https://api.sejadikopi.com/api/pengeluarans';
+
+      const payload = {
+        id: values.id || `EXP-${Date.now()}`,
+        kategori: values.kategori,
+        deskripsi: values.deskripsi,
+        jumlah: values.jumlah,
+        tanggal: values.tanggal,
+        created_by: userEmail,
+        bukti_url: imageUrl,
+        foto_url: imageUrl
+      };
 
       const response = await fetch(url, {
         method: method,
@@ -222,14 +222,8 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
       });
 
       if (!response.ok) {
-        let errorMessage = 'Gagal menyimpan pengeluaran.';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`;
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menyimpan pengeluaran.');
       }
 
       toast({
@@ -289,9 +283,9 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                 <FormField control={form.control} name="jumlah" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Jumlah (Rp)</FormLabel>
-                                        <FormControl><Input type="number" placeholder="cth. 15.000" {...field} /></FormControl>
+                                        <FormControl><Input type="number" placeholder="cth. 15000" {...field} /></FormControl>
                                         <FormMessage />
-                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis (contoh: 80001)</p>
+                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis.</p>
                                     </FormItem>
                                 )} />
                             </div>
@@ -300,7 +294,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
                                     {imagePreview ? (
                                         <div className="relative w-full h-48 mb-4">
-                                            <img src={imagePreview} alt="Pratinjau Bukti" className="rounded-md object-cover w-full h-full" />
+                                            <Image src={imagePreview} alt="Pratinjau Bukti" layout="fill" objectFit="cover" className="rounded-md" unoptimized/>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
@@ -312,7 +306,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                         type="file"
                                         ref={fileInputRef}
                                         className="hidden"
-                                        accept="image/jpeg,image/png,image/jpg"
+                                        accept="image/jpeg,image/png,image/jpg,image/webp"
                                         onChange={handleImageChange}
                                     />
                                     <div className="flex gap-4 mt-4">
@@ -323,14 +317,14 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                             <Folder className="mr-2 h-4 w-4" /> Galeri
                                         </Button>
                                     </div>
-                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, (Max 5MB). Foto akan dikompres otomatis untuk upload cepat.</p>
+                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, WEBP (Max 5MB). Foto akan dikompres otomatis.</p>
                                 </div>
                             </div>
                         </div>
 
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={onClose}>Batal</Button>
-                            <Button type="submit" className="bg-red-600 text-white hover:bg-red-700">Simpan</Button>
+                            <Button type="submit">Simpan</Button>
                         </DialogFooter>
                     </form>
                 </Form>
@@ -446,7 +440,7 @@ export default function ReportsPage() {
     setIsExpenseFormOpen(true);
   };
 
-  const handleDeleteExpense = async (id: number) => {
+  const handleDeleteExpense = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus pengeluaran ini?')) return;
     try {
         const response = await fetch(`https://api.sejadikopi.com/api/pengeluarans/${id}`, {
@@ -667,7 +661,7 @@ export default function ReportsPage() {
                 <Button variant="outline" className="bg-blue-500 hover:bg-blue-600 text-white border-none" onClick={fetchData}>
                     <RefreshCw className="mr-2 h-4 w-4" /> Segarkan
                 </Button>
-                <Button variant="destructive" className="bg-red-600 hover:bg-red-700 text-white" onClick={handleAddExpense}>
+                <Button className="bg-primary hover:bg-primary/90 text-white" onClick={handleAddExpense}>
                     <Plus className="mr-2 h-4 w-4" /> Tambah Pengeluaran
                 </Button>
             </div>

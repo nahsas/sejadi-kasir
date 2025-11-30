@@ -56,7 +56,7 @@ export function StockForm({
   useEffect(() => {
     if (menuItem) {
       form.reset({
-        stok: (menuItem as any).stok || 0,
+        stok: menuItem.stok || 0,
       });
     }
   }, [menuItem, form]);
