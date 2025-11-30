@@ -180,43 +180,55 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
 
     const onSubmit = async (values: ExpenseFormValues) => {
         try {
-            const formData = new FormData();
-            
-            // Append all form values to FormData
-            formData.append('id', values.id || `EXP-${Date.now()}`);
-            formData.append('kategori', values.kategori);
-            formData.append('deskripsi', values.deskripsi);
-            formData.append('jumlah', String(values.jumlah));
-            formData.append('tanggal', values.tanggal);
-            formData.append('created_by', userEmail);
-            
-            if (values.image) {
-                formData.append('foto', values.image); // The API expects 'foto' for new uploads
-            }
+            let imageUrl = expense?.bukti_url || '';
 
-            const method = expense ? 'POST' : 'POST'; // API uses POST for update with _method
+            // 1. Upload image if a new one is selected
+            if (values.image) {
+                const imageFormData = new FormData();
+                imageFormData.append('image', values.image);
+                imageFormData.append('folder', 'expenses');
+
+                const imageUploadRes = await fetch('https://api.sejadikopi.com/api/images/upload', {
+                    method: 'POST',
+                    body: imageFormData,
+                });
+                
+                if (!imageUploadRes.ok) {
+                    throw new Error('Gagal mengunggah gambar.');
+                }
+                
+                const imageUploadResult = await imageUploadRes.json();
+                imageUrl = imageUploadResult.data.path; // Use the path returned by the API
+            }
+            
+            // 2. Prepare payload for expense creation/update
+            const payload: any = {
+                ...values,
+                id: values.id || `EXP-${Date.now()}`,
+                created_by: userEmail,
+                bukti_url: imageUrl,
+                foto_url: imageUrl, // also save to foto_url if it exists
+            };
+            delete payload.image;
+
+
+            const method = expense ? 'PUT' : 'POST';
             const url = expense
                 ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
                 : 'https://api.sejadikopi.com/api/pengeluarans';
             
-            if (expense) {
-                formData.append('_method', 'PUT');
-            }
-
             const response = await fetch(url, {
-                method,
-                body: formData,
-                // Do not set Content-Type header, browser will set it with boundary
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
-                // Try to parse error, but handle cases where it's not JSON
                 let errorMessage = 'Gagal menyimpan pengeluaran.';
                 try {
                     const errorData = await response.json();
                     errorMessage = errorData.message || errorMessage;
                 } catch (e) {
-                    // Response was not JSON, could be HTML error page
                     errorMessage = `Server error: ${response.status} ${response.statusText}`;
                 }
                 throw new Error(errorMessage);
