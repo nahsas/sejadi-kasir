@@ -180,45 +180,46 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
 
     const onSubmit = async (values: ExpenseFormValues) => {
         try {
-            let buktiUrl = expense?.bukti_url || '';
-
+            const formData = new FormData();
+            
+            // Append all form values to FormData
+            formData.append('id', values.id || `EXP-${Date.now()}`);
+            formData.append('kategori', values.kategori);
+            formData.append('deskripsi', values.deskripsi);
+            formData.append('jumlah', String(values.jumlah));
+            formData.append('tanggal', values.tanggal);
+            formData.append('created_by', userEmail);
+            
             if (values.image) {
-                const imageFormData = new FormData();
-                imageFormData.append('image', values.image);
-                imageFormData.append('folder', 'expenses');
-                const res = await fetch('https://api.sejadikopi.com/api/images/upload', {
-                    method: 'POST',
-                    body: imageFormData,
-                });
-                const uploadResult = await res.json();
-                if (!res.ok) {
-                    throw new Error(uploadResult.message || 'Gagal mengunggah gambar');
-                }
-                buktiUrl = uploadResult.data.path;
+                formData.append('foto', values.image); // The API expects 'foto' for new uploads
             }
 
-            const payload: any = {
-                ...values,
-                bukti_url: buktiUrl,
-                created_by: userEmail,
-            };
-            delete payload.image;
-
-
-            const method = expense ? 'PUT' : 'POST';
+            const method = expense ? 'POST' : 'POST'; // API uses POST for update with _method
             const url = expense
                 ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
                 : 'https://api.sejadikopi.com/api/pengeluarans';
+            
+            if (expense) {
+                formData.append('_method', 'PUT');
+            }
 
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: formData,
+                // Do not set Content-Type header, browser will set it with boundary
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Gagal menyimpan pengeluaran.');
+                // Try to parse error, but handle cases where it's not JSON
+                let errorMessage = 'Gagal menyimpan pengeluaran.';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    // Response was not JSON, could be HTML error page
+                    errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
             }
 
             toast({ title: 'Sukses', description: `Pengeluaran berhasil ${expense ? 'diperbarui' : 'ditambahkan'}.` });
@@ -273,12 +274,12 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                         <FormLabel>Jumlah (Rp)</FormLabel>
                                         <FormControl><Input type="number" placeholder="cth. 15.000" {...field} /></FormControl>
                                         <FormMessage />
-                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis (contoh: 80.001)</p>
+                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis (contoh: 80001)</p>
                                     </FormItem>
                                 )} />
                             </div>
                             <div className="space-y-2">
-                                <FormLabel>Foto Bukti (Opsional, Max 15MB)</FormLabel>
+                                <FormLabel>Foto Bukti (Opsional, Max 5MB)</FormLabel>
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
                                     {imagePreview ? (
                                         <div className="relative w-full h-48 mb-4">
@@ -294,7 +295,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                         type="file"
                                         ref={fileInputRef}
                                         className="hidden"
-                                        accept="image/jpeg,image/png"
+                                        accept="image/jpeg,image/png,image/jpg"
                                         onChange={handleImageChange}
                                     />
                                     <div className="flex gap-4 mt-4">
@@ -305,7 +306,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                             <Folder className="mr-2 h-4 w-4" /> Galeri
                                         </Button>
                                     </div>
-                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, (Max 15MB). Foto akan dikompres otomatis untuk upload cepat.</p>
+                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, (Max 5MB). Foto akan dikompres otomatis untuk upload cepat.</p>
                                 </div>
                             </div>
                         </div>
@@ -482,8 +483,8 @@ export default function ReportsPage() {
   const toRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`;
   const filterDateRangeStr = `${startDate ? format(startDate, 'd MMM yyyy') : ''} - ${endDate ? format(endDate, 'd MMM yyyy') : ''}`;
 
-  const memoizedExpenseColumns = React.useMemo(() => expenseColumns({ onEdit: handleEditExpense, onDelete: handleDeleteExpense }), []);
-  const memoizedTransactionColumns = React.useMemo(() => transactionColumns(), []);
+  const memoizedExpenseColumns = React.useMemo(() => expenseColumns({ onEdit: handleEditExpense, onDelete: handleDeleteExpense }), [expenses]);
+  const memoizedTransactionColumns = React.useMemo(() => transactionColumns(), [transactions]);
 
 
   return (
