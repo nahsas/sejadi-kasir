@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import * as React from "react"
@@ -34,7 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -179,68 +178,74 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
     };
 
     const onSubmit = async (values: ExpenseFormValues) => {
-        try {
-            let imageUrl = expense?.bukti_url || '';
+    try {
+      let imageUrl = expense?.bukti_url || '';
 
-            // 1. Upload image if a new one is selected
-            if (values.image) {
-                const imageFormData = new FormData();
-                imageFormData.append('image', values.image);
-                imageFormData.append('folder', 'expenses');
+      // 1. Upload image if a new one is selected
+      if (values.image) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', values.image);
+        imageFormData.append('folder', 'expenses');
 
-                const imageUploadRes = await fetch('https://api.sejadikopi.com/api/images/upload', {
-                    method: 'POST',
-                    body: imageFormData,
-                });
-                
-                if (!imageUploadRes.ok) {
-                    throw new Error('Gagal mengunggah gambar.');
-                }
-                
-                const imageUploadResult = await imageUploadRes.json();
-                imageUrl = imageUploadResult.data.path; // Use the path returned by the API
-            }
-            
-            // 2. Prepare payload for expense creation/update
-            const payload: any = {
-                ...values,
-                id: values.id || `EXP-${Date.now()}`,
-                created_by: userEmail,
-                bukti_url: imageUrl,
-                foto_url: imageUrl, // also save to foto_url if it exists
-            };
-            delete payload.image;
+        const imageUploadRes = await fetch('https://api.sejadikopi.com/api/images/upload', {
+          method: 'POST',
+          body: imageFormData,
+        });
 
-
-            const method = expense ? 'PUT' : 'POST';
-            const url = expense
-                ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
-                : 'https://api.sejadikopi.com/api/pengeluarans';
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                let errorMessage = 'Gagal menyimpan pengeluaran.';
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch (e) {
-                    errorMessage = `Server error: ${response.status} ${response.statusText}`;
-                }
-                throw new Error(errorMessage);
-            }
-
-            toast({ title: 'Sukses', description: `Pengeluaran berhasil ${expense ? 'diperbarui' : 'ditambahkan'}.` });
-            onSuccess();
-            onClose();
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
+        if (!imageUploadRes.ok) {
+          throw new Error('Gagal mengunggah gambar.');
         }
-    };
+
+        const imageUploadResult = await imageUploadRes.json();
+        imageUrl = imageUploadResult.data.path; // Use the path returned by the API
+      }
+
+      // 2. Prepare payload for expense creation/update
+      const payload = {
+        ...values,
+        id: values.id || `EXP-${Date.now()}`,
+        created_by: userEmail,
+        bukti_url: imageUrl,
+        foto_url: imageUrl,
+      };
+      delete payload.image;
+
+      const method = expense ? 'PUT' : 'POST';
+      const url = expense
+        ? `https://api.sejadikopi.com/api/pengeluarans/${expense.id}`
+        : 'https://api.sejadikopi.com/api/pengeluarans';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Gagal menyimpan pengeluaran.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      toast({
+        title: 'Sukses',
+        description: `Pengeluaran berhasil ${expense ? 'diperbarui' : 'ditambahkan'}.`,
+      });
+      onSuccess();
+      onClose();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: (error as Error).message,
+      });
+    }
+  };
     
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -295,7 +300,7 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
                                     {imagePreview ? (
                                         <div className="relative w-full h-48 mb-4">
-                                            <Image src={imagePreview} alt="Pratinjau Bukti" layout="fill" objectFit="cover" className="rounded-md" />
+                                            <img src={imagePreview} alt="Pratinjau Bukti" className="rounded-md object-cover w-full h-full" />
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
