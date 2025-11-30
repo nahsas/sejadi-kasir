@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MapPin, FileText, Info, ArrowRight, Wallet } from 'lucide-react';
+import { printStruk } from '@/lib/print-utils';
 
 const statusConfig: {
   [key: string]: {
@@ -39,6 +40,10 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
     } else {
       onUpdateStatus(order.id);
     }
+  }
+
+  const handlePrintChecker = () => {
+    printStruk(order, menuItems);
   }
 
   return (
@@ -100,7 +105,7 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1">
+            <Button onClick={handlePrintChecker} size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1">
               <FileText className="h-3 w-3" />
               Checker
             </Button>
