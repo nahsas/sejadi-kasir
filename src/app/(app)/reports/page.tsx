@@ -237,7 +237,7 @@ export default function ReportsPage() {
         const eDateOnly = endDate ? format(endDate, 'yyyy-MM-dd') : '';
 
         const transactionUrl = `https://api.sejadikopi.com/api/pesanans?status=selesai&created_from=${sDate}&created_to=${eDate}`;
-        const expenseUrl = `https://api.sejadikopi.com/api/pengeluarans?start_date=${sDateOnly}&end_date=${eDateOnly}`;
+        const expenseUrl = `https://api.sejadikopi.com/api/pengeluarans?tanggal_from=${sDateOnly}&tanggal_to=${eDateOnly}&order=tanggal.desc`;
         
         const [transactionRes, expenseRes] = await Promise.all([
             fetch(transactionUrl),
