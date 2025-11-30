@@ -34,8 +34,8 @@ import {
   MapPin,
   ArrowRight,
   MessageSquare,
-  Pencil,
   Wallet,
+  XCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PaymentModal } from './payment-modal';
@@ -94,6 +94,37 @@ export function OrderDetailModal({
         variant: 'destructive',
         title: 'Error',
         description: 'Tidak dapat menghapus pesanan.',
+      });
+    }
+  };
+  
+  const handleCancelOrder = async () => {
+    if (!order) return;
+
+    try {
+      const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal membatalkan pesanan');
+      }
+      
+      toast({
+        title: 'Sukses',
+        description: `Pesanan #${order.id} telah dibatalkan.`,
+      });
+      onOpenChange(false);
+      onOrderDeleted();
+
+    } catch (error) {
+       console.error('Error cancelling order:', error);
+       toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Tidak dapat membatalkan pesanan.',
       });
     }
   };
@@ -225,9 +256,28 @@ export function OrderDetailModal({
                 </div>
                 {!isCompleted && (
                     <DialogFooter className="grid grid-cols-2 gap-2">
-                        <Button variant="secondary" className="bg-yellow-500 text-white hover:bg-yellow-600">
-                            <Pencil className="mr-2 h-4 w-4" /> Edit Item
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="bg-red-600 text-white hover:bg-red-700">
+                                    <XCircle className="mr-2 h-4 w-4" /> Batalkan Pesanan
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                    Tindakan ini akan membatalkan pesanan. Ini tidak bisa dibatalkan.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleCancelOrder} className="bg-destructive hover:bg-destructive/90">
+                                    Ya, Batalkan
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
                         <Button 
                             onClick={isProcessing ? handlePaymentClick : () => {}}
                             className={cn(
