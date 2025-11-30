@@ -219,28 +219,26 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="space-y-4">
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
             <CardTitle className="text-xl font-bold">Status Pesanan</CardTitle>
-            <div className="flex items-center gap-2">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
-                    <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full">
-                        <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
-                          Dine-in
-                          <Badge className="bg-primary-foreground/90 text-primary rounded-full">{dineInOrders.length}</Badge>
-                        </TabsTrigger>
-                        <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
-                          Take Away
-                          <Badge className="bg-primary-foreground/90 text-primary rounded-full">{takeawayOrders.length}</Badge>
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-              <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Segarkan
-              </Button>
-            </div>
+            <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-full">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Segarkan
+            </Button>
           </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+              <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full">
+                  <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
+                    Dine-in
+                    <Badge className="bg-primary-foreground/90 text-primary rounded-full">{dineInOrders.length}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
+                    Take Away
+                    <Badge className="bg-primary-foreground/90 text-primary rounded-full">{takeawayOrders.length}</Badge>
+                  </TabsTrigger>
+              </TabsList>
+          </Tabs>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
