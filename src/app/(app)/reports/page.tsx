@@ -215,6 +215,7 @@ export default function ReportsPage() {
 
   const [startDate, setStartDate] = React.useState<Date | undefined>(startOfMonth(new Date()));
   const [endDate, setEndDate] = React.useState<Date | undefined>(endOfMonth(new Date()));
+  const [paymentMethod, setPaymentMethod] = React.useState<string>("all");
 
   const [transactions, setTransactions] = React.useState<any[]>([]);
   const [expenses, setExpenses] = React.useState<any[]>([]);
@@ -236,11 +237,18 @@ export default function ReportsPage() {
         const sDateOnly = startDate ? format(startDate, 'yyyy-MM-dd') : '';
         const eDateOnly = endDate ? format(endDate, 'yyyy-MM-dd') : '';
 
-        const transactionUrl = `https://api.sejadikopi.com/api/pesanans?status=selesai&created_from=${sDate}&created_to=${eDate}`;
+        const transactionUrl = new URL('https://api.sejadikopi.com/api/pesanans');
+        transactionUrl.searchParams.set('status', 'selesai');
+        transactionUrl.searchParams.set('created_from', sDate);
+        transactionUrl.searchParams.set('created_to', eDate);
+        if (paymentMethod !== 'all') {
+            transactionUrl.searchParams.set('metode_pembayaran', paymentMethod);
+        }
+
         const expenseUrl = `https://api.sejadikopi.com/api/pengeluarans?tanggal_from=${sDateOnly}&tanggal_to=${eDateOnly}&order=tanggal.desc`;
         
         const [transactionRes, expenseRes] = await Promise.all([
-            fetch(transactionUrl),
+            fetch(transactionUrl.toString()),
             fetch(expenseUrl),
         ]);
 
@@ -264,7 +272,7 @@ export default function ReportsPage() {
     } finally {
         setDataLoading(false);
     }
-  }, [startDate, endDate, toast]);
+  }, [startDate, endDate, paymentMethod, toast]);
 
   React.useEffect(() => {
     if (user?.role === 'admin') {
@@ -290,6 +298,7 @@ export default function ReportsPage() {
   const handleResetFilter = () => {
     setStartDate(startOfMonth(new Date()));
     setEndDate(endOfMonth(new Date()));
+    setPaymentMethod("all");
     // Re-fetch will be triggered by state change if fetchData is in useEffect dependency
     setTimeout(fetchData, 100);
   };
@@ -336,13 +345,13 @@ export default function ReportsPage() {
           acc.qris.amount += t.total_after_discount || 0;
           acc.qris.count += 1;
           
-          if (bank.toLowerCase().includes('bca')) {
+          if (bank && bank.toLowerCase().includes('bca')) {
               acc.qris_bca.amount += t.total_after_discount || 0;
               acc.qris_bca.count += 1;
-          } else if (bank.toLowerCase().includes('bri')) {
+          } else if (bank && bank.toLowerCase().includes('bri')) {
               acc.qris_bri.amount += t.total_after_discount || 0;
               acc.qris_bri.count += 1;
-          } else if (bank.toLowerCase().includes('bsi')) {
+          } else if (bank && bank.toLowerCase().includes('bsi')) {
               acc.qris_bsi.amount += t.total_after_discount || 0;
               acc.qris_bsi.count += 1;
           }
@@ -424,13 +433,32 @@ export default function ReportsPage() {
                     </PopoverContent>
                 </Popover>
                 </div>
+                <div className="space-y-2">
+                    <Label>Metode Pembayaran</Label>
+                    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                        <SelectTrigger>
+                            <div className="flex items-center gap-2">
+                                <Wallet className="h-4 w-4" />
+                                <SelectValue placeholder="Semua Metode" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Semua Metode</SelectItem>
+                            <SelectItem value="cash">Tunai</SelectItem>
+                            <SelectItem value="qris">QRIS</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-4">
             <Button onClick={handleApplyFilter} className="bg-amber-600 hover:bg-amber-700 text-white font-bold">
                 <Check className="mr-2 h-4 w-4" /> Terapkan
             </Button>
             <Button variant="secondary" onClick={handleResetFilter} className="bg-slate-500 hover:bg-slate-600 text-white font-bold">
                 <RotateCcw className="mr-2 h-4 w-4" /> Reset
+            </Button>
+            <Button variant="secondary" className="bg-green-600 hover:bg-green-700 text-white font-bold" disabled>
+                <Download className="mr-2 h-4 w-4" /> Export
             </Button>
           </div>
         </CardContent>
@@ -591,5 +619,3 @@ export default function ReportsPage() {
     </div>
   )
 }
-
-    
