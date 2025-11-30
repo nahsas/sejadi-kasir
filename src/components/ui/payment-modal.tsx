@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Order } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { X, Landmark, QrCode, Pencil, Check, Receipt, Info } from 'lucide-react';
+import { X, Landmark, QrCode, Pencil, Check, Receipt, Info, Tag, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
@@ -40,21 +40,72 @@ export function PaymentModal({
   const [paymentAmount, setPaymentAmount] = React.useState('');
   const [selectedBank, setSelectedBank] = React.useState<'BCA' | 'BRI' | 'BSI' | null>('BCA');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isApplyingDiscount, setIsApplyingDiscount] = React.useState(false);
 
-  const quickAddAmounts = [1000, 2000, 5000, 10000, 50000, 100000];
+  const [discountCode, setDiscountCode] = React.useState('');
+  const [appliedDiscount, setAppliedDiscount] = React.useState<{ amount: number, finalTotal: number, code: string } | null>(null);
+
   const orderTotal = order ? parseInt(order.total, 10) : 0;
+  const displayTotal = appliedDiscount ? appliedDiscount.finalTotal : orderTotal;
   
   const handleAutoFill = () => {
-    setPaymentAmount(orderTotal.toString());
+    setPaymentAmount(displayTotal.toString());
   };
 
+  const quickAddAmounts = [1000, 2000, 5000, 10000, 50000, 100000];
   const handleQuickAdd = (amount: number) => {
     setPaymentAmount((prev) => (Number(prev || 0) + amount).toString());
   }
   
-  const changeAmount = Number(paymentAmount) - orderTotal;
+  const changeAmount = Number(paymentAmount) - displayTotal;
   const isShortfall = changeAmount < 0;
   const changeText = `Rp ${Math.abs(changeAmount).toLocaleString('id-ID')}`;
+
+  const handleApplyDiscount = async () => {
+    if (!discountCode || !order) return;
+    setIsApplyingDiscount(true);
+
+    try {
+        const response = await fetch('https://api.sejadikopi.com/api/discount-codes/apply', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                code: discountCode,
+                order_amount: orderTotal
+            }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Kode diskon tidak valid.');
+        }
+        
+        setAppliedDiscount({
+            amount: result.discount_amount,
+            finalTotal: result.total_after_discount,
+            code: discountCode.toUpperCase(),
+        });
+
+        toast({
+            title: "Diskon Diterapkan",
+            description: result.message,
+        });
+
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message || "Gagal menerapkan diskon.",
+        });
+        setAppliedDiscount(null);
+    } finally {
+        setIsApplyingDiscount(false);
+    }
+  };
 
   const handleFinishPayment = async () => {
     if (!order) return;
@@ -73,39 +124,26 @@ export function PaymentModal({
     let payload = {};
     const now = new Date().toISOString();
 
-    if (paymentMethod === 'QRIS') {
-        payload = {
-            status: "selesai",
-            updated_at: now,
-            completed_at: now,
-            is_final: true,
-            metode_pembayaran: "qris",
-            bank_qris: selectedBank,
-            discount_code: null, // Assuming no discount for now
-            discount_amount: 0,
-            total_after_discount: order.total
-        };
-    } else { // Cash
-        payload = {
-            status: "selesai",
-            updated_at: now,
-            completed_at: now,
-            is_final: true,
-            metode_pembayaran: "cash",
-            bank_qris: null,
-            discount_code: null, // Assuming no discount for now
-            discount_amount: 0,
-            total_after_discount: order.total
-        };
-    }
+    const finalPayload = {
+        status: "selesai",
+        updated_at: now,
+        completed_at: now,
+        is_final: true,
+        metode_pembayaran: paymentMethod.toLowerCase() as 'cash' | 'qris',
+        bank_qris: paymentMethod === 'QRIS' ? selectedBank : null,
+        discount_code: appliedDiscount?.code || null,
+        discount_amount: appliedDiscount?.amount || 0,
+        total_after_discount: appliedDiscount?.finalTotal || orderTotal
+    };
     
     try {
         const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(finalPayload)
         });
 
         if (!response.ok) {
@@ -139,6 +177,8 @@ export function PaymentModal({
       setPaymentMethod('Cash');
       setSelectedBank('BCA');
       setIsLoading(false);
+      setDiscountCode('');
+      setAppliedDiscount(null);
     }
   }, [open]);
 
@@ -161,19 +201,50 @@ export function PaymentModal({
         </DialogHeader>
 
         <div className="px-4 pb-4 space-y-4 max-h-[70vh] overflow-y-auto">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex justify-between items-center">
-            <span className="font-medium text-yellow-800">Total Pembayaran:</span>
-            <span className="font-bold text-xl text-yellow-900">
-              Rp {orderTotal.toLocaleString('id-ID')}
-            </span>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 space-y-2">
+             <div className="flex justify-between items-center text-sm">
+                <span className="font-medium text-yellow-800">Subtotal:</span>
+                <span className="text-yellow-900">
+                Rp {orderTotal.toLocaleString('id-ID')}
+                </span>
+            </div>
+            {appliedDiscount && (
+                 <div className="flex justify-between items-center text-sm text-red-600">
+                    <span className="font-medium">Diskon ({appliedDiscount.code}):</span>
+                    <span>
+                    - Rp {appliedDiscount.amount.toLocaleString('id-ID')}
+                    </span>
+                </div>
+            )}
+            <div className="border-t border-yellow-200 border-dashed my-1"></div>
+            <div className="flex justify-between items-center">
+                <span className="font-medium text-yellow-800">Total Pembayaran:</span>
+                <span className="font-bold text-xl text-yellow-900">
+                Rp {displayTotal.toLocaleString('id-ID')}
+                </span>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="discount-code">Kode Diskon (Opsional)</Label>
             <div className="flex gap-2">
-              <Input id="discount-code" placeholder="MASUKKAN KODE DISKON" />
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white">
-                Terapkan
+              <Input 
+                id="discount-code" 
+                placeholder="MASUKKAN KODE DISKON"
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+                disabled={!!appliedDiscount || isApplyingDiscount}
+              />
+              <Button 
+                onClick={handleApplyDiscount}
+                className="bg-amber-600 hover:bg-amber-700 text-white" 
+                disabled={!discountCode || !!appliedDiscount || isApplyingDiscount}
+              >
+                {isApplyingDiscount ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    "Terapkan"
+                )}
               </Button>
             </div>
           </div>
@@ -286,7 +357,7 @@ export function PaymentModal({
                              <div className="flex justify-between items-center">
                                 <span className="font-medium text-purple-800">Total Pembayaran:</span>
                                 <span className="font-bold text-xl text-purple-900">
-                                    Rp {orderTotal.toLocaleString('id-ID')}
+                                    Rp {displayTotal.toLocaleString('id-ID')}
                                 </span>
                              </div>
                         </div>
@@ -322,3 +393,5 @@ export function PaymentModal({
     </Dialog>
   );
 }
+
+    
