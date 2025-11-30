@@ -102,8 +102,8 @@ export function MenuForm({
         kategori_struk: menuItem.kategori_struk || 'makanan',
         available_variants: variants,
       });
-      if(menuItem.image_url) {
-        setImagePreview(`https://api.sejadikopi.com/storage/${menuItem.image_url}`);
+      if(menuItem.foto) {
+        setImagePreview(`https://api.sejadikopi.com/storage/${menuItem.foto}`);
       } else {
         setImagePreview(null);
       }
@@ -134,7 +134,7 @@ export function MenuForm({
   const onSubmit = async (values: MenuFormValues) => {
     setIsSubmitting(true);
     try {
-      let imageUrl = menuItem?.image_url || '';
+      let imageUrl = menuItem?.foto || '';
 
       if (values.image instanceof File) {
         const imageFormData = new FormData();
@@ -352,18 +352,18 @@ export function MenuForm({
                     )}
                     />
                 )}
-                <DialogFooter className="sticky bottom-0 bg-background py-4">
-                    <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                        Batal
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-                    </Button>
-                </DialogFooter>
-            </form>
+                </form>
             </Form>
         </div>
+        <DialogFooter className="sticky bottom-0 bg-background p-6 pt-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+                Batal
+            </Button>
+            <Button type="submit" disabled={isSubmitting} onClick={form.handleSubmit(onSubmit)}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

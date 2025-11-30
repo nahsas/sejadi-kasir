@@ -219,7 +219,7 @@ export function OrderDetailModal({
               </div>
             </DialogHeader>
 
-            <div className="p-4 space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+            <div className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
                 {order.detail_pesanans.map((item) => {
                 const menuItem = getMenuDetails(item.menu_id);
                 return (

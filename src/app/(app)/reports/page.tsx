@@ -251,91 +251,92 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
     
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-3xl">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-3xl p-0">
+                <DialogHeader className="p-6 pb-0">
                     <DialogTitle>{expense ? 'Ubah Pengeluaran' : 'Tambah Pengeluaran'}</DialogTitle>
                     <DialogDescription>Isi detail pengeluaran baru di bawah ini.</DialogDescription>
                 </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <FormField control={form.control} name="kategori" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Kategori</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Pilih kategori" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Bahan Baku">Bahan Baku</SelectItem>
-                                                <SelectItem value="Gaji Karyawan">Gaji Karyawan</SelectItem>
-                                                <SelectItem value="Operasional">Operasional</SelectItem>
-                                                <SelectItem value="Lainnya">Lainnya</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="deskripsi" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Deskripsi</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="cth. Pembelian biji kopi Arabica 5kg" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="jumlah" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Jumlah (Rp)</FormLabel>
-                                        <FormControl><Input type="number" placeholder="cth. 15000" {...field} /></FormControl>
-                                        <FormMessage />
-                                         <p className="text-xs text-muted-foreground">Input angka saja, format otomatis.</p>
-                                    </FormItem>
-                                )} />
-                            </div>
-                            <div className="space-y-2">
-                                <FormLabel>Foto Bukti (Opsional, Max 50MB)</FormLabel>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
-                                    {imagePreview ? (
-                                        <div className="relative w-full h-48 mb-4">
-                                            <img src={imagePreview} alt="Pratinjau Bukti" className="rounded-md object-cover w-full h-full" />
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
-                                            <UploadCloud className="w-12 h-12 mb-2" />
-                                            <p className="font-semibold">Pilih foto bukti pengeluaran</p>
-                                        </div>
-                                    )}
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        className="hidden"
-                                        accept="image/jpeg,image/png,image/jpg,image/webp"
-                                        onChange={handleImageChange}
-                                    />
-                                    <div className="flex gap-4 mt-4">
-                                        <Button type="button" onClick={() => fileInputRef.current?.click()}>
-                                            <Camera className="mr-2 h-4 w-4" /> Kamera
-                                        </Button>
-                                        <Button type="button" variant="secondary" className="bg-green-600 text-white hover:bg-green-700" onClick={() => fileInputRef.current?.click()}>
-                                            <Folder className="mr-2 h-4 w-4" /> Galeri
-                                        </Button>
-                                    </div>
-                                     <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, WEBP (Max 50MB). Foto akan dikompres otomatis.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <DialogFooter className="pt-4">
-                            <Button type="button" variant="outline" onClick={onClose}>Batal</Button>
-                            <Button type="submit">Simpan</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                <div className="px-6 max-h-[70vh] overflow-y-auto">
+                  <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                  <FormField control={form.control} name="kategori" render={({ field }) => (
+                                      <FormItem>
+                                          <FormLabel>Kategori</FormLabel>
+                                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                              <FormControl>
+                                                  <SelectTrigger>
+                                                      <SelectValue placeholder="Pilih kategori" />
+                                                  </SelectTrigger>
+                                              </FormControl>
+                                              <SelectContent>
+                                                  <SelectItem value="Bahan Baku">Bahan Baku</SelectItem>
+                                                  <SelectItem value="Gaji Karyawan">Gaji Karyawan</SelectItem>
+                                                  <SelectItem value="Operasional">Operasional</SelectItem>
+                                                  <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                          <FormMessage />
+                                      </FormItem>
+                                  )} />
+                                  <FormField control={form.control} name="deskripsi" render={({ field }) => (
+                                      <FormItem>
+                                          <FormLabel>Deskripsi</FormLabel>
+                                          <FormControl>
+                                              <Textarea placeholder="cth. Pembelian biji kopi Arabica 5kg" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                      </FormItem>
+                                  )} />
+                                  <FormField control={form.control} name="jumlah" render={({ field }) => (
+                                      <FormItem>
+                                          <FormLabel>Jumlah (Rp)</FormLabel>
+                                          <FormControl><Input type="number" placeholder="cth. 15000" {...field} /></FormControl>
+                                          <FormMessage />
+                                          <p className="text-xs text-muted-foreground">Input angka saja, format otomatis.</p>
+                                      </FormItem>
+                                  )} />
+                              </div>
+                              <div className="space-y-2">
+                                  <FormLabel>Foto Bukti (Opsional, Max 50MB)</FormLabel>
+                                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-full flex flex-col justify-center items-center text-center">
+                                      {imagePreview ? (
+                                          <div className="relative w-full h-48 mb-4">
+                                              <img src={imagePreview} alt="Pratinjau Bukti" className="rounded-md object-cover w-full h-full" />
+                                          </div>
+                                      ) : (
+                                          <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
+                                              <UploadCloud className="w-12 h-12 mb-2" />
+                                              <p className="font-semibold">Pilih foto bukti pengeluaran</p>
+                                          </div>
+                                      )}
+                                      <input
+                                          type="file"
+                                          ref={fileInputRef}
+                                          className="hidden"
+                                          accept="image/jpeg,image/png,image/jpg,image/webp"
+                                          onChange={handleImageChange}
+                                      />
+                                      <div className="flex gap-4 mt-4">
+                                          <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                                              <Camera className="mr-2 h-4 w-4" /> Kamera
+                                          </Button>
+                                          <Button type="button" variant="secondary" className="bg-green-600 text-white hover:bg-green-700" onClick={() => fileInputRef.current?.click()}>
+                                              <Folder className="mr-2 h-4 w-4" /> Galeri
+                                          </Button>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground mt-2">Format: JPG, PNG, WEBP (Max 50MB). Foto akan dikompres otomatis.</p>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </Form>
+                </div>
+                <DialogFooter className="p-6 pt-2">
+                    <Button type="button" variant="outline" onClick={onClose}>Batal</Button>
+                    <Button type="submit" onClick={form.handleSubmit(onSubmit)}>Simpan</Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
