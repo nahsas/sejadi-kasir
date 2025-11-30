@@ -58,7 +58,7 @@ const generateReceiptText = (
   if (showPrices) {
     receipt += alignCenter("Jl. Pattimura, Air Saga") + "\n";
   }
-  receipt += "\x1B\x21\x10${alignCenter("SEJADI KOPI")}\x1B\x21\x00\n\n`;
+  receipt += "\x1B\x21\x10" + alignCenter("SEJADI KOPI") + "\x1B\x21\x00\n\n";
   
   receipt += "\x1B\x61\x00"; // Align left
   if (showPrices) {
