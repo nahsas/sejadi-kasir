@@ -17,8 +17,12 @@ const alignCenter = (str: string, isDoubleWidth = false): string => {
 };
 
 const createLine = (left: string, right: string): string => {
-  const spaceCount = Math.max(1, paperWidth - left.length - right.length);
-  return left + " ".repeat(spaceCount) + right;
+    const spaces = paperWidth - left.length - right.length;
+    if (spaces < 1) {
+        // If there's no space, just concatenate with a single space
+        return `${left} ${right}`;
+    }
+    return left + ' '.repeat(spaces) + right;
 };
 
 const formatCurrency = (num: number): string => {
