@@ -292,7 +292,7 @@ export function OrderDetailModal({
                 ];
                 return (
                     <div key={item.id} className="bg-slate-50 rounded-lg p-3">
-                        <div className="flex justify-between items-start gap-2">
+                        <div className="flex justify-between items-start gap-4">
                            <div className="flex-1">
                                 <p className="font-bold flex items-center gap-2">
                                     {menuItem?.nama || 'Nama tidak ditemukan'}{' '}
@@ -314,7 +314,7 @@ export function OrderDetailModal({
                                     ))}
                                 </div>
                             </div>
-                            <div className="text-right flex-shrink-0 w-20">
+                            <div className="text-right flex-shrink-0">
                                 <p className="font-semibold">x {item.jumlah}</p>
                                 <p className="font-bold text-lg text-primary">
                                     Rp{' '}
@@ -332,7 +332,7 @@ export function OrderDetailModal({
                                         <AlertDialogHeader>
                                             <AlertDialogTitle>Hapus item ini?</AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                Yakin ingin menghapus item "{menuItem?.nama || 'Item'}" dari pesanan?
+                                                Yakin ingin menghapus item "{menuItem?.nama || 'Item'}" dari pesanan? Tindakan ini tidak dapat dibatalkan.
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>

@@ -27,8 +27,10 @@ interface ReceiptOptions {
 }
 
 const updatePrintedStatus = async (items: OrderItem[]) => {
-  for (const item of items) {
-    if (item.printed === 0) {
+  const unprintedItems = items.filter(item => item.printed === 0);
+  if (unprintedItems.length === 0) return;
+
+  for (const item of unprintedItems) {
       try {
         await fetch(`https://api.sejadikopi.com/api/detail_pesanan/${item.id}`, {
           method: 'PUT',
@@ -39,7 +41,6 @@ const updatePrintedStatus = async (items: OrderItem[]) => {
         console.error(`Gagal update status print untuk item ${item.id}:`, error);
         // Continue trying to update other items
       }
-    }
   }
 };
 
@@ -72,7 +73,7 @@ const generateReceiptText = (
   receipt += "\x1B\x61\x01"; // Align center
 
   // --- Header ---
-  receipt += `\x1B\x21\x10${alignCenter(title)}\x1B\x21\x00\n`;
+  receipt += `\x1B\x21\x10` + alignCenter(title) + `\x1B\x21\x00\n`;
   if (showPrices) {
     receipt += alignCenter("Jl. Pattimura, Air Saga") + "\n";
   }
@@ -168,18 +169,25 @@ export const printOperationalStruk = (
 ) => {
   try {
     const unprintedItems = order.detail_pesanans.filter(item => item.printed === 0);
+    let itemsToProcess: OrderItem[];
 
-    if (unprintedItems.length === 0) {
-      alert("Tidak ada item baru untuk dicetak.");
+    if (unprintedItems.length > 0) {
+      itemsToProcess = unprintedItems;
+    } else {
+      itemsToProcess = order.detail_pesanans;
+    }
+    
+    if (itemsToProcess.length === 0) {
+      alert("Tidak ada item dalam pesanan untuk dicetak.");
       return;
     }
 
-    const makananItems = unprintedItems.filter(item => {
+    const makananItems = itemsToProcess.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         return menuItem?.kategori_struk === 'makanan';
     });
 
-    const minumanItems = unprintedItems.filter(item => {
+    const minumanItems = itemsToProcess.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         return menuItem?.kategori_struk === 'minuman';
     });
@@ -211,7 +219,7 @@ export const printOperationalStruk = (
         const receiptText = generateReceiptText(order, menuItems, {
             title: "CHECKER PELAYAN",
             showPrices: false,
-            itemsToPrint: unprintedItems // Waiter sees all new items
+            itemsToPrint: itemsToProcess
         });
         printJob(receiptText);
     }
@@ -219,7 +227,7 @@ export const printOperationalStruk = (
     const printQueue: { fn: () => void, title: string }[] = [];
     if(hasMakanan) printQueue.push({ fn: kitchenPrintFn, title: "Cetak Struk Dapur?" });
     if(hasMinuman) printQueue.push({ fn: barPrintFn, title: "Cetak Struk Bar?" });
-    if(unprintedItems.length > 0) printQueue.push({ fn: waiterPrintFn, title: "Cetak Struk Pelayan?" });
+    if(itemsToProcess.length > 0) printQueue.push({ fn: waiterPrintFn, title: "Cetak Struk Pelayan?" });
 
 
     const runNextPrint = (index: number) => {
@@ -228,18 +236,15 @@ export const printOperationalStruk = (
         const currentPrint = printQueue[index];
 
         if (index === 0) {
-            currentPrint.fn(); // Print the first one directly
+            currentPrint.fn();
             if (printQueue.length > 1) {
-                // If there's more to print, queue up the next one
                 setTimeout(() => {
                     onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
-                }, 500); // Adding a small delay to ensure intent is processed
+                }, 500); 
             }
         } else {
-            // For subsequent prints, the function is called via the dialog action
             currentPrint.fn();
             if (index + 1 < printQueue.length) {
-                // Queue up the next one after this
                  setTimeout(() => {
                     onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
                 }, 500);
@@ -249,6 +254,8 @@ export const printOperationalStruk = (
     
     if (printQueue.length > 0) {
       runNextPrint(0);
+    } else {
+       alert("Tidak ada item baru untuk dicetak.");
     }
 
   } catch (error) {
