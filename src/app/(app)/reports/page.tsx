@@ -551,7 +551,7 @@ export default function ReportsPage() {
         [],
         ["RINCIAN PEMBAYARAN"],
         ["Metode", "Jumlah Transaksi", "Total Nominal"],
-        ["Petty Cash", "", pettyCash],
+        ["Pitty Cash", "", pettyCash],
         ["Tunai", paymentBreakdown.cash.count, paymentBreakdown.cash.amount],
         ["Setoran", "", setoran],
         ["QRIS (Semua)", paymentBreakdown.qris.count, paymentBreakdown.qris.amount],
@@ -750,11 +750,11 @@ export default function ReportsPage() {
           <ReportStatCard
             title="Setoran"
             value={toRupiah(setoran)}
-            date={`Total Transaksi: ${transactions.length}`}
-            icon={<ShoppingCart className="h-5 w-5" />}
+            icon={<Wallet className="h-5 w-5" />}
             bgColor="bg-orange-500"
+            date={"Uang yang harus di setor"}
             textColor="text-white"
-            rightIcon={<ShoppingCart className="h-6 w-6" />}
+            rightIcon={<Wallet className="h-6 w-6" />}
           />
         </div>
 
@@ -766,7 +766,7 @@ export default function ReportsPage() {
                 <h2 className="text-xl font-bold">Rincian Pembayaran</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                <PaymentBreakdownCard title="Petty Cash" amount={toRupiah(pettyCash)} transactions="Statis" icon={<Landmark className="h-6 w-6 text-gray-500"/>} borderColor="border-gray-500" />
+                <PaymentBreakdownCard title="Pity Cash" amount={toRupiah(pettyCash)} transactions="Kas tetap" icon={<Landmark className="h-6 w-6 text-gray-500"/>} borderColor="border-gray-500" />
                 <PaymentBreakdownCard title="Tunai" amount={toRupiah(paymentBreakdown.cash.amount)} transactions={paymentBreakdown.cash.count} icon={<Landmark className="h-6 w-6 text-green-500"/>} borderColor="border-green-500" />
                 <PaymentBreakdownCard title="QRIS (Semua)" amount={toRupiah(paymentBreakdown.qris.amount)} transactions={paymentBreakdown.qris.count} icon={<Grip className="h-6 w-6 text-purple-500"/>} borderColor="border-purple-500" />
                 <PaymentBreakdownCard title="QRIS BCA" amount={toRupiah(paymentBreakdown.qris_bca.amount)} transactions={paymentBreakdown.qris_bca.count} icon={<Grip className="h-6 w-6 text-blue-500"/>} borderColor="border-blue-500" />
