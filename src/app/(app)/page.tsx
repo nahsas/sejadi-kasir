@@ -143,8 +143,8 @@ export default function DashboardPage() {
   const renderOrderList = (orders: Order[], type: 'dine-in' | 'take-away') => {
       if (ordersLoading) {
           return (
-             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {[...Array(3)].map((_, i) => (
+             <div className="grid gap-4 md:grid-cols-2">
+                {[...Array(2)].map((_, i) => (
                     <Card key={i} className="h-64 animate-pulse bg-gray-200"></Card>
                 ))}
              </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       }
        if (orders.length > 0) {
           return (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
                 {orders.map((order) => (
                     <OrderCard key={order.id} order={order} menuItems={menuItems} />
                 ))}
@@ -184,7 +184,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {user?.role === 'admin' && (
           <>
             <StatCard 
