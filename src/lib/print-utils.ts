@@ -8,10 +8,13 @@ const paperWidth = 32;
 const createLine = (left: string, right: string): string => {
     const spaces = paperWidth - left.length - right.length;
     if (spaces < 1) {
-        return `${left} ${right}`.substring(0, paperWidth);
+        // If the combined length is too long, truncate the left string to make space
+        const leftTruncated = left.substring(0, left.length + spaces - 1);
+        return `${leftTruncated} ${right}`;
     }
     return left + ' '.repeat(spaces) + right;
 };
+
 
 const formatCurrency = (num: number): string => {
     return num.toLocaleString('id-ID');
@@ -145,13 +148,8 @@ const generateReceiptText = (
       receipt += "\n\n"; // Wide spacing
     }
     
-    receipt += "--- SEMUA ITEM LAINNYA ---\n";
-    const otherItems = itemsToPrint.filter(item => {
-        const menuItem = menuItems.find(mi => mi.id === item.menu_id);
-        return menuItem?.kategori_struk !== 'minuman';
-    });
-
-    otherItems.forEach(item => {
+    receipt += "--- SEMUA ITEM ---\n";
+    itemsToPrint.forEach(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         if (!menuItem) return;
         let itemName = `${item.jumlah}x ${menuItem.nama}`;
@@ -249,7 +247,6 @@ export const printOperationalStruk = async (
     if (unprintedItems.length > 0) {
       itemsToProcess = unprintedItems;
     } else {
-      alert("Tidak ada item baru untuk dicetak. Mencetak ulang semua item.");
       itemsToProcess = order.detail_pesanans;
     }
     
@@ -346,6 +343,7 @@ export const printPaymentStruk = (order: Order, menuItems: MenuItem[], additiona
         alert("Gagal mencetak struk pembayaran.");
     }
 };
+
 
 
 
