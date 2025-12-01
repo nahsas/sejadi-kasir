@@ -79,7 +79,7 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
     <>
     <Card className={cn("shadow-lg border-2 relative overflow-hidden", order.status.toLowerCase() === 'pending' ? 'border-yellow-400' : 'border-blue-500')}>
       {hasNewItems && (
-        <div className="absolute top-0 left-0 w-24 h-24 overflow-hidden">
+        <div className="absolute top-0 left-0 w-24 h-24 overflow-hidden z-0">
             <div className="absolute top-[22px] left-[-42px] w-[150px] transform -rotate-45 bg-red-500 text-white text-center py-1 text-xs font-bold shadow-md">
                 <div className="flex items-center justify-center">
                     <Bell className="w-3 h-3 mr-1" />
@@ -88,7 +88,7 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
             </div>
         </div>
       )}
-      <CardContent className="p-4 flex flex-col h-full">
+      <CardContent className="p-4 flex flex-col h-full relative z-10">
         <div className="flex-grow space-y-3">
           <div className="flex justify-between items-start">
             <div>
