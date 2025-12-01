@@ -44,20 +44,20 @@ export function useOrderNotification() {
 
   }, []);
 
-  const fetchPendingOrders = useCallback(async () => {
+  const fetchActiveOrders = useCallback(async () => {
     try {
-      const response = await fetch('https://api.sejadikopi.com/api/pesanans?status=pending');
+      const response = await fetch('https://api.sejadikopi.com/api/pesanans?status=pending,diproses');
       if (!response.ok) {
-        console.error('Failed to fetch pending orders');
+        console.error('Failed to fetch active orders');
         return;
       }
-      const { data: pendingOrders }: { data: Order[] } = await response.json();
+      const { data: activeOrders }: { data: Order[] } = await response.json();
 
-      if (!pendingOrders) {
+      if (!activeOrders) {
         return;
       }
       
-      const currentOrdersState = new Map(pendingOrders.map(order => [order.id, order.detail_pesanans.length]));
+      const currentOrdersState = new Map(activeOrders.map(order => [order.id, order.detail_pesanans.length]));
 
       if (isFirstLoad.current) {
         setLastKnownOrdersState(currentOrdersState);
@@ -68,7 +68,7 @@ export function useOrderNotification() {
       let hasNewActivity = false;
       const ordersWithNewActivity: Order[] = [];
 
-      for (const order of pendingOrders) {
+      for (const order of activeOrders) {
           const lastItemCount = lastKnownOrdersState.get(order.id);
           const currentItemCount = order.detail_pesanans.length;
 
@@ -118,18 +118,18 @@ export function useOrderNotification() {
       }
 
     } catch (error) {
-      console.error('Error fetching pending orders:', error);
+      console.error('Error fetching active orders:', error);
     }
   }, [lastKnownOrdersState, toast, router]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchPendingOrders();
+      fetchActiveOrders();
     }, 3000); // Poll every 3 seconds
 
     // Fetch once on mount
-    fetchPendingOrders();
+    fetchActiveOrders();
 
     return () => clearInterval(interval);
-  }, [fetchPendingOrders]);
+  }, [fetchActiveOrders]);
 }
