@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Order, MenuItem } from '@/lib/data';
+import { Order, MenuItem, OrderItem } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -69,12 +69,19 @@ export function OrderDetailModal({
 }) {
   const { toast } = useToast();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
+  
+  const [currentOrder, setCurrentOrder] = React.useState<Order | null>(order);
+
+  React.useEffect(() => {
+    setCurrentOrder(order);
+  }, [order, open]);
+
 
   const handleDelete = async () => {
-    if (!order) return;
+    if (!currentOrder) return;
 
     try {
-      const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
+      const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${currentOrder.id}`, {
         method: 'DELETE',
       });
 
@@ -84,10 +91,10 @@ export function OrderDetailModal({
       
       toast({
         title: 'Sukses',
-        description: `Pesanan #${order.id} telah dihapus.`,
+        description: `Pesanan #${currentOrder.id} telah dihapus.`,
       });
-      onOpenChange(false); // Close the modal
-      onOrderDeleted(); // Trigger a refetch on the parent page
+      onOpenChange(false);
+      onOrderDeleted(); 
 
     } catch (error) {
        console.error('Error deleting order:', error);
@@ -100,23 +107,21 @@ export function OrderDetailModal({
   };
   
   const handleCancelOrder = async () => {
-    if (!order) return;
+    if (!currentOrder) return;
   
     try {
-      // Fetch the full, most recent order data first
-      const getOrderResponse = await fetch(`https://api.sejadikopi.com/api/pesanan/${order.id}`);
+      const getOrderResponse = await fetch(`https://api.sejadikopi.com/api/pesanan/${currentOrder.id}`);
       if (!getOrderResponse.ok) {
         throw new Error('Gagal mengambil data pesanan terbaru sebelum membatalkan.');
       }
       const fullOrderData = await getOrderResponse.json();
   
-      // Now, update the status and send the full object back
       const updatedOrder = {
         ...fullOrderData.data,
         status: 'cancelled',
       };
   
-      const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${order.id}`, {
+      const response = await fetch(`https://api.sejadikopi.com/api/pesanans/${currentOrder.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedOrder),
@@ -130,7 +135,7 @@ export function OrderDetailModal({
       
       toast({
         title: 'Sukses',
-        description: `Pesanan #${order.id} telah dibatalkan.`,
+        description: `Pesanan #${currentOrder.id} telah dibatalkan.`,
       });
       onOpenChange(false);
       onOrderDeleted();
@@ -145,13 +150,47 @@ export function OrderDetailModal({
     }
   };
 
+  const handleDeleteItem = async (itemId: number) => {
+    if (!currentOrder) return;
+    try {
+        const response = await fetch(`https://api.sejadikopi.com/api/detail_pesanan/${itemId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            throw new Error('Gagal menghapus item pesanan.');
+        }
+
+        // Optimistic UI update
+        const updatedDetails = currentOrder.detail_pesanans.filter(item => item.id !== itemId);
+        const newTotal = updatedDetails.reduce((sum, item) => sum + parseInt(item.subtotal, 10), 0);
+        
+        setCurrentOrder({
+            ...currentOrder,
+            detail_pesanans: updatedDetails,
+            total: String(newTotal),
+            total_after_discount: newTotal, // Assuming discount is removed if an item is deleted. This could be more complex.
+        });
+
+        toast({
+            title: 'Sukses',
+            description: 'Item berhasil dihapus dari pesanan.',
+        });
+    } catch (error) {
+        console.error('Error deleting order item:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: (error as Error).message || 'Gagal menghapus item.',
+        });
+    }
+  };
+
   const getMenuDetails = (menuId: number) => {
     return menuItems.find((item) => item.id === menuId);
   };
 
   const parseAdditionals = (additionals: string | null | undefined): string[] => {
-    if (!additionals) return [];
-    if (typeof additionals !== 'string') return [];
+    if (!additionals || typeof additionals !== 'string') return [];
     try {
       // Handles cases like "['item1', 'item2']" or "'item1', 'item2'"
       const cleanedString = additionals.replace(/'/g, '"');
@@ -163,29 +202,36 @@ export function OrderDetailModal({
     }
   };
   
-  const totalItems = order?.detail_pesanans.reduce((sum, item) => sum + item.jumlah, 0) || 0;
-  const isProcessing = order?.status.toLowerCase() === 'diproses';
-  const isCompleted = order?.status.toLowerCase() === 'selesai' || order?.status.toLowerCase() === 'cancelled';
+  const totalItems = currentOrder?.detail_pesanans.reduce((sum, item) => sum + item.jumlah, 0) || 0;
+  const isProcessing = currentOrder?.status.toLowerCase() === 'diproses';
+  const isCompleted = currentOrder?.status.toLowerCase() === 'selesai' || currentOrder?.status.toLowerCase() === 'cancelled';
 
   const handlePaymentClick = () => {
-    onOpenChange(false); // Close current modal
-    setIsPaymentModalOpen(true); // Open payment modal
+    onOpenChange(false);
+    setIsPaymentModalOpen(true);
   }
+
+  const handleClose = (isOpen: boolean) => {
+    if (!isOpen) {
+      onOrderDeleted(); // Refresh data on parent when modal closes
+    }
+    onOpenChange(isOpen);
+  };
 
   return (
     <>
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg p-0">
-        {!order && <div className="p-8 text-center">No order selected.</div>}
-        {order && (
+        {!currentOrder && <div className="p-8 text-center">No order selected.</div>}
+        {currentOrder && (
           <>
             <DialogHeader className="p-4 bg-primary text-primary-foreground rounded-t-lg relative">
               <div className="flex justify-between items-center">
                 <DialogTitle>
                   Detail Pesanan{' '}
-                  {order.location_type.toLowerCase() === 'dine-in'
-                    ? `Meja ${order.no_meja}`
-                    : order.no_meja}
+                  {currentOrder.location_type.toLowerCase() === 'dine_in'
+                    ? `Meja ${currentOrder.no_meja}`
+                    : currentOrder.no_meja}
                 </DialogTitle>
                 <div className="flex items-center gap-2">
                    <AlertDialog>
@@ -216,33 +262,33 @@ export function OrderDetailModal({
               </DialogClose>
               <div className="flex items-center gap-2 text-sm pt-2">
                 <Badge variant="secondary">
-                  {format(new Date(order.created_at), 'HH:mm - dd MMM yyyy', {
+                  {format(new Date(currentOrder.created_at), 'HH:mm - dd MMM yyyy', {
                     locale: id,
                   })}
                 </Badge>
                 <Badge
-                  className={cn(statusConfig[order.status.toLowerCase()]?.color)}
+                  className={cn(statusConfig[currentOrder.status.toLowerCase()]?.color)}
                 >
-                  {statusConfig[order.status.toLowerCase()]?.label}
+                  {statusConfig[currentOrder.status.toLowerCase()]?.label}
                 </Badge>
-                {order.location_area && (
+                {currentOrder.location_area && (
                   <Badge variant="outline" className="bg-white/20 border-white/50 text-white">
                     <MapPin className="mr-1 h-3 w-3" />
-                    {order.location_area}
+                    {currentOrder.location_area}
                   </Badge>
                 )}
               </div>
             </DialogHeader>
 
             <div className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
-                {order.detail_pesanans.map((item) => {
+                {currentOrder.detail_pesanans.map((item) => {
                 const menuItem = getMenuDetails(item.menu_id);
                 const allAdditionals = [
                     ...parseAdditionals(item.additionals),
                     ...parseAdditionals(item.dimsum_additionals)
                 ];
                 return (
-                    <div key={item.id} className="bg-slate-50 rounded-lg p-3">
+                    <div key={item.id} className="bg-slate-50 rounded-lg p-3 relative">
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="font-bold flex items-center gap-2">
@@ -267,11 +313,11 @@ export function OrderDetailModal({
                                 </p>
                             </div>
                         </div>
-                            <div className="mt-2 pt-2 border-t border-dashed text-sm text-muted-foreground flex items-start gap-2">
-                               <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
-                               <span>{item.note || "Tidak ada catatan."}</span>
-                            </div>
-                         <div className="text-sm mt-2 pt-2 border-t border-dashed">
+                        <div className="mt-2 pt-2 border-t border-dashed text-sm text-muted-foreground flex items-start gap-2">
+                            <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
+                            <span>{item.note || "Tidak ada catatan."}</span>
+                        </div>
+                        <div className="text-sm mt-2 pt-2 border-t border-dashed">
                              <div className="flex justify-between">
                                  <span>Harga satuan:</span>
                                  <span>Rp {item.base_price.toLocaleString('id-ID')}</span>
@@ -286,7 +332,30 @@ export function OrderDetailModal({
                                  <span>Subtotal ({item.jumlah}x):</span>
                                  <span>Rp {parseInt(item.subtotal, 10).toLocaleString('id-ID')}</span>
                              </div>
-                         </div>
+                        </div>
+                         {!isCompleted && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7 text-destructive/50 hover:text-destructive hover:bg-destructive/10">
+                                        <Trash2 className="h-4 w-4"/>
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Hapus item ini?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Yakin ingin menghapus item "{menuItem?.nama || 'Item'}" dari pesanan?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteItem(item.id)} className="bg-destructive hover:bg-destructive/90">
+                                            Ya, Hapus
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
                     </div>
                 );
                 })}
@@ -296,7 +365,7 @@ export function OrderDetailModal({
                 <div className="w-full flex justify-between items-center">
                     <div>
                         <p className="text-sm text-muted-foreground">Total Pembayaran:</p>
-                        <p className="text-2xl font-bold">Rp {(order.total_after_discount ?? parseInt(order.total, 10)).toLocaleString('id-ID')}</p>
+                        <p className="text-2xl font-bold">Rp {(currentOrder.total_after_discount ?? parseInt(currentOrder.total, 10)).toLocaleString('id-ID')}</p>
                     </div>
                      <p className="text-sm text-muted-foreground">{totalItems} item</p>
                 </div>
@@ -351,7 +420,7 @@ export function OrderDetailModal({
       </DialogContent>
     </Dialog>
     <PaymentModal 
-        order={order}
+        order={currentOrder}
         open={isPaymentModalOpen}
         onOpenChange={setIsPaymentModalOpen}
     />
