@@ -36,6 +36,7 @@ export type OrderItem = {
   cancellation_notes: string | null;
   cancelled_at: string | null;
   jumlah_asli: number | null;
+  printed: number; // 0 for false, 1 for true
 };
 
 export type Order = {

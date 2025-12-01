@@ -36,7 +36,8 @@ import {
   MessageSquare,
   Wallet,
   XCircle,
-  PlusCircle
+  PlusCircle,
+  Bell,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PaymentModal } from './payment-modal';
@@ -197,8 +198,10 @@ export function OrderDetailModal({
       const parsed = JSON.parse(cleanedString.startsWith('[') ? cleanedString : `[${cleanedString}]`);
       return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-      // Handles simple comma-separated strings
-      return additionals.split(',').map(s => s.trim());
+      if (typeof additionals === 'string') {
+        return additionals.split(',').map(s => s.trim());
+      }
+      return [];
     }
   };
   
@@ -289,11 +292,17 @@ export function OrderDetailModal({
                 ];
                 return (
                     <div key={item.id} className="bg-slate-50 rounded-lg p-3">
-                        <div className="flex justify-between items-start gap-4">
-                            <div className="flex-1">
+                        <div className="flex justify-between items-start gap-2">
+                           <div className="flex-1">
                                 <p className="font-bold flex items-center gap-2">
                                     {menuItem?.nama || 'Nama tidak ditemukan'}{' '}
                                     <Utensils className="w-4 h-4 text-amber-600" />
+                                     {item.printed === 0 && !isCompleted && (
+                                      <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5 animate-pulse">
+                                          <Bell className="w-2.5 h-2.5 mr-1"/>
+                                          BARU
+                                      </Badge>
+                                    )}
                                 </p>
                                 <div className="flex items-center gap-1 mt-1 flex-wrap">
                                     {item.varian && <Badge variant="secondary" className="text-xs">{item.varian}</Badge>}
@@ -305,7 +314,7 @@ export function OrderDetailModal({
                                     ))}
                                 </div>
                             </div>
-                            <div className="text-right flex-shrink-0">
+                            <div className="text-right flex-shrink-0 w-20">
                                 <p className="font-semibold">x {item.jumlah}</p>
                                 <p className="font-bold text-lg text-primary">
                                     Rp{' '}
@@ -315,7 +324,7 @@ export function OrderDetailModal({
                             {!isCompleted && (
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/50 hover:text-destructive hover:bg-destructive/10 -mr-2">
+                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/50 hover:text-destructive hover:bg-destructive/10">
                                             <Trash2 className="h-4 w-4"/>
                                         </Button>
                                     </AlertDialogTrigger>

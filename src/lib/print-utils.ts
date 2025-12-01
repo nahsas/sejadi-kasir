@@ -26,6 +26,23 @@ interface ReceiptOptions {
     paymentAmount?: number;
 }
 
+const updatePrintedStatus = async (items: OrderItem[]) => {
+  for (const item of items) {
+    if (item.printed === 0) {
+      try {
+        await fetch(`https://api.sejadikopi.com/api/detail_pesanan/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ printed: 1 }),
+        });
+      } catch (error) {
+        console.error(`Gagal update status print untuk item ${item.id}:`, error);
+        // Continue trying to update other items
+      }
+    }
+  }
+};
+
 const generateReceiptText = (
     order: Order, 
     menuItems: MenuItem[],
@@ -75,7 +92,10 @@ const generateReceiptText = (
     const menuItem = menuItems.find(mi => mi.id === item.menu_id);
     if (!menuItem || item.jumlah === 0) return;
 
-    const qty = `${item.jumlah}x `;
+    let qty = `${item.jumlah}x `;
+    if (item.printed === 0) {
+      qty = `**${item.jumlah}x** `; // Mark new items
+    }
     let itemName = menuItem.nama;
     if (item.varian) itemName += ` (${item.varian})`;
     
@@ -147,12 +167,19 @@ export const printOperationalStruk = (
   onNextPrint: (nextPrintFn: (() => void), title: string) => void
 ) => {
   try {
-    const makananItems = order.detail_pesanans.filter(item => {
+    const unprintedItems = order.detail_pesanans.filter(item => item.printed === 0);
+
+    if (unprintedItems.length === 0) {
+      alert("Tidak ada item baru untuk dicetak.");
+      return;
+    }
+
+    const makananItems = unprintedItems.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         return menuItem?.kategori_struk === 'makanan';
     });
 
-    const minumanItems = order.detail_pesanans.filter(item => {
+    const minumanItems = unprintedItems.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         return menuItem?.kategori_struk === 'minuman';
     });
@@ -167,6 +194,7 @@ export const printOperationalStruk = (
             itemsToPrint: makananItems
         });
         printJob(receiptText);
+        updatePrintedStatus(makananItems);
     }
     
     const barPrintFn = () => {
@@ -176,13 +204,14 @@ export const printOperationalStruk = (
             itemsToPrint: minumanItems
         });
         printJob(receiptText);
+        updatePrintedStatus(minumanItems);
     }
     
     const waiterPrintFn = () => {
         const receiptText = generateReceiptText(order, menuItems, {
             title: "CHECKER PELAYAN",
             showPrices: false,
-            itemsToPrint: order.detail_pesanans
+            itemsToPrint: unprintedItems // Waiter sees all new items
         });
         printJob(receiptText);
     }
@@ -190,7 +219,7 @@ export const printOperationalStruk = (
     const printQueue: { fn: () => void, title: string }[] = [];
     if(hasMakanan) printQueue.push({ fn: kitchenPrintFn, title: "Cetak Struk Dapur?" });
     if(hasMinuman) printQueue.push({ fn: barPrintFn, title: "Cetak Struk Bar?" });
-    if(order.detail_pesanans.length > 0) printQueue.push({ fn: waiterPrintFn, title: "Cetak Struk Pelayan?" });
+    if(unprintedItems.length > 0) printQueue.push({ fn: waiterPrintFn, title: "Cetak Struk Pelayan?" });
 
 
     const runNextPrint = (index: number) => {
