@@ -221,7 +221,7 @@ export function PaymentModal({
             </DialogClose>
         </DialogHeader>
 
-        <div className="px-4 pb-4 space-y-4 overflow-y-auto flex-grow">
+        <div className="flex-grow overflow-y-auto px-4 pb-4 space-y-4">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 space-y-2">
              <div className="flex justify-between items-center text-sm">
                 <span className="font-medium text-yellow-800">Subtotal:</span>
@@ -394,7 +394,7 @@ export function PaymentModal({
             )}
         </div>
 
-        <DialogFooter className="p-4 bg-slate-50 border-t grid grid-cols-2 gap-2 sticky bottom-0">
+        <DialogFooter className="p-4 bg-slate-50 border-t grid grid-cols-2 gap-2">
             <Button onClick={handleFinishPayment} className="bg-green-600 hover:bg-green-700 text-white" disabled={isLoading}>
                 {isLoading ? "Memproses..." : (
                     <>
