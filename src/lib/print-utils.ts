@@ -305,21 +305,15 @@ export const printOperationalStruk = async (
         if (index >= printQueue.length) return;
 
         const currentPrint = printQueue[index];
+        currentPrint.fn(); // Execute the print job immediately
 
-        if (index === 0) {
-            currentPrint.fn();
-            if (printQueue.length > 1) {
-                setTimeout(() => {
-                    onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
-                }, 500); 
-            }
-        } else {
-            currentPrint.fn();
-            if (index + 1 < printQueue.length) {
-                 setTimeout(() => {
-                    onNextPrint(() => runNextPrint(index + 1), printQueue[index + 1].title);
-                }, 500);
-            }
+        // Check if there is a next print job in the queue
+        if (index + 1 < printQueue.length) {
+            // Use a short delay to allow the intent to fire, then show the confirmation dialog for the next job.
+            setTimeout(() => {
+                const nextPrint = printQueue[index + 1];
+                onNextPrint(() => runNextPrint(index + 1), nextPrint.title);
+            }, 500); 
         }
     }
     
@@ -349,10 +343,3 @@ export const printPaymentStruk = (order: Order, menuItems: MenuItem[], additiona
         alert("Gagal mencetak struk pembayaran.");
     }
 };
-
-
-
-
-
-
-
