@@ -65,8 +65,8 @@ export function useOrderNotification() {
         return;
       }
       
-      let hasNewActivity = false;
-      const ordersWithNewActivity: Order[] = [];
+      const newOrders: Order[] = [];
+      const updatedOrders: Order[] = [];
 
       for (const order of activeOrders) {
           const lastItemCount = lastKnownOrdersState.get(order.id);
@@ -74,16 +74,15 @@ export function useOrderNotification() {
 
           // Case 1: A completely new order has arrived.
           if (lastItemCount === undefined) {
-              hasNewActivity = true;
-              ordersWithNewActivity.push(order);
+              newOrders.push(order);
           } 
           // Case 2: An existing order has new items added.
           else if (currentItemCount > lastItemCount) {
-              hasNewActivity = true;
-              ordersWithNewActivity.push(order);
+              updatedOrders.push(order);
           }
       }
 
+      const hasNewActivity = newOrders.length > 0 || updatedOrders.length > 0;
 
       if (hasNewActivity) {
         if (audioRef.current) {
@@ -93,14 +92,27 @@ export function useOrderNotification() {
           });
         }
         
-        ordersWithNewActivity.forEach(newOrder => {
-            const customer = newOrder.location_type.toLowerCase() === 'dine_in' ? `Meja ${newOrder.no_meja}`: newOrder.no_meja;
-            const title = lastKnownOrdersState.has(newOrder.id) ? '🔔 Item Baru Ditambahkan!' : '🔔 Pesanan Baru Diterima!';
-            const description = lastKnownOrdersState.has(newOrder.id) ? `Item baru ditambahkan ke pesanan ${customer}.` : `Pesanan baru dari ${customer} telah diterima.`;
-
+        // Handle new orders
+        newOrders.forEach(order => {
+            const customer = order.location_type.toLowerCase() === 'dine_in' ? `Meja ${order.no_meja}`: order.no_meja;
             toast({
-                title: title,
-                description: description,
+                title: '🔔 Pesanan Baru Diterima!',
+                description: `Pesanan baru dari ${customer} telah diterima.`,
+                action: (
+                    <Button onClick={() => router.push('/orders')} size="sm">
+                        Lihat Pesanan
+                    </Button>
+                ),
+                duration: 10000,
+            });
+        });
+
+        // Handle updated orders
+        updatedOrders.forEach(order => {
+            const customer = order.location_type.toLowerCase() === 'dine_in' ? `Meja ${order.no_meja}`: order.no_meja;
+            toast({
+                title: '🔔 Item Baru Ditambahkan!',
+                description: `Item baru ditambahkan ke pesanan ${customer}.`,
                 action: (
                     <Button onClick={() => router.push('/orders')} size="sm">
                         Lihat Pesanan
