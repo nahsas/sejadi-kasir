@@ -127,7 +127,8 @@ type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
 function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpen: boolean, onClose: () => void, onSuccess: () => void, userEmail: string, expense: any | null }) {
     const { toast } = useToast();
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const galleryInputRef = React.useRef<HTMLInputElement>(null);
+    const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
     const form = useForm<ExpenseFormValues>({
         resolver: zodResolver(expenseFormSchema),
@@ -313,16 +314,24 @@ function ExpenseForm({ isOpen, onClose, onSuccess, userEmail, expense }: { isOpe
                                       )}
                                       <input
                                           type="file"
-                                          ref={fileInputRef}
+                                          ref={galleryInputRef}
                                           className="hidden"
                                           accept="image/jpeg,image/png,image/jpg,image/webp"
                                           onChange={handleImageChange}
                                       />
+                                      <input
+                                          type="file"
+                                          ref={cameraInputRef}
+                                          className="hidden"
+                                          accept="image/*"
+                                          capture="environment"
+                                          onChange={handleImageChange}
+                                      />
                                       <div className="flex gap-4 mt-4">
-                                          <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                                          <Button type="button" onClick={() => cameraInputRef.current?.click()}>
                                               <Camera className="mr-2 h-4 w-4" /> Kamera
                                           </Button>
-                                          <Button type="button" variant="secondary" className="bg-green-600 text-white hover:bg-green-700" onClick={() => fileInputRef.current?.click()}>
+                                          <Button type="button" variant="secondary" className="bg-green-600 text-white hover:bg-green-700" onClick={() => galleryInputRef.current?.click()}>
                                               <Folder className="mr-2 h-4 w-4" /> Galeri
                                           </Button>
                                       </div>
@@ -850,5 +859,7 @@ export default function ReportsPage() {
     </div>
   )
 }
+
+    
 
     
