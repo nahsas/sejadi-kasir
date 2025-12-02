@@ -227,8 +227,26 @@ export function OrderDetailModal({
 
   const getAdditionalNames = (item: OrderItem): string[] => {
     const names: string[] = [];
-    const itemAdditionals = JSON.parse((item.additionals as any) || '{}');
-    const itemDimsumAdditionals = JSON.parse((item.dimsum_additionals as any) || '{}');
+
+    const processAdditionals = (data: any) => {
+        let parsedData;
+        if (typeof data === 'string') {
+            try {
+                parsedData = JSON.parse(data);
+            } catch (e) {
+                console.error("Failed to parse additionals string:", e);
+                return {}; // Return empty object on failure
+            }
+        } else if (typeof data === 'object' && data !== null) {
+            parsedData = data;
+        } else {
+            return {}; // Not a string or a valid object
+        }
+        return parsedData;
+    }
+    
+    const itemAdditionals = processAdditionals(item.additionals);
+    const itemDimsumAdditionals = processAdditionals(item.dimsum_additionals);
 
     for (const id in itemAdditionals) {
         if (itemAdditionals[id]) {
