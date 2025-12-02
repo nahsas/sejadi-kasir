@@ -145,7 +145,7 @@ const generateReceiptText = (
         receipt += itemName + "\n";
         receipt += renderItemDetails(item, menuItem);
       });
-      receipt += "\n\n"; // Wide spacing
+      receipt += "\n";
     }
     
     receipt += "--- SEMUA ITEM ---\n";
@@ -217,6 +217,10 @@ const generateReceiptText = (
     receipt += "Sampai Jumpa" + "\n";
     receipt += "Terima Kasih" + "\n";
     receipt += "\x1B\x61\x00"; // Align left
+  } else if (title === 'MAIN CHECKER') {
+    const total = order.total_after_discount ?? parseInt(order.total, 10);
+    receipt += createLine("TOTAL", `Rp${formatCurrency(total)}`) + "\n";
+    receipt += "-".repeat(paperWidth) + "\n";
   }
 
   receipt += "\n\n\n";
@@ -251,7 +255,7 @@ export const printOperationalStruk = async (
     }
     
     if (itemsToProcess.length === 0) {
-      alert("Tidak ada item dalam pesanan untuk dicetak.");
+      // No alert if no new items, just don't print
       return;
     }
 
@@ -343,6 +347,7 @@ export const printPaymentStruk = (order: Order, menuItems: MenuItem[], additiona
         alert("Gagal mencetak struk pembayaran.");
     }
 };
+
 
 
 
