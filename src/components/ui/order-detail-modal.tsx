@@ -214,18 +214,27 @@ export function OrderDetailModal({
 
   const getAdditionalNames = (item: OrderItem): string[] => {
     const names: string[] = [];
-    const allAddons = { ...item.additionals, ...item.dimsum_additionals };
+    const itemAdditionals = JSON.parse((item.additionals as any) || '{}');
+    const itemDimsumAdditionals = JSON.parse((item.dimsum_additionals as any) || '{}');
 
-    for (const id in allAddons) {
-      if (allAddons[id]) {
-        const additional = additionals.find(add => add.id === parseInt(id));
-        if (additional) {
-          names.push(additional.nama);
+    for (const id in itemAdditionals) {
+        if (itemAdditionals[id]) {
+            const additional = additionals.find(add => add.id === parseInt(id));
+            if (additional) {
+                names.push(additional.nama);
+            }
         }
-      }
+    }
+    for (const id in itemDimsumAdditionals) {
+        if (itemDimsumAdditionals[id]) {
+            const additional = additionals.find(add => add.id === parseInt(id));
+            if (additional) {
+                names.push(additional.nama);
+            }
+        }
     }
     return names;
-  }
+}
   
   const totalItems = currentOrder?.detail_pesanans.reduce((sum, item) => sum + item.jumlah, 0) || 0;
   const isProcessing = currentOrder?.status.toLowerCase() === 'diproses';
