@@ -34,10 +34,10 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
     return category ? category.nama : 'N/A';
   }
 
-  const handleUpdateStock = async (menuItem: MenuItem, isAvailable: boolean) => {
+  const handleUpdateStock = async (menuItem: MenuItem, newStockLevel: number) => {
     try {
       const payload = {
-        is_available: isAvailable,
+        stok: newStockLevel,
       };
 
       const response = await fetch(`https://api.sejadikopi.com/api/menu/${menuItem.id}`, {
@@ -60,11 +60,11 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
         description: `Stok untuk ${menuItem.nama} telah diperbarui.`,
       });
       onUpdateSuccess();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Tidak dapat memperbarui stok.',
+        description: error.message || 'Tidak dapat memperbarui stok.',
       });
     }
   }
@@ -94,10 +94,11 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
       }
     },
     {
-        accessorKey: "is_available",
+        accessorKey: "stok",
         header: "Status",
         cell: ({ row }) => {
-            const isAvailable = row.getValue("is_available");
+            const stock = row.getValue("stok") as number;
+            const isAvailable = stock > 0;
             return (
                 <Badge variant={isAvailable ? "outline" : "destructive"} className={isAvailable ? "bg-green-100 text-green-800 border-green-300" : ""}>
                     {isAvailable ? 'Tersedia' : 'Habis'}
@@ -122,13 +123,13 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
                     <AlertDialogHeader>
                       <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Ini akan menandai "{menuItem.nama}" sebagai Habis.
+                        Ini akan menandai "{menuItem.nama}" sebagai Habis dengan mengatur stok menjadi 0.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Batal</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleUpdateStock(menuItem, false)}
+                        onClick={() => handleUpdateStock(menuItem, 0)}
                         className="bg-destructive hover:bg-destructive/90"
                       >
                         Ya, Tandai Habis
@@ -147,13 +148,13 @@ export const columns = ({ onUpdateSuccess, categories }: StockColumnsProps): Col
                     <AlertDialogHeader>
                       <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                       <AlertDialogDescription>
-                           Ini akan menandai "{menuItem.nama}" sebagai Tersedia.
+                           Ini akan menandai "{menuItem.nama}" sebagai Tersedia dengan mengatur ulang stok.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Batal</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleUpdateStock(menuItem, true)}
+                        onClick={() => handleUpdateStock(menuItem, 1000)}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         Ya, Tandai Tersedia
