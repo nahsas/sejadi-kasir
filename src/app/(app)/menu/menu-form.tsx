@@ -84,8 +84,20 @@ export function MenuForm({
     let variants: string[] = [];
     if (menuItem?.available_variants) {
       try {
-        // The value from API is a string like "['Hot','Ice']"
-        const parsed = JSON.parse(menuItem.available_variants.replace(/'/g, '"'));
+        let parsed;
+        // The value from API can be a string like "['Hot','Ice']" or a valid JSON array string
+        if (typeof menuItem.available_variants === 'string') {
+          // Attempt to parse it as JSON directly first
+          try {
+            parsed = JSON.parse(menuItem.available_variants);
+          } catch {
+            // If direct parsing fails, it might be the Python-like list string
+            parsed = JSON.parse(menuItem.available_variants.replace(/'/g, '"'));
+          }
+        } else if (Array.isArray(menuItem.available_variants)) {
+           parsed = menuItem.available_variants;
+        }
+
         if(Array.isArray(parsed)) {
           variants = parsed;
         }
@@ -155,7 +167,7 @@ export function MenuForm({
         nama: values.nama,
         harga: Number(values.harga),
         kategori_id: values.kategori_id,
-        available_variants: values.available_variants || null,
+        available_variants: values.available_variants ? JSON.stringify(values.available_variants) : null,
         foto: imageUrl,
         stok: 1000,
         is_available: true,
