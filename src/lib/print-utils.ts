@@ -31,28 +31,27 @@ interface ReceiptOptions {
     additionals: Additional[]; // Add this to pass additional names
 }
 
-const updatePrintedStatus = async (items: OrderItem[]) => {
+const updatePrintedStatus = (items: OrderItem[]) => {
   const unprintedItems = items.filter(item => item.printed === 0);
   if (unprintedItems.length === 0) return;
 
+  // Fire-and-forget: Don't await the promises here to avoid blocking the UI
   for (const item of unprintedItems) {
-      try {
-        const response = await fetch(`https://api.sejadikopi.com/api/detail_pesanan/${item.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ printed: 1 }),
-        });
+      fetch(`https://api.sejadikopi.com/api/detail_pesanan/${item.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ printed: 1 }),
+      }).then(response => {
         if (!response.ok) {
-            const errorData = await response.json();
-            console.error(`Gagal update status print untuk item ${item.id}:`, errorData);
+           console.error(`Gagal update status print untuk item ${item.id}`);
+        } else {
+            // After all updates, emit an event to refresh data
+            appEventEmitter.emit('new-order');
         }
-      } catch (error) {
-        console.error(`Gagal update status print untuk item ${item.id}:`, error);
-        // Continue trying to update other items
-      }
+      }).catch(error => {
+         console.error(`Gagal update status print untuk item ${item.id}:`, error);
+      });
   }
-  // After all updates, emit an event to refresh data
-  appEventEmitter.emit('new-order');
 };
 
 
@@ -252,7 +251,7 @@ const printJob = (receiptContent: string) => {
     window.location.href = url;
 };
 
-export const printOperationalStruk = async (
+export const printOperationalStruk = (
   order: Order, 
   menuItems: MenuItem[],
   additionals: Additional[], // Pass additionals here
@@ -305,7 +304,6 @@ export const printOperationalStruk = async (
             additionals
         });
         printJob(receiptText);
-        // Only update printed status for the items belonging to this station
         updatePrintedStatus(minumanItems); 
     }
     
@@ -319,22 +317,23 @@ export const printOperationalStruk = async (
         const currentPrint = printQueue[index];
         const nextPrint = printQueue[index + 1];
 
-        if (nextPrint) {
-            // More than one job left, show confirmation to chain them.
-            onNextPrint(() => {
-                currentPrint.fn(); // Print the current job
-                setTimeout(() => runNextPrint(index + 1), 500); // And then immediately process the next one
-            }, currentPrint.title);
-        } else {
-            // This is the last job in the queue, just confirm and print.
-            onNextPrint(() => {
-                currentPrint.fn();
-            }, currentPrint.title);
-        }
+        // This is the last job in the queue, just confirm and print.
+        onNextPrint(() => {
+            currentPrint.fn(); // Print the current job
+            // If there's a next job, trigger it automatically after a short delay
+            if (nextPrint) {
+                setTimeout(() => runNextPrint(index + 1), 500); 
+            }
+        }, currentPrint.title);
     }
     
-    if (printQueue.length > 0) {
-      runNextPrint(0); // Start the print queue from the first job
+    if (printQueue.length > 1) {
+        // If there are multiple jobs, we start the chain with confirmation
+        runNextPrint(0);
+    } else if (printQueue.length === 1) {
+        // If there's only one job, just print it directly without confirmation chaining
+        const job = printQueue[0];
+        job.fn();
     }
 
   } catch (error) {

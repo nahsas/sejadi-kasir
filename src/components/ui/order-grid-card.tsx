@@ -157,7 +157,7 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
             </span>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            <Button onClick={handlePrintChecker} size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1">
+            <Button onClick={handlePrintChecker} size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-1 py-1 flex items-center justify-center gap-1" disabled={!hasNewItems}>
               <FileText className="h-3 w-3" />
               Checker
             </Button>
