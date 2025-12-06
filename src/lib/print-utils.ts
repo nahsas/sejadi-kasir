@@ -1,5 +1,4 @@
 
-
 import { Order, OrderItem, MenuItem, Additional } from './data';
 import { appEventEmitter } from './event-emitter';
 
@@ -105,12 +104,31 @@ const generateReceiptText = (
   receipt += createLine("Tipe", tipeText) + "\n";
   receipt += createLine("Tanggal", dateStr + " " + timeStr) + "\n";
   receipt += "-".repeat(paperWidth) + "\n";
+
+  const safeParseAdditionals = (data: any) => {
+    if (typeof data === 'object' && data !== null) {
+        return data; // It's already an object
+    }
+    if (typeof data === 'string') {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            console.error("Failed to parse additionals string:", e);
+            return {}; // Return empty object on failure
+        }
+    }
+    return {}; // Not a string or a valid object
+  };
   
   const renderItemDetails = (item: OrderItem, menuItem: MenuItem) => {
       let details = '';
-      const itemAdditionals = { ...item.additionals, ...item.dimsum_additionals };
-      for (const id in itemAdditionals) {
-          if (itemAdditionals[id]) {
+      const itemAdditionals = safeParseAdditionals(item.additionals);
+      const itemDimsumAdditionals = safeParseAdditionals(item.dimsum_additionals);
+
+      const allItemAdditionals = { ...itemAdditionals, ...itemDimsumAdditionals };
+
+      for (const id in allItemAdditionals) {
+          if (allItemAdditionals[id]) { // Check if the value is truthy (e.g., true or 1)
               const additional = additionals.find(add => add.id === parseInt(id));
               if (additional) {
                   details += `  + ${additional.nama}\n`;
@@ -313,28 +331,37 @@ export const printOperationalStruk = (
     if(hasMinuman) printQueue.push({ fn: barPrintFn, title: "Cetak Struk Bar/Checker?" });
 
     const runNextPrint = (index: number) => {
-        if (index >= printQueue.length) return; // Stop when queue is empty
+        if (index >= printQueue.length) {
+            // All jobs done, or queue was empty
+            return;
+        }
 
-        const currentPrint = printQueue[index];
-        const nextPrint = printQueue[index + 1];
+        const currentJob = printQueue[index];
 
-        // This is the last job in the queue, just confirm and print.
-        onNextPrint(() => {
-            currentPrint.fn(); // Print the current job
-            // If there's a next job, trigger it automatically after a short delay
-            if (nextPrint) {
-                setTimeout(() => runNextPrint(index + 1), 500); 
-            }
-        }, currentPrint.title);
+        if (printQueue.length > 1) {
+            // If we have more than one job, we need confirmation chaining.
+            onNextPrint(() => {
+                currentJob.fn(); // Execute the current print job.
+                
+                // Automatically trigger the next one after a delay.
+                // No more confirmation dialog for subsequent prints in the same batch.
+                if (index + 1 < printQueue.length) {
+                    setTimeout(() => runNextPrint(index + 1), 500); 
+                }
+            }, currentJob.title);
+        } else {
+            // If it's the only job, just do it. No confirmation needed.
+            currentJob.fn();
+        }
     }
     
-    if (printQueue.length > 1) {
-        // If there are multiple jobs, we start the chain with confirmation
-        runNextPrint(0);
-    } else if (printQueue.length === 1) {
-        // If there's only one job, just print it directly without confirmation chaining
-        const job = printQueue[0];
-        job.fn();
+    // Start the print chain if there's anything to print.
+    if (printQueue.length > 0) {
+        if(printQueue.length > 1) {
+            runNextPrint(0);
+        } else {
+            printQueue[0].fn(); // Just run the single job
+        }
     }
 
   } catch (error) {
