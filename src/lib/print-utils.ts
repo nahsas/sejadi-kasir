@@ -268,14 +268,15 @@ export const printOperationalStruk = (
       return;
     }
 
-    const makananItems = itemsToProcess.filter(item => {
-        const menuItem = menuItems.find(mi => mi.id === item.menu_id);
-        return menuItem?.kategori_struk === 'makanan';
-    });
-
     const minumanItems = itemsToProcess.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.menu_id);
         return menuItem?.kategori_struk === 'minuman';
+    });
+
+    const makananItems = itemsToProcess.filter(item => {
+        const menuItem = menuItems.find(mi => mi.id === item.menu_id);
+        // Default to 'makanan' if kategori_struk is not 'minuman'
+        return menuItem?.kategori_struk !== 'minuman';
     });
     
     const hasMakanan = makananItems.length > 0;
