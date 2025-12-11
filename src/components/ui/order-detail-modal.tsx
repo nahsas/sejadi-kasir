@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -29,8 +28,6 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import {
-  X,
-  Trash2,
   MapPin,
   ArrowRight,
   MessageSquare,
@@ -48,11 +45,12 @@ const statusConfig: {
   [key: string]: {
     label: string;
     variant: Parameters<typeof badgeVariants>[0]['variant'];
+    className?: string;
   };
 } = {
   pending: { label: 'PENDING', variant: 'warning' },
   diproses: { label: 'PROSES', variant: 'default' },
-  selesai: { label: 'SELESAI', variant: 'outline' },
+  selesai: { label: 'SELESAI', variant: 'secondary', className: 'bg-green-100 text-green-800 border border-green-200 hover:bg-green-200' },
   dibatalkan: { label: 'BATAL', variant: 'destructive' },
   cancelled: { label: 'BATAL', variant: 'destructive' },
 };
@@ -310,6 +308,7 @@ export function OrderDetailModal({
                 </Badge>
                 <Badge
                   variant={statusInfo.variant}
+                  className={cn(statusInfo.className)}
                 >
                   {statusInfo.label}
                 </Badge>
