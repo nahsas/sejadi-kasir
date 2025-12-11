@@ -816,10 +816,10 @@ export default function ReportsPage() {
                 />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
-                <Button variant="outline" className="w-full bg-blue-500 hover:bg-blue-600 text-white border-none" onClick={fetchData}>
+                <Button variant="outline" className="w-full bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg" onClick={fetchData}>
                     <RefreshCw className="mr-2 h-4 w-4" /> Segarkan
                 </Button>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white" onClick={handleAddExpense}>
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg" onClick={handleAddExpense}>
                     <Plus className="mr-2 h-4 w-4" /> Tambah
                 </Button>
             </div>
@@ -867,6 +867,7 @@ export default function ReportsPage() {
     
 
     
+
 
 
 
