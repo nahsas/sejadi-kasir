@@ -38,7 +38,7 @@ function StatCard({
   iconColor: string;
 }) {
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md bg-white">
       <CardContent className="p-4 flex items-center gap-4">
         <div className={`p-3 rounded-md ${bgColor}`}>
           <Icon className={`w-8 h-8 ${iconColor}`} />
