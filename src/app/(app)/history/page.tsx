@@ -260,6 +260,24 @@ export default function HistoryPage() {
     }
   };
 
+  const PaginationControls = () => (
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-muted-foreground hidden sm:inline">
+        Halaman {currentPage} dari {totalPages}
+      </span>
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1}>
+            <ChevronLeft className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Sebelumnya</span>
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleNextPage} disabled={currentPage === totalPages}>
+            <span className="hidden sm:inline">Berikutnya</span>
+            <ChevronRight className="h-4 w-4 sm:ml-2" />
+        </Button>
+      </div>
+    </div>
+  );
+
 
   return (
     <div className="space-y-6">
@@ -311,9 +329,12 @@ export default function HistoryPage() {
 
       <Card className="bg-white rounded-2xl">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Riwayat Transaksi Pembelian</CardTitle>
-            <Badge variant="secondary">{filteredOrders.length} transaksi ditemukan</Badge>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex-1">
+                <CardTitle>Riwayat Transaksi Pembelian</CardTitle>
+                <Badge variant="secondary" className="mt-2">{filteredOrders.length} transaksi ditemukan</Badge>
+            </div>
+            {totalPages > 1 && <PaginationControls />}
           </div>
         </CardHeader>
         <CardContent>
@@ -341,23 +362,6 @@ export default function HistoryPage() {
             </div>
           )}
         </CardContent>
-        {totalPages > 1 && (
-            <CardFooter className="flex justify-between items-center border-t pt-4">
-                <span className="text-sm text-muted-foreground">
-                    Halaman {currentPage} dari {totalPages}
-                </span>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1}>
-                        <ChevronLeft className="h-4 w-4 mr-2" />
-                        Sebelumnya
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleNextPage} disabled={currentPage === totalPages}>
-                        Berikutnya
-                        <ChevronRight className="h-4 w-4 ml-2" />
-                    </Button>
-                </div>
-            </CardFooter>
-        )}
       </Card>
     </div>
   );
