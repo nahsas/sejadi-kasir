@@ -135,7 +135,20 @@ export function OrderGridCard({ order, menuItems, onDetailClick, onUpdateStatus,
                 <div key={item.id} className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                      <span className="truncate">{getMenuName(item.menu_id)}</span>
-                     {item.varian && <Badge variant="outline" className="text-xs bg-gray-200">{item.varian}</Badge>}
+                     {item.varian && (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-xs',
+                            item.varian.toLowerCase() === 'ice' &&
+                              'border-blue-300 text-blue-700 bg-blue-100',
+                            item.varian.toLowerCase() === 'hot' &&
+                              'border-red-300 text-red-700 bg-red-100'
+                          )}
+                        >
+                          {item.varian}
+                        </Badge>
+                      )}
                   </div>
                   <span>x {item.jumlah}</span>
                 </div>
