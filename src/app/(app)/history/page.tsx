@@ -7,21 +7,12 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
   Search,
-  Filter,
   RefreshCw,
   Calendar,
   CheckCircle,
-  XCircle,
   Wallet,
   Receipt,
   AlertTriangle,
@@ -176,7 +167,6 @@ export default function HistoryPage() {
   const [error, setError] = React.useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [filterStatus, setFilterStatus] = React.useState('all');
   
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -230,10 +220,6 @@ export default function HistoryPage() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const statusMatch = filterStatus === 'all' || order.status.toLowerCase() === filterStatus;
-    
-    if (!statusMatch) return false;
-    
     if (searchTerm === "") return true;
 
     const lowerCaseSearch = searchTerm.toLowerCase();
@@ -271,19 +257,6 @@ export default function HistoryPage() {
             onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <SelectValue placeholder="Filter" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua</SelectItem>
-            <SelectItem value="selesai">Selesai</SelectItem>
-            <SelectItem value="cancelled">Dibatalkan</SelectItem>
-          </SelectContent>
-        </Select>
         <Button variant="outline" onClick={fetchData}>
           <RefreshCw className="h-4 w-4" />
         </Button>
