@@ -154,7 +154,7 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
 
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full bg-white border border-black text-black hover:bg-gray-100" variant="outline" onClick={() => onDetailClick(order)}>
+        <Button className="w-full bg-white border border-emerald-500 text-emerald-600 hover:bg-emerald-50" variant="outline" onClick={() => onDetailClick(order)}>
           <Eye className="mr-2 h-4 w-4" />
           Lihat Detail
         </Button>
