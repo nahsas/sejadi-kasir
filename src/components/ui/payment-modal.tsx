@@ -10,23 +10,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Order, MenuItem, Additional } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { X, Landmark, QrCode, Pencil, Check, Receipt, Info, Tag, Loader2 } from 'lucide-react';
+import { Landmark, QrCode, Pencil, Check, Receipt, Info, Tag, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { printPaymentStruk } from '@/lib/print-utils';
 import { appEventEmitter } from '@/lib/event-emitter';
 
 const banks = [
-    { id: 'BCA', name: 'BCA', logo: 'https://placehold.co/100x40/003087/FFFFFF?text=BCA' },
-    { id: 'BRI', name: 'BRI', logo: 'https://placehold.co/100x40/00529C/FFFFFF?text=BRI' },
-    { id: 'BSI', name: 'BSI', logo: 'https://placehold.co/100x40/00A59C/FFFFFF?text=BSI' },
+    { id: 'BCA', name: 'BCA', logo: 'https://vamos-api.sejadikopi.com/storage/images/BCA.png' },
+    { id: 'BRI', name: 'BRI', logo: 'https://vamos-api.sejadikopi.com/storage/images/BRI.png' },
+    { id: 'BSI', name: 'BSI', logo: 'https://vamos-api.sejadikopi.com/storage/images/BSI.png' },
 ]
 
 export function PaymentModal({
@@ -215,10 +214,6 @@ export function PaymentModal({
               : order.no_meja}
           </DialogTitle>
           <p className="text-muted-foreground text-sm">Silakan pilih metode pembayaran</p>
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-            </DialogClose>
         </DialogHeader>
 
         <div className="flex-grow overflow-y-auto px-4 pb-4 space-y-4">
