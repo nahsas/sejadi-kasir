@@ -282,7 +282,7 @@ export default function MenuPage() {
           </Card>
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
-          <Card className="mb-6 rounded-2xl">
+          <Card className="mb-6 bg-white rounded-2xl">
               <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
                 <div className="relative flex-grow w-full md:w-auto">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
