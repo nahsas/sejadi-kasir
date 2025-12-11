@@ -97,7 +97,7 @@ const PaymentBreakdownCard = ({
     icon: React.ReactNode;
     borderColor: string;
 }) => (
-    <Card className={cn("bg-white border-2", borderColor)}>
+    <Card className={cn("bg-white border-2 rounded-xl", borderColor)}>
         <CardContent className="p-4 flex flex-col gap-2">
             <div className="flex items-center gap-2">
                 <div className="p-2 bg-slate-100 rounded-md">
@@ -867,4 +867,5 @@ export default function ReportsPage() {
     
 
     
+
 
