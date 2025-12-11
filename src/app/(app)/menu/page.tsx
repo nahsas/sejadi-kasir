@@ -24,7 +24,7 @@ import { DiscountForm } from './discount-form';
 
 function StatCard({ title, value, icon: Icon, description, color }: { title: string, value: string, icon: React.ElementType, description: string, color: string }) {
   return (
-    <Card className={cn("relative overflow-hidden", color)}>
+    <Card className={cn("relative overflow-hidden rounded-2xl", color)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className="h-4 w-4 text-white/80" />
