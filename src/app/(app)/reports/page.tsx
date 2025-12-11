@@ -637,7 +637,7 @@ export default function ReportsPage() {
         <p className="text-muted-foreground">Analisis penjualan dan kinerja Anda.</p>
       </div>
 
-      <Card className="bg-white">
+      <Card className="bg-white rounded-2xl">
         <CardHeader className="flex flex-row items-center gap-4 space-y-0">
             <div className="p-3 rounded-md bg-yellow-100">
                 <Filter className="w-5 h-5 text-yellow-600" />
