@@ -5,6 +5,8 @@ import {
   Card,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -285,35 +287,39 @@ export default function HistoryPage() {
         />
       </div>
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Riwayat Transaksi Pembelian</h2>
-        <Badge variant="secondary">{filteredOrders.length} transaksi ditemukan</Badge>
-      </div>
-
-       {loading && <div className="text-center p-8">Memuat data riwayat...</div>}
-       {error && (
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3">
-                <AlertTriangle className="h-6 w-6"/>
-                <div>
-                    <p className="font-bold">Gagal memuat data</p>
-                    <p className="text-sm">{error}</p>
+      <Card className="bg-white rounded-2xl">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Riwayat Transaksi Pembelian</CardTitle>
+            <Badge variant="secondary">{filteredOrders.length} transaksi ditemukan</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading && <div className="text-center p-8">Memuat data riwayat...</div>}
+          {error && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6"/>
+                  <div>
+                      <p className="font-bold">Gagal memuat data</p>
+                      <p className="text-sm">{error}</p>
+                  </div>
+              </div>
+          )}
+          {!loading && !error && (
+            <div className="space-y-4">
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <OrderCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} />
+                ))
+              ) : (
+                <div className="text-center py-16 text-muted-foreground">
+                  <p>Tidak ada riwayat transaksi untuk filter yang dipilih.</p>
                 </div>
-            </div>
-        )}
-
-      {!loading && !error && (
-        <div className="space-y-4">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order) => (
-              <OrderCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} />
-            ))
-          ) : (
-            <div className="text-center py-16 text-muted-foreground">
-              <p>Tidak ada riwayat transaksi untuk filter yang dipilih.</p>
+              )}
             </div>
           )}
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
