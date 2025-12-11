@@ -77,6 +77,7 @@ export function useOrderNotification() {
             toast({
                 title: '🔔 Pesanan Baru Diterima!',
                 description: `Pesanan baru dari ${customer} telah diterima.`,
+                className: 'bg-white',
                 action: (
                     <Button onClick={() => router.push('/orders')} size="sm">
                         Lihat Pesanan
@@ -92,6 +93,7 @@ export function useOrderNotification() {
             toast({
                 title: '🔔 Item Baru Ditambahkan!',
                 description: `Item baru ditambahkan ke pesanan ${customer}.`,
+                className: 'bg-white',
                 action: (
                     <Button onClick={() => router.push('/orders')} size="sm">
                         Lihat Pesanan
