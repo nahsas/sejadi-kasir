@@ -256,7 +256,7 @@ export default function MenuPage() {
                   />
                 </div>
                 <Select value={menuFilterCategory} onValueChange={setMenuFilterCategory}>
-                  <SelectTrigger className="w-full md:w-[240px]">
+                  <SelectTrigger className="w-full md:w-[240px] bg-white">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4" />
                       <SelectValue placeholder="Filter Kategori" />
