@@ -221,7 +221,7 @@ export default function MenuPage() {
       </div>
       
       <Tabs defaultValue="menu">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto bg-slate-100">
           <TabsTrigger value="menu">Menu</TabsTrigger>
           <TabsTrigger value="stock">Stok</TabsTrigger>
           <TabsTrigger value="discount">Diskon</TabsTrigger>
@@ -349,6 +349,7 @@ export default function MenuPage() {
     
 
     
+
 
 
 
