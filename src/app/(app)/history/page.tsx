@@ -58,13 +58,13 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
   };
 
   const statusColor: { [key: string]: string } = {
-    selesai: 'bg-green-100 text-green-700 border-green-300',
-    diproses: 'bg-blue-100 text-blue-700 border-blue-300',
+    selesai: 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200',
+    diproses: 'bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200',
     cancelled: 'bg-red-100 text-red-700 border-red-300'
   };
   
   const statusBorder: { [key: string]: string } = {
-    selesai: 'border-green-400',
+    selesai: 'border-emerald-400',
     diproses: 'border-blue-400',
     cancelled: 'border-red-400'
   };
