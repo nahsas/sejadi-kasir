@@ -240,7 +240,7 @@ export default function MenuPage() {
                     <p className="text-sm text-muted-foreground">Tambah dan kelola menu kopi & makanan</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMenuFormOpen()} className="w-full md:w-auto">
+                <Button onClick={() => handleMenuFormOpen()} className="w-full md:w-auto rounded-lg">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Buat Menu Baru
                 </Button>
