@@ -38,6 +38,8 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
     router.push('/orders');
   }
 
+  const isPending = order.status.toLowerCase() === 'pending';
+
   return (
     <Card className={cn("shadow-lg hover:shadow-xl transform transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white border-2", order.status.toLowerCase() === 'pending' ? 'border-yellow-400' : 'border-blue-500')}>
       <CardContent className="p-4 flex flex-col h-full">
@@ -98,7 +100,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
             </div>
         </div>
         <div className="mt-4">
-             <Button onClick={handleRedirect} className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold">
+             <Button onClick={handleRedirect} className={cn("w-full font-bold text-white", isPending ? "bg-amber-600 hover:bg-amber-700" : "bg-blue-600 hover:bg-blue-700")}>
                 <Eye className="mr-2 h-4 w-4" />
                 Lihat Detail
              </Button>
