@@ -87,6 +87,14 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
       qris: `QRIS (${order.bank_qris || 'N/A'})`,
   }
 
+  const statusInfo = order.status ? {
+      label: order.status.toUpperCase(),
+      className: statusColor[order.status.toLowerCase()] || 'bg-gray-100 text-gray-700 border-gray-300'
+  } : {
+      label: 'UNKNOWN',
+      className: 'bg-gray-100 text-gray-700 border-gray-300'
+  };
+
   return (
     <Card className={cn("shadow-md border-l-4 flex flex-col", statusBorder[order.status.toLowerCase()])}>
       <CardContent className="p-4 space-y-4 flex-grow">
@@ -96,7 +104,7 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
               {order.location_type.toLowerCase() === "dine-in"
                 ? `Meja ${order.no_meja}`
                 : order.no_meja}
-              <Badge className={cn("text-xs capitalize", statusColor[order.status.toLowerCase()])}>{order.status}</Badge>
+              <Badge className={cn("text-xs capitalize", statusInfo.className)}>{statusInfo.label}</Badge>
             </h3>
             <div className="flex items-center gap-2 mt-2">
                 {order.metode_pembayaran && (

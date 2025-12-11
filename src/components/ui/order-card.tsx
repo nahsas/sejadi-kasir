@@ -2,7 +2,7 @@
 'use client';
 
 import { Order, MenuItem } from '@/lib/data';
-import { Badge } from '@/components/ui/badge';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,15 +14,14 @@ import { useRouter } from 'next/navigation';
 
 const statusConfig: {
   [key: string]: {
-    variant: 'default' | 'secondary' | 'destructive' | 'outline';
+    variant: Parameters<typeof badgeVariants>[0]['variant'];
     label: string;
-    color: string;
   };
 } = {
-  pending: { variant: 'secondary', label: 'Tertunda', color: 'bg-yellow-400 text-yellow-900' },
-  diproses: { variant: 'default', label: 'Diproses', color: 'bg-blue-500 text-white' },
-  selesai: { variant: 'outline', label: 'Selesai', color: 'bg-green-500 text-white' },
-  dibatalkan: { variant: 'destructive', label: 'Dibatalkan', color: 'bg-red-500 text-white' },
+  pending: { variant: 'warning', label: 'Tertunda' },
+  diproses: { variant: 'default', label: 'Diproses' },
+  selesai: { variant: 'outline', label: 'Selesai' },
+  dibatalkan: { variant: 'destructive', label: 'Dibatalkan' },
 };
 
 export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuItem[] }) {
@@ -48,7 +47,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
                 {order.location_type.toLowerCase() === 'dine_in' ? `Meja ${order.no_meja}` : order.no_meja}
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
-                <Badge className={statusInfo.color}>
+                <Badge variant={statusInfo?.variant}>
                     {statusInfo.label}
                 </Badge>
                 {order.location_area && (

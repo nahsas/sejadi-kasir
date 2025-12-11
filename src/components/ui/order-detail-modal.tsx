@@ -23,7 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Order, MenuItem, OrderItem, Additional } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -47,14 +47,14 @@ import { PaymentModal } from './payment-modal';
 const statusConfig: {
   [key: string]: {
     label: string;
-    color: string;
+    variant: Parameters<typeof badgeVariants>[0]['variant'];
   };
 } = {
-  pending: { label: 'PENDING', color: 'bg-yellow-400 text-yellow-900' },
-  diproses: { label: 'PROSES', color: 'bg-blue-500 text-white' },
-  selesai: { label: 'SELESAI', color: 'bg-green-500 text-white' },
-  dibatalkan: { label: 'BATAL', color: 'bg-red-500 text-white' },
-  cancelled: { label: 'BATAL', color: 'bg-red-500 text-white' },
+  pending: { label: 'PENDING', variant: 'warning' },
+  diproses: { label: 'PROSES', variant: 'default' },
+  selesai: { label: 'SELESAI', variant: 'outline' },
+  dibatalkan: { label: 'BATAL', variant: 'destructive' },
+  cancelled: { label: 'BATAL', variant: 'destructive' },
 };
 
 export function OrderDetailModal({
@@ -283,12 +283,14 @@ export function OrderDetailModal({
     onOpenChange(isOpen);
   };
 
+  const statusInfo = currentOrder ? statusConfig[currentOrder.status.toLowerCase()] : null;
+
   return (
     <>
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg p-0">
         {!currentOrder && <div className="p-8 text-center">No order selected.</div>}
-        {currentOrder && (
+        {currentOrder && statusInfo && (
           <>
             <DialogHeader className="p-4 bg-primary text-primary-foreground rounded-t-lg relative">
               <div className="flex justify-between items-center">
@@ -310,9 +312,9 @@ export function OrderDetailModal({
                   })}
                 </Badge>
                 <Badge
-                  className={cn(statusConfig[currentOrder.status.toLowerCase()]?.color)}
+                  variant={statusInfo.variant}
                 >
-                  {statusConfig[currentOrder.status.toLowerCase()]?.label}
+                  {statusInfo.label}
                 </Badge>
                 {currentOrder.location_area && (
                   <Badge variant="outline" className="bg-white/20 border-white/50 text-white">
