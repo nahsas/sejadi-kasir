@@ -322,7 +322,7 @@ export default function OrdersPage() {
           <Badge variant="outline" className="h-9 text-sm font-medium hidden md:flex">
             {allActiveOrders.length} pesanan aktif
           </Badge>
-          <Button onClick={fetchData} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
+          <Button onClick={fetchData} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground rounded-[20px]">
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
