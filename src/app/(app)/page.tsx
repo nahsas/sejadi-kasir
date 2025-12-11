@@ -232,11 +232,11 @@ export default function DashboardPage() {
                     <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full p-1 h-auto">
                         <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5">
                             Dine-in
-                            <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{dineInOrders.length}</Badge>
+                            <Badge className="bg-white text-primary data-[state=inactive]:bg-primary data-[state=inactive]:text-white rounded-full h-6 w-6 flex items-center justify-center">{dineInOrders.length}</Badge>
                         </TabsTrigger>
                         <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5">
                             Take Away
-                            <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{takeawayOrders.length}</Badge>
+                            <Badge className="bg-white text-primary data-[state=inactive]:bg-primary data-[state=inactive]:text-white rounded-full h-6 w-6 flex items-center justify-center">{takeawayOrders.length}</Badge>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
