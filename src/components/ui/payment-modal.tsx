@@ -384,8 +384,8 @@ export function PaymentModal({
             )}
         </div>
 
-        <DialogFooter className="p-4 bg-slate-50 border-t grid grid-cols-2 gap-2">
-            <Button onClick={handleFinishPayment} className="bg-green-600 hover:bg-green-700 text-white" disabled={isLoading}>
+        <DialogFooter className="p-4 bg-slate-50 border-t">
+            <Button onClick={handleFinishPayment} className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={isLoading}>
                 {isLoading ? "Memproses..." : (
                     <>
                         <Check className="mr-2 h-4 w-4" />
@@ -393,12 +393,6 @@ export function PaymentModal({
                     </>
                 )}
             </Button>
-             <DialogClose asChild>
-                <Button variant="secondary" className="bg-gray-300 text-gray-800 hover:bg-gray-400" disabled={isLoading}>
-                    <X className="mr-2 h-4 w-4" />
-                    Batal
-                </Button>
-             </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
