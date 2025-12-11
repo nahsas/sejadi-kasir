@@ -177,7 +177,7 @@ export function SidebarNav() {
   return (
     <>
       <Sidebar>
-        <SidebarHeader className="p-4">
+        <SidebarHeader className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
              <Image src="https://api.sejadikopi.com/storage/Logo/sejadi_logo.jpg" alt="Sejadi Kopi Logo" width={56} height={56} className="rounded-lg" unoptimized />
             <div>
