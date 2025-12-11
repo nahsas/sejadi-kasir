@@ -305,20 +305,10 @@ export function PaymentModal({
                             id="payment-amount"
                             type="number"
                             placeholder="Masukkan jumlah pembayaran"
-                            className="pl-8 pr-8"
+                            className="pl-8 pr-2"
                             value={paymentAmount}
                             onChange={(e) => setPaymentAmount(e.target.value)}
                         />
-                         {paymentAmount && (
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-muted-foreground"
-                                onClick={() => setPaymentAmount('')}
-                            >
-                                <X className="h-4 w-4"/>
-                            </Button>
-                        )}
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                         {quickAddAmounts.map(amount => (
