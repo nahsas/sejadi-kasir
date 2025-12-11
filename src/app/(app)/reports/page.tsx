@@ -812,7 +812,7 @@ export default function ReportsPage() {
                   placeholder="Cari pengeluaran..."
                   value={expenseSearch}
                   onChange={(e) => setExpenseSearch(e.target.value)}
-                  className="w-full bg-white rounded-md"
+                  className="w-full bg-white rounded-lg"
                 />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
@@ -846,7 +846,7 @@ export default function ReportsPage() {
                   placeholder="Cari transaksi..."
                   value={transactionSearch}
                   onChange={(e) => setTransactionSearch(e.target.value)}
-                  className="w-full bg-white rounded-md"
+                  className="w-full bg-white rounded-lg"
                 />
             </div>
         </CardHeader>
@@ -867,6 +867,7 @@ export default function ReportsPage() {
     
 
     
+
 
 
 
