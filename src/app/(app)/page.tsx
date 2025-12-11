@@ -218,7 +218,7 @@ export default function DashboardPage() {
         <StatCard title="Selesai" value={completedOrders !== null ? completedOrders.toString() : "..."} icon={CheckCircle2} description="Selesai hari ini" bgColor="bg-green-500" textColor="text-white" />
       </div>
 
-      <Card>
+      <Card className="bg-white">
         <CardHeader className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <CardTitle className="text-xl font-bold">Status Pesanan</CardTitle>
