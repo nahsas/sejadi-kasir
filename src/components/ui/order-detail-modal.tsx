@@ -339,7 +339,20 @@ export function OrderDetailModal({
                                     )}
                                 </p>
                                 <div className="flex items-center gap-1 flex-wrap">
-                                    {item.varian && <Badge variant="secondary" className="text-xs">{item.varian}</Badge>}
+                                    {item.varian && (
+                                      <Badge
+                                        variant="outline"
+                                        className={cn(
+                                          'text-xs',
+                                          item.varian.toLowerCase() === 'ice' &&
+                                            'border-blue-300 text-blue-700 bg-blue-100',
+                                          item.varian.toLowerCase() === 'hot' &&
+                                            'border-red-300 text-red-700 bg-red-100'
+                                        )}
+                                      >
+                                        {item.varian}
+                                      </Badge>
+                                    )}
                                     {addonNames.map((add, index) => (
                                         <Badge key={index} variant="outline" className="text-xs bg-blue-100 text-blue-800 border-blue-200">
                                             <PlusCircle className="mr-1 h-3 w-3" />
