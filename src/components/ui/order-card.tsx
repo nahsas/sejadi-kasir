@@ -100,7 +100,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
             </div>
         </div>
         <div className="mt-4">
-             <Button onClick={handleRedirect} className={cn("w-full font-bold text-white", isPending ? "bg-amber-600 hover:bg-amber-700" : "bg-blue-600 hover:bg-blue-700")}>
+             <Button onClick={handleRedirect} className={cn("w-full font-bold text-white rounded-xl", isPending ? "bg-amber-600 hover:bg-amber-700" : "bg-blue-600 hover:bg-blue-700")}>
                 <Eye className="mr-2 h-4 w-4" />
                 Lihat Detail
              </Button>
