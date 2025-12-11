@@ -159,7 +159,7 @@ export function SidebarNav() {
       <Link href={item.href}>
         <SidebarMenuButton
           isActive={pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))}
-          className="group flex items-center gap-4 rounded-lg px-4 py-3"
+          className="group flex items-center gap-4 rounded-xl px-4 py-3"
         >
           <div className={cn(
               "p-2 rounded-lg bg-gray-100 group-data-[active=true]:bg-white"
