@@ -228,9 +228,9 @@ export default function MenuPage() {
           <TabsTrigger value="category">Kategori</TabsTrigger>
         </TabsList>
         <TabsContent value="menu" className="mt-6">
-          <div className="space-y-4">
-            <Card className="rounded-2xl bg-card">
-              <CardContent className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 gap-4">
+          <div className="space-y-4 bg-white rounded-2xl p-4">
+            <Card className="shadow-none border-none">
+              <CardContent className="flex flex-col md:flex-row items-start md:items-center justify-between p-0 gap-4">
                   <div className="flex items-center gap-4 flex-grow">
                       <div className="p-3 bg-primary/10 rounded-lg">
                           <BookOpen className="w-8 h-8 text-primary" />
@@ -246,8 +246,8 @@ export default function MenuPage() {
                   </Button>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl">
-                <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
+            <Card className="shadow-none border-none">
+                <CardContent className="p-0 flex flex-col md:flex-row items-center gap-4">
                   <div className="relative flex-grow w-full md:w-auto">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
