@@ -288,13 +288,13 @@ export default function MenuPage() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     placeholder="Cari nama item..."
-                    className="pl-10 bg-white"
+                    className="pl-10 bg-white rounded-lg"
                     value={stockSearchTerm}
                     onChange={(e) => setStockSearchTerm(e.target.value)}
                   />
                 </div>
                 <Select value={stockFilterAvailability} onValueChange={setStockFilterAvailability}>
-                  <SelectTrigger className="w-full md:w-[240px] bg-white">
+                  <SelectTrigger className="w-full md:w-[240px] bg-white rounded-lg">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4" />
                       <SelectValue placeholder="Filter Ketersediaan" />
@@ -349,3 +349,4 @@ export default function MenuPage() {
     
 
     
+
