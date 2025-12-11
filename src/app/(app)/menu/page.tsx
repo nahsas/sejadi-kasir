@@ -42,7 +42,7 @@ function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick, 
     <Card className="mb-6 bg-card rounded-2xl">
       <CardContent className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 gap-4">
         <div className="flex items-center gap-4 flex-grow">
-          <div className="p-3 bg-primary/10 rounded-lg">
+          <div className="p-3 bg-white/20 rounded-lg">
              <Icon className="w-8 h-8 text-primary" />
           </div>
           <div>
@@ -51,7 +51,7 @@ function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick, 
           </div>
         </div>
         {children || (
-            <Button onClick={onButtonClick} disabled={buttonDisabled} className="w-full md:w-auto">
+            <Button onClick={onButtonClick} disabled={buttonDisabled} className="w-full md:w-auto rounded-lg">
               <PlusCircle className="mr-2 h-4 w-4" />
               {buttonText}
             </Button>
