@@ -288,7 +288,7 @@ export default function OrdersPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="Cari nomor meja, catatan, atau nama menu..."
-            className="pl-10"
+            className="pl-10 bg-white"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -332,12 +332,12 @@ export default function OrdersPage() {
       <Card>
         <CardHeader className="flex items-center justify-center p-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
-            <TabsList className="grid grid-cols-2 rounded-[25px] bg-gray-200 p-1 h-auto">
-              <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+            <TabsList className="grid grid-cols-2 rounded-full bg-gray-200 p-1 h-auto">
+              <TabsTrigger value="dine-in" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Dine-in
                 <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{filteredDineInOrders.length}</Badge>
               </TabsTrigger>
-              <TabsTrigger value="take-away" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+              <TabsTrigger value="take-away" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
                 Take Away
                 <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{filteredTakeawayOrders.length}</Badge>
               </TabsTrigger>
