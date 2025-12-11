@@ -51,7 +51,7 @@ function TabHeader({ icon: Icon, title, description, buttonText, onButtonClick, 
           </div>
         </div>
         {children || (
-            <Button onClick={onButtonClick} disabled={buttonDisabled} className="w-full md:w-auto rounded-lg">
+            <Button onClick={onButtonClick} disabled={buttonDisabled} className="w-full md:w-auto rounded-xl">
               <PlusCircle className="mr-2 h-4 w-4" />
               {buttonText}
             </Button>
@@ -349,5 +349,6 @@ export default function MenuPage() {
     
 
     
+
 
 
