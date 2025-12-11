@@ -90,7 +90,7 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
   };
 
   return (
-    <Card className={cn("shadow-md border-l-4 flex flex-col", statusBorder[order.status.toLowerCase()])}>
+    <Card className={cn("shadow-md flex flex-col bg-white border-2", statusBorder[order.status.toLowerCase()])}>
       <CardContent className="p-4 space-y-4 flex-grow">
         <div className="flex justify-between items-start">
           <div>
