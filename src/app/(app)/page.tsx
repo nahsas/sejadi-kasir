@@ -205,7 +205,7 @@ export default function DashboardPage() {
             />
             <StatCard 
                 title="Pesanan Hari Ini" 
-                value={todaysOrdersCount !== null ? todaysOrdersCount.toString() : "..."} 
+                value={todaysOrdersCount !== null ? todaysOrdersCount.toString() : "..."} _
                 icon={ClipboardList} 
                 description="Total pesanan" 
                 bgColor="bg-gradient-to-br from-yellow-400 to-amber-600" 
@@ -218,7 +218,7 @@ export default function DashboardPage() {
         <StatCard title="Selesai" value={completedOrders !== null ? completedOrders.toString() : "..."} icon={CheckCircle2} description="Selesai hari ini" bgColor="bg-green-500" textColor="text-white" />
       </div>
 
-      <Card className="bg-white">
+      <Card className="bg-white rounded-2xl">
         <CardHeader className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <CardTitle className="text-xl font-bold">Status Pesanan</CardTitle>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-center">
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
-                    <TabsList className="grid grid-cols-2 bg-gray-200 rounded-[25px] p-1 h-auto">
+                    <TabsList className="grid grid-cols-2 bg-gray-200 rounded-full p-1 h-auto">
                         <TabsTrigger value="dine-in" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-2 px-3 py-1.5">
                             Dine-in
                             <Badge className="bg-primary-foreground/90 text-primary rounded-full h-6 w-6 flex items-center justify-center">{dineInOrders.length}</Badge>
