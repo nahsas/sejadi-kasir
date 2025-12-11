@@ -801,7 +801,7 @@ export default function ReportsPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white">
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex-1">
                 <CardTitle className="text-xl">Pelacakan Pengeluaran</CardTitle>
@@ -835,7 +835,7 @@ export default function ReportsPage() {
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="bg-white">
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex-1">
                 <CardTitle className="text-xl">Riwayat Transaksi</CardTitle>
@@ -867,5 +867,6 @@ export default function ReportsPage() {
     
 
     
+
 
 
