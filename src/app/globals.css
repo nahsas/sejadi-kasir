@@ -29,7 +29,7 @@
     --chart-4: 25 60% 70%;
     --chart-5: 25 70% 80%;
     --radius: 0.5rem;
-    --sidebar-background: 28 55% 96%; /* Even creamier */
+    --sidebar-background: 0 0% 100%; /* Changed to white */
     --sidebar-foreground: 25 30% 20%;
     --sidebar-primary: 25 30% 37%;
     --sidebar-primary-foreground: 40 100% 97%;
