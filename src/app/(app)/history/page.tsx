@@ -18,6 +18,8 @@ import {
   Wallet,
   AlertTriangle,
   Eye,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Order, MenuItem } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
@@ -174,6 +176,8 @@ export default function HistoryPage() {
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 5;
 
   const fetchData = React.useCallback(async () => {
     setLoading(true);
@@ -237,6 +241,24 @@ export default function HistoryPage() {
   const totalRevenue = orders
     .filter((o) => o.status === "selesai")
     .reduce((sum, order) => sum + (order.total_after_discount ?? parseInt(order.total, 10)), 0);
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
 
   return (
@@ -307,8 +329,8 @@ export default function HistoryPage() {
           )}
           {!loading && !error && (
             <div className="space-y-4">
-              {filteredOrders.length > 0 ? (
-                filteredOrders.map((order) => (
+              {paginatedOrders.length > 0 ? (
+                paginatedOrders.map((order) => (
                   <OrderCard key={order.id} order={order} menuItems={menuItems} onDetailClick={handleDetailClick} />
                 ))
               ) : (
@@ -319,6 +341,23 @@ export default function HistoryPage() {
             </div>
           )}
         </CardContent>
+        {totalPages > 1 && (
+            <CardFooter className="flex justify-between items-center border-t pt-4">
+                <span className="text-sm text-muted-foreground">
+                    Halaman {currentPage} dari {totalPages}
+                </span>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1}>
+                        <ChevronLeft className="h-4 w-4 mr-2" />
+                        Sebelumnya
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                        Berikutnya
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                </div>
+            </CardFooter>
+        )}
       </Card>
     </div>
   );
