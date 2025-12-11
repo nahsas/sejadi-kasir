@@ -222,7 +222,7 @@ export default function DashboardPage() {
         <CardHeader className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <CardTitle className="text-xl font-bold">Status Pesanan</CardTitle>
-                <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground w-full sm:w-auto">
+                <Button onClick={handleRefresh} variant="outline" className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground w-full sm:w-auto rounded-[20px]">
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Segarkan
                 </Button>
