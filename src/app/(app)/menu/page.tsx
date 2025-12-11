@@ -228,53 +228,51 @@ export default function MenuPage() {
           <TabsTrigger value="category">Kategori</TabsTrigger>
         </TabsList>
         <TabsContent value="menu" className="mt-6">
-          <div className="space-y-4 bg-white rounded-2xl p-4">
-            <Card className="shadow-none border-none">
-              <CardContent className="flex flex-col md:flex-row items-start md:items-center justify-between p-0 gap-4">
-                  <div className="flex items-center gap-4 flex-grow">
-                      <div className="p-3 bg-primary/10 rounded-lg">
-                          <BookOpen className="w-8 h-8 text-primary" />
-                      </div>
-                      <div>
-                          <h3 className="text-lg font-bold">Kelola Menu</h3>
-                          <p className="text-sm text-muted-foreground">Tambah dan kelola menu kopi & makanan</p>
-                      </div>
+           <Card className="mb-4 bg-white rounded-2xl">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4 flex-grow">
+                  <div className="p-3 bg-primary/10 rounded-lg">
+                    <BookOpen className="w-8 h-8 text-primary" />
                   </div>
-                  <Button onClick={() => handleMenuFormOpen()} className="w-full md:w-auto">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Buat Menu Baru
-                  </Button>
-              </CardContent>
-            </Card>
-            <Card className="shadow-none border-none">
-                <CardContent className="p-0 flex flex-col md:flex-row items-center gap-4">
-                  <div className="relative flex-grow w-full md:w-auto">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      placeholder="Cari menu..."
-                      className="pl-10"
-                      value={menuSearchTerm}
-                      onChange={(e) => setMenuSearchTerm(e.target.value)}
-                    />
+                  <div>
+                    <h3 className="text-lg font-bold">Kelola Menu</h3>
+                    <p className="text-sm text-muted-foreground">Tambah dan kelola menu kopi & makanan</p>
                   </div>
-                  <Select value={menuFilterCategory} onValueChange={setMenuFilterCategory}>
-                    <SelectTrigger className="w-full md:w-[240px]">
-                      <div className="flex items-center gap-2">
-                        <Filter className="h-4 w-4" />
-                        <SelectValue placeholder="Filter Kategori" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Semua Kategori</SelectItem>
-                      {categories.map(cat => (
-                        <SelectItem key={cat.id} value={cat.id.toString()}>{cat.nama}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </CardContent>
-              </Card>
-          </div>
-          <Card className="mt-4 rounded-2xl bg-white">
+                </div>
+                <Button onClick={() => handleMenuFormOpen()} className="w-full md:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Buat Menu Baru
+                </Button>
+              </div>
+              <div className="flex flex-col md:flex-row items-center gap-4 pt-4 border-t">
+                <div className="relative flex-grow w-full md:w-auto">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Cari menu..."
+                    className="pl-10"
+                    value={menuSearchTerm}
+                    onChange={(e) => setMenuSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select value={menuFilterCategory} onValueChange={setMenuFilterCategory}>
+                  <SelectTrigger className="w-full md:w-[240px]">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      <SelectValue placeholder="Filter Kategori" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kategori</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id.toString()}>{cat.nama}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl bg-white">
             <CardContent className="p-4">
               <DataTable 
                   columns={menuColumnsWithCategories} 
@@ -345,5 +343,7 @@ export default function MenuPage() {
     </div>
   );
 }
+
+    
 
     
