@@ -329,7 +329,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      <Card>
+      <Card className="bg-white rounded-2xl shadow-lg">
         <CardHeader className="flex items-center justify-center p-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
             <TabsList className="grid grid-cols-2 rounded-full bg-gray-200 p-1 h-auto">
