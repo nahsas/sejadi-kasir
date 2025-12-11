@@ -253,7 +253,7 @@ export default function HistoryPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="Cari meja, pelanggan, atau item..."
-            className="pl-10"
+            className="pl-10 bg-white"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
