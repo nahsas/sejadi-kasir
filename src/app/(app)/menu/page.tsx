@@ -274,12 +274,14 @@ export default function MenuPage() {
                 </CardContent>
               </Card>
           </div>
-          <div className="w-full overflow-x-auto">
-            <DataTable 
-                columns={menuColumnsWithCategories} 
-                data={filteredMenuItems} 
-              />
-          </div>
+          <Card className="mt-4 rounded-2xl bg-white">
+            <CardContent className="p-4">
+              <DataTable 
+                  columns={menuColumnsWithCategories} 
+                  data={filteredMenuItems} 
+                />
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="stock" className="mt-6">
           <Card className="mb-6 rounded-2xl">
@@ -308,30 +310,36 @@ export default function MenuPage() {
                 </Select>
               </CardContent>
             </Card>
-          <div className="w-full overflow-x-auto">
-            <DataTable 
-                columns={stockColumnsWithHandlers}
-                data={filteredStockItems} 
-              />
-          </div>
+          <Card className="rounded-2xl bg-white">
+            <CardContent className="p-4">
+              <DataTable 
+                  columns={stockColumnsWithHandlers}
+                  data={filteredStockItems} 
+                />
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="discount" className="mt-6">
           <TabHeader icon={Percent} title="Kelola Diskon" description="Buat dan kelola promosi untuk item menu" buttonText="Buat Diskon Baru" onButtonClick={() => handleDiscountFormOpen()} />
-          <div className="w-full overflow-x-auto">
-            <DataTable 
-              columns={discountColumns({ onEdit: handleDiscountFormOpen, onDeleteSuccess: fetchData })}
-              data={discounts}
-            />
-          </div>
+          <Card className="rounded-2xl bg-white">
+            <CardContent className="p-4">
+              <DataTable 
+                columns={discountColumns({ onEdit: handleDiscountFormOpen, onDeleteSuccess: fetchData })}
+                data={discounts}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="category" className="mt-6">
           <TabHeader icon={Utensils} title="Kelola Kategori" description="Kelompokkan item menu ke dalam kategori" buttonText="Buat Kategori Baru" onButtonClick={() => handleCategoryFormOpen()} />
-          <div className="w-full overflow-x-auto">
-            <DataTable
-              columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
-              data={categories}
-            />
-          </div>
+          <Card className="rounded-2xl bg-white">
+            <CardContent className="p-4">
+              <DataTable
+                columns={categoryColumns({ onEdit: handleCategoryFormOpen, onDeleteSuccess: fetchData })}
+                data={categories}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
