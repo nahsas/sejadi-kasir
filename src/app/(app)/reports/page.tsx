@@ -653,7 +653,7 @@ export default function ReportsPage() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal bg-white",
                             !startDate && "text-muted-foreground"
                             )}
                         >
@@ -678,7 +678,7 @@ export default function ReportsPage() {
                         <Button
                             variant={"outline"}
                             className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal bg-white",
                             !endDate && "text-muted-foreground"
                             )}
                         >
@@ -700,7 +700,7 @@ export default function ReportsPage() {
             <div className="space-y-2">
                 <Label>Metode Pembayaran</Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                         <div className="flex items-center gap-2">
                             <Wallet className="h-4 w-4" />
                             <SelectValue placeholder="Semua Metode" />
@@ -863,4 +863,3 @@ export default function ReportsPage() {
     
 
     
-
