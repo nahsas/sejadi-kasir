@@ -16,11 +16,12 @@ const statusConfig: {
   [key: string]: {
     variant: Parameters<typeof badgeVariants>[0]['variant'];
     label: string;
+    className?: string;
   };
 } = {
   pending: { variant: 'warning', label: 'Tertunda' },
-  diproses: { variant: 'default', label: 'Diproses' },
-  selesai: { variant: 'outline', label: 'Selesai' },
+  diproses: { variant: 'default', label: 'Diproses', className: 'bg-blue-500 text-white' },
+  selesai: { variant: 'outline', label: 'Selesai', className: 'bg-green-500 text-white' },
   dibatalkan: { variant: 'destructive', label: 'Dibatalkan' },
 };
 
@@ -47,7 +48,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
                 {order.location_type.toLowerCase() === 'dine_in' ? `Meja ${order.no_meja}` : order.no_meja}
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
-                <Badge variant={statusInfo?.variant}>
+                <Badge variant={statusInfo?.variant} className={cn(statusInfo?.className)}>
                     {statusInfo.label}
                 </Badge>
                 {order.location_area && (

@@ -30,7 +30,7 @@ const statusConfig: {
   };
 } = {
   pending: { label: 'PENDING', color: 'bg-yellow-400 text-yellow-900' },
-  diproses: { label: 'PROSES', color: 'bg-primary text-primary-foreground' },
+  diproses: { label: 'PROSES', color: 'bg-blue-500 text-white' },
   selesai: { label: 'SELESAI', color: 'bg-green-500 text-white' },
   dibatalkan: { label: 'BATAL', color: 'bg-red-500 text-white' },
 };

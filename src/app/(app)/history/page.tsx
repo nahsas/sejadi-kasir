@@ -14,7 +14,6 @@ import {
   Calendar,
   CheckCircle,
   Wallet,
-  Receipt,
   AlertTriangle,
   Eye,
 } from "lucide-react";
@@ -60,11 +59,13 @@ function OrderCard({ order, menuItems, onDetailClick }: { order: Order; menuItem
 
   const statusColor: { [key: string]: string } = {
     selesai: 'bg-green-100 text-green-700 border-green-300',
+    diproses: 'bg-blue-100 text-blue-700 border-blue-300',
     cancelled: 'bg-red-100 text-red-700 border-red-300'
   };
   
   const statusBorder: { [key: string]: string } = {
     selesai: 'border-green-400',
+    diproses: 'border-blue-400',
     cancelled: 'border-red-400'
   };
   
@@ -178,7 +179,7 @@ export default function HistoryPage() {
     try {
       const today = format(startOfToday(), 'yyyy-MM-dd');
       const [orderRes, menuRes] = await Promise.all([
-        fetch(`https://api.sejadikopi.com/api/pesanans?status=selesai,cancelled&payment_date=${today}`),
+        fetch(`https://api.sejadikopi.com/api/pesanans?status=selesai,cancelled,diproses&payment_date=${today}`),
         fetch('https://api.sejadikopi.com/api/menu')
       ]);
 
@@ -267,16 +268,9 @@ export default function HistoryPage() {
         <span>Hari ini: {format(new Date(), "dd MMMM yyyy", { locale: id })}</span>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         <StatCard
-          title="TOTAL TRANSAKSI"
-          value={orders.length.toString()}
-          icon={Receipt}
-          bgColor="bg-yellow-100"
-          iconColor="text-yellow-600"
-        />
-        <StatCard
-          title="SELESAI"
+          title="TRANSAKSI SELESAI"
           value={completedOrders.toString()}
           icon={CheckCircle}
           bgColor="bg-green-100"
