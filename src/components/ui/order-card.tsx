@@ -39,7 +39,7 @@ export function OrderCard({ order, menuItems }: { order: Order; menuItems: MenuI
   }
 
   return (
-    <Card className={cn("shadow-md bg-white border-2", order.status.toLowerCase() === 'pending' ? 'border-yellow-400' : 'border-blue-500')}>
+    <Card className={cn("shadow-lg hover:shadow-xl transform transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white border-2", order.status.toLowerCase() === 'pending' ? 'border-yellow-400' : 'border-blue-500')}>
       <CardContent className="p-4 flex flex-col h-full">
         <div className="flex-grow space-y-3">
             <div className="flex justify-between items-start">
