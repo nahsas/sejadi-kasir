@@ -88,4 +88,11 @@
     @apply bg-cover bg-center bg-no-repeat;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('https://api.sejadikopi.com/storage/images/login_bg.jpg');
   }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
