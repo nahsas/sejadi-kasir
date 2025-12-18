@@ -10,23 +10,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Order, MenuItem, Additional } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Landmark, QrCode, Pencil, Check, Receipt, Info, Tag, Loader2, X } from 'lucide-react';
+import { Landmark, QrCode, Pencil, Check, Receipt, Info, Tag, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { printPaymentStruk } from '@/lib/print-utils';
 import { appEventEmitter } from '@/lib/event-emitter';
 
 const banks = [
-    { id: 'BCA', name: 'BCA', logo: 'https://vamos-api.sejadikopi.com/storage/images/BCA.png' },
-    { id: 'BRI', name: 'BRI', logo: 'https://vamos-api.sejadikopi.com/storage/images/BRI.png' },
-    { id: 'BSI', name: 'BSI', logo: 'https://vamos-api.sejadikopi.com/storage/images/BSI.png' },
+    { id: 'BCA', name: 'BCA', logo: 'https://api.sejadikopi.com/storage/images/BCA.png' },
+    { id: 'BRI', name: 'BRI', logo: 'https://api.sejadikopi.com/storage/images/BRI.png' },
+    { id: 'BSI', name: 'BSI', logo: 'https://api.sejadikopi.com/storage/images/BSI.png' },
 ]
 
 export function PaymentModal({
@@ -205,10 +204,6 @@ export function PaymentModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md p-0 flex flex-col max-h-[90vh]">
         <DialogHeader className="p-4 text-center items-center sticky top-0 bg-background z-10 border-b">
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
             <div className="p-3 bg-green-100 rounded-full mb-2">
                 <Receipt className="w-6 h-6 text-green-600" />
             </div>
